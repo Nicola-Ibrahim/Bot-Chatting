@@ -1,0 +1,92 @@
+[tool.poetry]
+name = "fast-api"
+version = "0.1.0"
+description = ""
+authors = ["Nicola Ibrahim <nicolaibrahim969@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = []
+
+[tool.poetry.dependencies]
+python = "^3.12.1"
+python-dotenv = "^0.21.1"
+pip = "^23.0"
+fastapi = {extras = ["all"], version = "^0.110.1"}
+uvicorn = {extras = ["standard"], version = "^0.29.0"}
+install = "^1.3.5"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+pre-commit = "^3.0.4"
+flake8 = "^6.0.0"
+isort = "^5.12.0"
+yapf = "^0.32.0"
+colorlog = "^6.7.0"
+
+
+# ==== black ====
+[tool.black]
+line-length = 119
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+# ==== isort ====
+[tool.isort]
+profile = "black"
+line_length = 119
+multi_line_output = 5
+skip = [".venv/", "venv/"]
+skip_glob = ["**/migrations/*.py"]
+
+# ==== yapf ====
+[tool.yapf]
+based_on_style = "google"
+align_closing_bracket_with_visual_indent = true
+coalesce_brackets = true
+column_limit = 119
+dedent_closing_brackets = true
+
+# ==== PyLint ====
+[tool.pylint.MASTER]
+load-plugins = [
+    "pylint_django",
+]
+
+[tool.pylint.FORMAT]
+max-line-length = 119
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+    "missing-docstring",
+    "invalid-name",
+]
+
+[tool.pylint.DESIGN]
+max-parents = 13
+
+[tool.pylint.TYPECHECK]
+generated-members = [
+    "REQUEST",
+    "acl_users",
+    "aq_parent",
+    "[a-zA-Z]+_set{1,2}",
+    "save",
+    "delete",
+]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,22 @@
+[flake8]
+ignore = C101, D403, F403, F401, F405, I100, I201, W503, W504, F821, Q000, E501, A001, A003, Q000, T201, I101, A002
+exclude =
+    .git,
+    __pycache__,
+    .venv
+    .tox,
+    */migrations/*,
+    */static/CACHE/*,
+    docs,
+    node_modules,
+    venv,
+    .venv,
+    .script-venv
+filename = *.py
+accept-encodings = utf-8
+inline-quotes = single
+max-complexity = 12
+max-linenumber = 500
+max-line-length = 119
+multiline-quotes = double
+# per-file-ignores =
