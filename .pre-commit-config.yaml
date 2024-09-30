@@ -21,14 +21,8 @@ repos:
       - id: check-docstring-first
       - id: detect-private-key
 
-  # - repo: https://github.com/pycqa/isort
-  #   rev: 5.12.0
-  #   hooks:
-  #     - id: isort
-  #       additional_dependencies: [toml]
-
   - repo: https://github.com/psf/black
-    rev: 22.10.0
+    rev: 23.1.0  # Updated to match pyproject.toml
     hooks:
       - id: black
         additional_dependencies: [toml]
@@ -39,6 +33,13 @@ repos:
       - id: pyupgrade
         args: [--py310-plus]
 
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.5.1
+    hooks:
+      - id: mypy
+        additional_dependencies: [toml]
+
+
   - repo: https://github.com/PyCQA/flake8
     rev: 6.0.0
     hooks:
@@ -48,11 +49,16 @@ repos:
           - flake8-builtins
           - flake8-coding
           - flake8-import-order
-          - flake8-polyfill
           - flake8-quotes
           - flake8-print
 
-# sets up .pre-commit-ci.yaml to ensure pre-commit dependencies stay up to date
+  # Uncomment if you want to use isort
+  # - repo: https://github.com/pycqa/isort
+  #   rev: 5.12.0
+  #   hooks:
+  #     - id: isort
+  #       additional_dependencies: [toml]
+
 ci:
   autoupdate_schedule: weekly
   skip: []

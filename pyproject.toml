@@ -1,29 +1,34 @@
 [tool.poetry]
 name = "fast-api"
 version = "0.1.0"
-description = ""
+description = "FastAPI application"
 authors = ["Nicola Ibrahim <nicolaibrahim969@gmail.com>"]
 license = "MIT"
 readme = "README.md"
-packages = []
+packages = [{ include = "src" }]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12.1"
 python-dotenv = "^0.21.1"
-pip = "^23.0"
-fastapi = {extras = ["all"], version = "^0.110.1"}
-uvicorn = {extras = ["standard"], version = "^0.29.0"}
-install = "^1.3.5"
+fastapi = { extras = ["all"], version = "^0.110.1" }
+uvicorn = { extras = ["standard"], version = "^0.29.0" }
+httpx = "^0.24.0"                                        # For making async requests in tests
+pydantic = "^2.1.0"                                      # For model validation (required by FastAPI)
 
+# Adding test-related dependencies
+pytest = "^7.4.0"          # For testing
+pytest-asyncio = "^0.20.3" # For testing async FastAPI routes
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
-pre-commit = "^3.0.4"
 flake8 = "^6.0.0"
 isort = "^5.12.0"
-yapf = "^0.32.0"
+mypy = "^1.5.1"
+pylint = "^2.15.0"
 colorlog = "^6.7.0"
-
+pre-commit = "^3.0.4"
+pytest-cov = "^4.1.0" # For coverage reports
 
 # ==== black ====
 [tool.black]
@@ -40,6 +45,7 @@ exclude = '''
   | buck-out
   | build
   | dist
+    | migrations/
 )/
 '''
 
@@ -51,27 +57,17 @@ multi_line_output = 5
 skip = [".venv/", "venv/"]
 skip_glob = ["**/migrations/*.py"]
 
-# ==== yapf ====
-[tool.yapf]
-based_on_style = "google"
-align_closing_bracket_with_visual_indent = true
-coalesce_brackets = true
-column_limit = 119
-dedent_closing_brackets = true
-
-# ==== PyLint ====
+# ==== pylint ====
 [tool.pylint.MASTER]
-load-plugins = [
-    "pylint_django",
-]
+load-plugins = ["pylint_django"]
 
 [tool.pylint.FORMAT]
 max-line-length = 119
 
 [tool.pylint."MESSAGES CONTROL"]
 disable = [
-    "missing-docstring",
-    "invalid-name",
+    "missing-docstring", # Disable docstring warning for brevity
+    "invalid-name",      # Disable naming convention warnings
 ]
 
 [tool.pylint.DESIGN]
@@ -86,6 +82,21 @@ generated-members = [
     "save",
     "delete",
 ]
+
+# ==== mypy ====
+[tool.mypy]
+python_version = "3.12"
+files = [
+    "src/",
+    "tests/",
+] # Specify the source and test directories for type checking
+ignore_missing_imports = true
+strict = true # Enables strict type checking
+
+# ==== flake8 ====
+[tool.flake8]
+max-line-length = 119
+exclude = ".venv,venv,migrations,tests"
 
 [build-system]
 requires = ["poetry-core"]
