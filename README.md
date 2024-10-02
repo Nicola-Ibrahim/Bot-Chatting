@@ -11,10 +11,7 @@ auth_service/
 │   │   │   │   ├── auth.py        # Authentication endpoints (login, logout)
 │   │   │   │   ├── users.py       # User management endpoints (create, update, delete users)
 │   │   │   └── responses.py       # Standardized response models
-│   │   ├── v2/
-│   │   │   ├── endpoints/
-│   │   │   │   ├── auth.py        # Future version for auth
-│   │   │   │   ├── users.py       # Future version for user management
+│   │   │   
 │   ├── core/
 │   │   ├── config.py               # Configuration settings (e.g., database URL, JWT secret)
 │   │   ├── security.py             # Security-related functions (hashing, JWT token generation)

@@ -6,7 +6,7 @@ from pydantic import AnyHttpUrl, BaseModel, PostgresDsn, field_validator
 # The `Settings` class defines a set of configuration settings including project name, CORS origins, database connection
 # details, and configuration options.
 class Settings(BaseModel):
-    PROJECT_NAME: str
+    PROJECT_NAME: str = "Auth Service"
 
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
 
@@ -33,36 +33,36 @@ class Settings(BaseModel):
             return v
         raise ValueError(v)
 
-    POSTGRES_SERVER: str
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_DB: str
-    DATABASE_URI: PostgresDsn | None = None
+    # POSTGRES_SERVER: str
+    # POSTGRES_USER: str
+    # POSTGRES_PASSWORD: str
+    # POSTGRES_DB: str
+    # DATABASE_URI: PostgresDsn | None = None
 
-    @field_validator("DATABASE_URI", check_fields=True)
-    def assemble_db_connection(cls, v: str | None, values: dict[str, Any]) -> Any:
-        """
-        Check the databaase uri, if it is string then return it as correct
-        if is not then constructs the database URI with taken values from
-        Setting models
+    # @field_validator("DATABASE_URI", check_fields=True)
+    # def assemble_db_connection(cls, v: str | None, values: dict[str, Any]) -> Any:
+    #     """
+    #     Check the databaase uri, if it is string then return it as correct
+    #     if is not then constructs the database URI with taken values from
+    #     Setting models
 
-        Args:
-            v (Optional[str]): The current value of the field being validated (DATABASE_URI in this case).
-            values (Dict[str, Any]): A dictionary containing the current values of all fields in the model.
+    #     Args:
+    #         v (Optional[str]): The current value of the field being validated (DATABASE_URI in this case).
+    #         values (Dict[str, Any]): A dictionary containing the current values of all fields in the model.
 
-        Returns:
-            Any: _description_
+    #     Returns:
+    #         Any: _description_
 
-        """
-        if isinstance(v, str):
-            return v
-        return PostgresDsn.build(
-            scheme="postgresql",
-            user=values.get("POSTGRES_USER"),
-            password=values.get("POSTGRES_PASSWORD"),
-            host=values.get("POSTGRES_SERVER"),
-            path=f"/{values.get('POSTGRES_DB') or ''}",
-        )
+    #     """
+    #     if isinstance(v, str):
+    #         return v
+    #     return PostgresDsn.build(
+    #         scheme="postgresql",
+    #         user=values.get("POSTGRES_USER"),
+    #         password=values.get("POSTGRES_PASSWORD"),
+    #         host=values.get("POSTGRES_SERVER"),
+    #         path=f"/{values.get('POSTGRES_DB') or ''}",
+    #     )
 
     class Config:
         case_sensitive = True

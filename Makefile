@@ -1,93 +1,93 @@
+lang := en  # Language for translation
 
-lang:=en
+# Catch all targets and store them in a variable
+COMMANDS := $(shell grep -E '^[a-zA-Z0-9_-]+:' Makefile | sed 's/:.*//')
 
-.PHONY: superuser
-superuser:
-	poetry run python dj_rest_api/manage.py makesuperuser
-users:
-	poetry run python dj_rest_api/manage.py generate_users
+# Define color codes
+RED    := \033[31m
+GREEN  := \033[32m
+YELLOW := \033[33m
+BLUE   := \033[34m
+RESET  := \033[0m
 
-.PHONY: lint
-lint:
+.PHONY: $(COMMANDS)  # Declare all commands as PHONY
+
+
+list:  # List all available commands with descriptions
+	@printf "$(YELLOW)Available commands:$(RESET)\n"
+	@printf "$(YELLOW)=====================$(RESET)\n"
+	@printf "\n"
+	@printf "%-20s  %s\n" "Command" "Description"  # Header without colors
+	@printf "$(YELLOW)---------------------  --------------------$(RESET)\n"
+	@for cmd in $(COMMANDS); do \
+		desc=$$(grep "^$$cmd:" Makefile | sed 's/.*# //'); \
+		printf "%-20s  %s\n" "$$cmd" "$$desc"; \
+	done
+
+
+# Define your targets with descriptions
+superuser:  # Create a superuser
+	poetry run python src/scripts/create_superuser.py
+
+users:  # Generate sample users
+	poetry run python src/scripts/generate_users.py
+
+lint:  # Run linters
 	poetry run pre-commit run --all-files
 
+migrations:  # Create new migrations
+	poetry run alembic revision --autogenerate -m "Migration message"
 
-.PHONY: migrations
-migrations:
-	poetry run python dj_rest_api/manage.py makemigrations
+migrate:  # Apply database migrations
+	poetry run alembic upgrade head
 
-.PHONY: migrate
-migrate:
-	poetry run python dj_rest_api/manage.py migrate
+runserver:  # Start the FastAPI server
+	fastapi run src/main.py --reload
 
-.PHONY: run-server
-runserver:
-	uvicorn src.main:app --reload
-
-
-.PHONY: install
-install:
+install:  # Install project dependencies
 	poetry install
 
-
-.PHONY: install-pre-commit
-install-pre-commit:
+install-pre-commit:  # Install pre-commit hooks
 	poetry run pre-commit uninstall
 	poetry run pre-commit install
 
-.PHONY: update
-update: migrations migrate	install-pre-commit
+update:  # Update the database and install pre-commit hooks
+	migrations migrate install-pre-commit
 
+shell:  # Open Django shell
+	poetry run python src/scripts/shell.py
 
-.PHONY: shell
-shell:
-	poetry run python dj_rest_api/manage.py shell_plus
+flush-tokens:  # Flush expired tokens
+	poetry run python src/scripts/flush_expired_tokens.py
 
-.PHONY: flush-tokens
-flush-tokens:
-	poetry run python dj_rest_api/manage.py flushexpiredtokens.py
+check-deploy:  # Check deployment readiness
+	poetry run python src/scripts/check_deploy.py
 
-.PHONY: check-deploy
-check-deploy:
-	poetry run python dj_rest_api/manage.py check.py --deploy
+db-graph:  # Generate database graph
+	poetry run python src/scripts/db_graph.py
 
+test:  # Run tests
+	poetry run pytest -v -rs -s -n auto --show-capture=no
 
-.PHONY: db-graph
-db-graph:
-	poetry run python dj_rest_api/manage.py graph_models.py -a -g -o lineup_models_visualized.png
-
-
-.PHONY: test
-test:
-	poetry run python -m pytest -v -rs -s -n auto --show-capture=no
-
-.PHONY: test-cov
-test-cov:
-	poetry run python -m pytest --cov
+test-cov:  # Run tests with coverage
+	poetry run pytest --cov
 	poetry run coverage html
 
-.PHONY: dev-docker
-dev-docker:
+dev-docker:  # Start development Docker containers
 	docker-compose -f docker-compose.dev.yml up --build -d --force-recreate
 
-.PHONY: prod-docker
-prod-docker:
+prod-docker:  # Start production Docker containers
 	docker-compose -f docker-compose.yml up --build -d --force-recreate
 
-.PHONY: generate_key
-generate_key:
-	openssl rand -base64 32 > dj_rest_api/config/settings/.keys/jwtHS256.key
+generate_key:  # Generate a new JWT key
+	openssl rand -base64 32 > src/config/.keys/jwtHS256.key
 
-
-.PHONY: translate
-translate:
+translate:  # Create translation messages
 	django-admin makemessages -l ${lang} --ignore .venv
 
-.PHONY: compile-translate
-compile-translate:
+compile-translate:  # Compile translation messages
 	django-admin compilemessages --ignore=.venv
 
+run-celery:  # Run Celery worker
+	celery -A src.celery_app worker --loglevel=info --pool=solo
 
-.PHONY: run-celery
-run-celery:
-	celery -A dj_rest_api worker --loglevel=info --pool=solo
