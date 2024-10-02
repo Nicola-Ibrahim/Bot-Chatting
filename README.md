@@ -1,3 +1,6 @@
+
+```bash
+
 auth_service/
 ├── app/
 │   ├── __init__.py
@@ -42,3 +45,4 @@ auth_service/
 ├── pre_commit_config.yaml          # Pre-commit hooks configuration
 ├── README.md                       # Documentation for the microservice
 └── .gitignore                      # Files and directories to ignore by Git
+```
