@@ -1,18 +1,28 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Path, Query
+from fastapi import APIRouter, FastAPI, Path, Query, WebSocket
+from fastapi.responses import FileResponse
 
-router = APIRouter()
+router = APIRouter(prefix="/v1")
 
 
 @router.get("/")
-def hello():
-    return "hii"
+async def get():
+    return FileResponse("src/templates/index.html")
 
 
-@router.get("/dd")
-def hello():
-    return "hii"
+@router.get("/f")
+async def getf():
+    return FileResponse("src/templates/index.html")
+
+
+@router.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    print(websocket)
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        await websocket.send_text(f"Message text was: {data}")
 
 
 # @router.get("/posts/{post_id}", response_model=PostResponse)

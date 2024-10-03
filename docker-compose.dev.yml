@@ -1,0 +1,42 @@
+services:
+  app:
+    build:
+      context: . # Points to the current directory where the Dockerfile is located
+      dockerfile: Dockerfile # The Dockerfile used to build the application image
+    volumes:
+      - .:/code # Mounts the current directory (source code) into the container for development
+    env_file:
+      - .env
+    expose:
+      - "8000" # Exposes port 8000 internally for communication within the Docker network (not publicly exposed)
+    networks:
+      - internal_network # Connects the app service to the internal network for secure communication with other services
+    depends_on:
+      - postgres_db # Ensures that the PostgreSQL database starts before the app service
+
+  postgres_db:
+    image: postgres:17.0 # Use the latest stable version of PostgreSQL
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/postgresql/data # Mounts a persistent volume to store PostgreSQL data, ensuring data is not lost on container restart
+    networks:
+      - internal_network # PostgreSQL service is on the same internal network, allowing only internal services to access it
+
+  nginx:
+    image: nginx:1.27 # Use the latest stable version of NGINX
+    volumes:
+      - ./nginx/default.dev.conf:/etc/nginx/conf.d/default.conf # Maps the local NGINX configuration file to the container for customization
+    ports:
+      - "80:80" # Exposes port 80 to the public, allowing external traffic to reach the NGINX server
+    depends_on:
+      - app # Ensures the app service starts before NGINX begins
+    networks:
+      - internal_network # Connects NGINX to the internal network to communicate with the app service
+
+volumes:
+  db_data: # Defines a volume for storing PostgreSQL data persistently
+
+networks:
+  internal_network: # Single internal network for all services
+    driver: bridge # Creates an internal bridge network for isolated service communication

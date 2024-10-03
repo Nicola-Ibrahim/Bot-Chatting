@@ -1,0 +1,25 @@
+services:
+  app:
+    image: myfastapi:latest # Uses a pre-built FastAPI image for production (no build required)
+    environment:
+      - DATABASE_URL=${DATABASE_URL} # Use an external database URL (ensure this is set in your environment)
+    expose:
+      - "8000"
+    networks:
+      - internal_network # Use a single internal network for all services
+    restart: always # Ensure the service restarts on failure for reliability
+
+  nginx:
+    image: nginx:latest # Production NGINX image for reverse proxy
+    volumes:
+      - ./nginx/default.prod.conf:/etc/nginx/conf.d/default.conf # Production NGINX configuration file
+    ports:
+      - "80:80" # Expose port 80 to the public for HTTP traffic
+    depends_on:
+      - app # Ensure FastAPI app is running before NGINX starts
+    networks:
+      - internal_network # Use the same internal network for communication
+    restart: always # Automatically restart NGINX in case of failure
+
+networks:
+  internal_network: # Single internal network for all services
