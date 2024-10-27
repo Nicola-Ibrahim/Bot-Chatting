@@ -2,7 +2,7 @@
 ```bash
 
 auth_service/
-├── app/
+├── src/
 │   ├── __init__.py
 │   ├── main.py                     # Entry point for the FastAPI app
 │   ├── api/
