@@ -1,8 +1,9 @@
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.core.config import settings
-from src.utils.helpers import import_members_from_package
+from src.shared.utils.helpers import import_members_from_package
+
+from .config import settings
 
 
 def get_application():

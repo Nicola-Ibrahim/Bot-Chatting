@@ -8,12 +8,12 @@ router = APIRouter(prefix="/v1")
 
 @router.get("/")
 async def get():
-    return FileResponse("src/templates/index.html")
+    return FileResponse("src/api/templates/index.html")
 
 
 @router.get("/f")
 async def getf():
-    return FileResponse("src/templates/index.html")
+    return FileResponse("src/api/templates/index.html")
 
 
 @router.websocket("/ws")
