@@ -1,45 +1,60 @@
 
 ```bash
-
 auth_service/
-├── src/
+├── app/
 │   ├── __init__.py
-│   ├── main.py                     # Entry point for the FastAPI app
+│   ├── main.py                         # Entry point for the FastAPI app
+│
 │   ├── api/
 │   │   ├── v1/
 │   │   │   ├── endpoints/
-│   │   │   │   ├── auth.py        # Authentication endpoints (login, logout)
-│   │   │   │   ├── users.py       # User management endpoints (create, update, delete users)
-│   │   │   └── responses.py       # Standardized response models
-│   │   │   
-│   ├── core/
-│   │   ├── config.py               # Configuration settings (e.g., database URL, JWT secret)
-│   │   ├── security.py             # Security-related functions (hashing, JWT token generation)
-│   │   ├── database.py             # Database connection logic (ORM setup)
-│   ├── models/
-│   │   ├── user.py                 # User model definition (Pydantic and SQLAlchemy)
-│   │   ├── role.py                 # Role model for user roles (if applicable)
-│   ├── services/
-│   │   ├── auth_service.py         # Business logic for authentication
-│   │   ├── user_service.py         # Business logic for user management
-│   ├── dependencies/
-│   │   ├── authentication.py        # Dependency functions for handling authentication
-│   │   ├── user_management.py       # Dependency functions for user management
-│   ├── schemas/
-│   │   ├── user_schema.py          # Pydantic schemas for user data validation
-│   │   ├── auth_schema.py          # Pydantic schemas for authentication data validation
-│   ├── tests/
-│   │   ├── test_auth.py            # Tests for authentication functionality
-│   │   ├── test_users.py           # Tests for user management functionality
-│   ├── utils/
-│   │   ├── helpers.py              # Helper functions (e.g., email verification, password strength)
-├── alembic/
-│   ├── env.py                      # Alembic configuration for database migrations
-│   ├── versions/                   # Directory for migration scripts
-├── .env                            # Environment variables
-├── pyproject.toml                  # Dependency management
-├── Dockerfile                      # Docker configuration for containerization
-├── pre_commit_config.yaml          # Pre-commit hooks configuration
-├── README.md                       # Documentation for the microservice
-└── .gitignore                      # Files and directories to ignore by Git
+│   │   │   │   ├── auth.py             # Authentication API routes
+│   │   │   │   ├── users.py            # User management routes
+│   │   │   │   ├── orders.py           # Order management routes
+│   │   │   └── responses.py            # Standardized response models
+│   │   ├── dependencies/
+│   │   │   ├── auth_dependency.py      # Dependency for authentication
+│   │   │   └── user_dependency.py      # Dependency for user management
+│
+│   ├── core/                           # Business Logic Layer
+│   │   ├── services/
+│   │   │   ├── auth_service.py         # Business logic for authentication
+│   │   │   ├── user_service.py         # Business logic for user operations
+│   │   │   ├── order_service.py        # Business logic for order operations
+│   │   ├── schemas/
+│   │   │   ├── user_schema.py          # Pydantic schemas for user validation
+│   │   │   ├── auth_schema.py          # Pydantic schemas for authentication
+│   │   │   └── order_schema.py         # Pydantic schemas for orders
+│
+│   ├── persistence/                    # Persistence Layer
+│   │   ├── database.py                 # Database setup and connection management
+│   │   ├── models/                     # ORM model definitions
+│   │   │   ├── user.py                 # User model
+│   │   │   └── role_model.py           # Role model (optional)
+│   │   ├── repositories/               # Repository for each model’s CRUD operations
+│   │   │   ├── user_repo.py            # User repository for DB interactions
+│   │   │   ├── order_repo.py           # Order repository for DB interactions
+│   │   │   └── role_repo.py            # Role repository (optional)
+│
+│   ├── config/                         # Configuration and Environment
+│   │   ├── config.py                   # Configuration settings (e.g., database URL, JWT secret)
+│   │   ├── security.py                 # Security and encryption utilities (JWT handling, password hashing)
+│   │   ├── logging_config.py           # Centralized logging setup
+│
+│   ├── utils/                          # Utilities and Helpers
+│   │   ├── helpers.py                  # Helper functions (e.g., email validation)
+│   │   └── constants.py                # Constants for shared values (e.g., role names)
+│
+│   ├── tests/                          # Tests
+│   │   ├── test_auth.py                # Tests for authentication
+│   │   ├── test_users.py               # Tests for user management
+│   │   ├── test_orders.py              # Tests for order management
+│   │   └── fixtures.py                 # Common test fixtures
+│
+├── .env                                # Environment variables
+├── pyproject.toml                      # Dependency management
+├── Dockerfile                          # Docker configuration for containerization
+├── pre_commit_config.yaml              # Pre-commit hooks configuration
+├── README.md                           # Documentation for the microservice
+└── .gitignore                          # Files and directories to ignore by Git
 ```
