@@ -130,5 +130,30 @@ class ConversationApplicationGateway:
         Returns:
             list[Message]: A list of recent messages within the token limit.
         """
-        conversation = self._repository.get_by_id(conversation_id)
+        conversation: Conversation = self._repository.get_by_id(conversation_id)
         return conversation.get_recent_messages(max_recent=max_recent, token_limit=token_limit)
+
+    def read_plain_message_responses(
+        conversation_id: uuid.UUID, tokenizer: AbstractTokenizerService, max_recent: int = 5, token_limit: int = 500
+    ) -> list[Message]:
+
+        conversation = self._repository.get_by_id(conversation_id)
+
+        # Retrieve recent messages
+        last_messages = chat.get_last_n_messages(max_recent)
+
+        selected_messages = []
+        total_tokens = 0
+
+        for message in reversed(last_messages):
+            prompt_tokens = tokenizer.tokenize(message.text)
+            response_tokens = tokenizer.tokenize(message.response.text if message.response else "")
+            total = len(prompt_tokens) + len(response_tokens)
+
+            if total_tokens + total > token_limit:
+                break
+
+            selected_messages.insert(0, message)
+            total_tokens += total
+
+        return selected_messages

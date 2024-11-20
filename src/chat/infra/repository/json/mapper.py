@@ -1,41 +1,44 @@
 from typing import Any
 
-from ....domain.entities.conversation import Chat
+from ....domain.entities.conversation import Conversation
 from ....domain.entities.message import Content
 
 
-class JsonChatMapper:
+class JsonConversationMapper:
     """
-    Mapper for converting between Chat and Content domain models
+    Mapper for converting between Conversation and Content domain models
     and their JSON-serializable representations.
     """
 
     @staticmethod
-    def chat_to_json(chat: Chat) -> dict[str, Any]:
+    def conversation_to_json(conversation: Conversation) -> dict[str, Any]:
         """
-        Converts a Chat domain model into a JSON-serializable dictionary.
+        Converts a Conversation domain model into a JSON-serializable dictionary.
 
         Args:
-            chat (Chat): The Chat domain model.
+            conversation (Conversation): The Conversation domain model.
 
         Returns:
-            dict[str, Any]: JSON-serializable dictionary for the Chat.
+            dict[str, Any]: JSON-serializable dictionary for the Conversation.
         """
-        return {"chat_id": chat.id, "messages": [JsonChatMapper.prompt_to_json(message) for message in chat.messages]}
+        return {
+            "conversation_id": conversation.id,
+            "messages": [JsonConversationMapper.prompt_to_json(message) for message in conversation.messages],
+        }
 
     @staticmethod
-    def chat_from_json(data: dict[str, Any]) -> Chat:
+    def conversation_from_json(data: dict[str, Any]) -> Conversation:
         """
-        Converts a JSON dictionary to a Chat domain model.
+        Converts a JSON dictionary to a Conversation domain model.
 
         Args:
-            data (dict[str, Any]): JSON dictionary with chat data.
+            data (dict[str, Any]): JSON dictionary with conversation data.
 
         Returns:
-            Chat: A Chat domain model populated from the JSON data.
+            Conversation: A Conversation domain model populated from the JSON data.
         """
-        messages = [JsonChatMapper.prompt_from_json(prompt_data) for prompt_data in data.get("messages", [])]
-        return Chat(chat_id=data["chat_id"], messages=messages)
+        messages = [JsonConversationMapper.prompt_from_json(prompt_data) for prompt_data in data.get("messages", [])]
+        return Conversation(conversation_id=data["conversation_id"], messages=messages)
 
     @staticmethod
     def prompt_to_json(message: Content) -> dict[str, Any]:

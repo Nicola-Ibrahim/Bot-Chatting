@@ -1,26 +1,33 @@
 from abc import ABC, abstractmethod
+from typing import List, Optional
 
-from chat.domain.entities.conversation import Chat
+from ...domain.entities.conversation import Conversation
 
 
 class AbstractConversationRepository(ABC):
-    """Abstract repository interface for managing memory storage in chat sessions."""
+    """Abstract repository interface for managing conversation sessions."""
 
     @abstractmethod
-    def get_by_id(self, chat_id: str) -> Chat:
-        """Fetches all memory entries for the specified chat session."""
+    def get_by_id(self, chat_id: str) -> Optional[Conversation]:
+        """Fetches a conversation aggregate by its ID."""
         pass
 
     @abstractmethod
-    def save(self, chat: Chat) -> Chat:
+    def save(self, conversation: Conversation) -> None:
+        """Persists a conversation aggregate."""
         pass
 
     @abstractmethod
     def delete(self, chat_id: str) -> None:
-        """Clears all stored memory entries for the specified chat session."""
+        """Deletes a conversation aggregate by its ID."""
         pass
 
-    # @abstractmethod
-    # def list_all_chats(self) -> list[Chat]:
-    #     """Lists all chat IDs with existing memory files."""
-    #     pass
+    @abstractmethod
+    def list_all_chats(self) -> List[str]:
+        """Lists all conversation IDs available in the repository."""
+        pass
+
+    @abstractmethod
+    def get_recent_chats(self, limit: int = 20) -> List[Conversation]:
+        """Fetches a list of recent chats."""
+        pass

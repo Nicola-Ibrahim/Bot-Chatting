@@ -1,12 +1,38 @@
-from typing import Any, Dict, List, Optional, Union
-
 from pydantic import AnyHttpUrl, BaseModel, PostgresDsn, field_validator
 
 
-# The `Settings` class defines a set of configuration settings including project name, CORS origins, database connection
-# details, and configuration options.
+class LogConfig(BaseModel):
+    """Logging configuration to be set for the server"""
+
+    LOGGER_NAME: str = "chat"
+    LOG_FORMAT: str = "%(levelprefix)s | %(asctime)s | %(message)s"
+    LOG_LEVEL: str = "DEBUG"
+
+    # Logging config
+    version: int = 1
+    disable_existing_loggers: bool = False
+    formatters: dict = {
+        "default": {
+            "()": "uvicorn.logging.DefaultFormatter",
+            "fmt": LOG_FORMAT,
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    }
+    handlers: dict = {
+        "default": {
+            "formatter": "default",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stderr",
+        },
+    }
+    loggers: dict = {
+        LOGGER_NAME: {"handlers": ["default"], "level": LOG_LEVEL},
+    }
+
+
 class Settings(BaseModel):
-    PROJECT_NAME: str = "Auth Service"
+    PROJECT_NAME: str = "Bot Chatting"
+    LOGGING: LogConfig = LogConfig()
 
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
 

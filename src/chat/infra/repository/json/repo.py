@@ -1,54 +1,54 @@
-from ....application.interface.chat_repository import AbstractChatRepository
-from ....domain.value_objects.chat import Chat
+from ....application.interfaces.conversation_repository import AbstractConversationRepository
+from ....domain.entities.conversation import Conversation
 from .file_handler import JsonFileHandler
-from .mapper import JsonChatMapper
+from .mapper import JsonConversationMapper
 
 
-class JsonFileMemoryRepository(AbstractChatRepository):
+class JsonFileConversationRepository(AbstractConversationRepository):
     """
-    Repository for managing chat data stored in JSON files.
+    Repository for managing conversation data stored in JSON files.
     """
 
     def __init__(self):
-        self.file_handler = JsonFileHandler("chat_memories")
+        self.file_handler = JsonFileHandler("conversation_data")
 
-    def get_by_id(self, chat_id: str) -> Chat:
+    def get_by_id(self, conversation_id: str) -> Conversation:
         """
-        Fetches a chat aggregate by ID.
+        Fetches a conversation aggregate by ID.
 
         Args:
-            chat_id (str): Unique identifier for the chat.
+            conversation_id (str): Unique identifier for the conversation.
 
         Returns:
-            Chat: The Chat domain model.
+            Conversation: The Conversation domain model.
         """
-        data = self.file_handler.read(chat_id)
-        return JsonChatMapper.chat_from_json(data)
+        data = self.file_handler.read(conversation_id)
+        return JsonConversationMapper.conversation_from_json(data)
 
-    def save(self, chat: Chat) -> None:
+    def save(self, conversation: Conversation) -> None:
         """
-        Saves or updates a chat aggregate.
+        Saves or updates a conversation aggregate.
 
         Args:
-            chat (Chat): The Chat domain model to save.
+            conversation (Conversation): The Conversation domain model to save.
         """
-        data = JsonChatMapper.chat_to_json(chat)
-        self.file_handler.write(chat.id, data)
+        data = JsonConversationMapper.conversation_to_json(conversation)
+        self.file_handler.write(conversation.id, data)
 
-    def delete(self, chat_id: str) -> None:
+    def delete(self, conversation_id: str) -> None:
         """
-        Deletes a chat by ID.
+        Deletes a conversation by ID.
 
         Args:
-            chat_id (str): Unique identifier for the chat.
+            conversation_id (str): Unique identifier for the conversation.
         """
-        self.file_handler.delete(chat_id)
+        self.file_handler.delete(conversation_id)
 
-    # def list_all_chats(self) -> list[str]:
-    #     """
-    #     Lists all existing chat IDs.
+    def list_all_conversations(self) -> list[str]:
+        """
+        Lists all existing conversation IDs.
 
-    #     Returns:
-    #         list[str]: List of chat IDs.
-    #     """
-    #     return self.file_handler.list_files()
+        Returns:
+            list[str]: List of conversation IDs.
+        """
+        return self.file_handler.list_files()
