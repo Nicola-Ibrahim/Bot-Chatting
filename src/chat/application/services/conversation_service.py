@@ -1,13 +1,15 @@
 import uuid
 
-from ...domain import MessageDomainService
-from ...domain.entities.conversation import Conversation
-from ...domain.entities.message import Message
-from ..interfaces.ai_services import AbstractResponseGeneratorService, AbstractTokenizerService
+from chat.domain.entities.conversation import Conversation
+from chat.domain.entities.message import Message
+from src.shared.domain.exception import InValidOperationException
+from src.shared.domain.result import Result
+
+from ..interfaces.ai_services import AbstractResponseGeneratorService
 from ..interfaces.conversation_repository import AbstractConversationRepository
 
 
-class ConversationApplicationGateway:
+class ConversationApplicationService:
     """
     Orchestrator for managing conversation-related operations. This class handles messages
     between domain models, domain services, and infrastructure services. It provides
@@ -17,40 +19,40 @@ class ConversationApplicationGateway:
 
     def __init__(
         self,
-        conversation_download_service: ConversationDownloadService,
+        conversation_downloader: ConversationDownloader,
         repository: AbstractConversationRepository,
         response_generator: AbstractResponseGeneratorService,
         tokenizer: AbstractTokenizerService,
-        feedback_repo: AbstractFeedbackRepository,
     ):
         """
         Initializes the gateway with necessary services and repositories.
 
         Args:
-            conversation_download_service (ConversationDownloadService): Service for downloading conversation data.
+            conversation_downloader (ConversationDownloader): Service for downloading conversation data.
             repository (AbstractConversationRepository): Repository for storing and retrieving conversations.
             response_generator (AbstractResponseGeneratorService): Service for generating responses.
             tokenizer (AbstractTokenizerService): Tokenizer for managing token-related constraints.
-            feedback_repo (AbstractFeedbackRepository): Repository for managing feedback data.
         """
-        self._conversation_download_service = conversation_download_service
+        self._conversation_downloader = conversation_downloader
         self._repository = repository
         self._response_generator = response_generator
         self._tokenizer = tokenizer
-        self._feedback_repo = feedback_repo
 
-    def start_conversation(self) -> Conversation:
+    def create_conversation(self) -> Result:
         """
-        Starts a new conversation session and stores it in the repository.
+        Creates a new conversation session and stores it in the repository.
 
         Returns:
-            Conversation: A newly created Conversation instance.
+            Result: A Result containing either the created Conversation or an error.
         """
-        conversation = Conversation.create()
-        self._repository.save(conversation)
-        return conversation
+        result = Conversation.create()
 
-    def get_conversation_by_id(self, conversation_id: uuid.UUID) -> Conversation:
+        # Save the conversation to the repository
+        self._repository.save(result.value)
+
+        return result
+
+    def get_conversation_by_id(self, conversation_id: uuid.UUID) -> Result:
         """
         Retrieves a conversation by its unique identifier.
 
@@ -58,67 +60,100 @@ class ConversationApplicationGateway:
             conversation_id (uuid.UUID): The unique ID of the conversation.
 
         Returns:
-            Conversation: The retrieved Conversation instance.
+            Result: A Result containing the retrieved Conversation or an error.
         """
-        return self._repository.get_by_id(conversation_id)
+        conversation = self._repository.get_by_id(conversation_id)
 
-    def add_message(self, conversation_id: uuid.UUID, message_text: str) -> Message:
+        result = Conversation.from_existing(conversation=conversation)
+
+        return result
+
+    def add_message(self, conversation_id: uuid.UUID, text: str) -> Result:
         """
         Adds a new message to a specific conversation and generates a response.
 
         Args:
             conversation_id (uuid.UUID): The unique ID of the conversation.
-            message_text (str): The text of the new message.
+            text (str): The text of the new message.
 
         Returns:
-            Message: The created message instance.
+            Result: A Result containing the created message or an error.
         """
-        conversation = self._repository.get_by_id(conversation_id)
-        response = self._response_generator.generate_answer(message_text)
-        conversation.add_message(message_text=message_text, response_text=response)
-        self._repository.save(conversation)
-        return conversation.get_last_message()
 
-    def regenerate_or_edit_message(self, conversation_id: uuid.UUID, message_id: uuid.UUID, text: str) -> str:
+        conversation = self._repository.get_by_id(conversation_id)
+
+        conversation: Conversation = Conversation.from_existing(conversation=conversation)
+
+        response = self._response_generator.generate_answer(text)
+
+        # Add the message and generate the response
+        result = conversation.add_message(text=text, response=response)
+
+        self._repository.save(conversation=conversation)
+
+        return result
+
+    def regenerate_or_edit_message(self, conversation_id: uuid.UUID, message_id: uuid.UUID, text: str) -> Result:
         """
         Regenerates the response for a specific message in a conversation.
 
         Args:
-            message_id (uuid.UUID): The unique ID of the conversation.
+            conversation_id (uuid.UUID): The unique ID of the conversation.
             message_id (uuid.UUID): The unique ID of the message.
-            message_text (str): The new message text for the response generation.
+            text (str): The new message text for the response generation.
 
         Returns:
-            str: The regenerated response text.
+            Result: A Result containing the regenerated response or an error.
         """
-        conversation: Conversation = self._repository.get_by_id(conversation_id)
+        conversation_result = self.get_conversation_by_id(conversation_id)
+        if conversation_result.is_error:
+            return conversation_result
+
+        conversation = conversation_result.value
         new_response = self._response_generator.generate(text)
+
+        # Edit or regenerate the message
         conversation.regenerate_or_edit_message(message_id=message_id, text=text, response=new_response)
         self._repository.save(conversation)
-        return new_response
 
-    def delete_conversation(self, conversation_id: uuid.UUID) -> None:
+        return Result.success(new_response)
+
+    def delete_conversation(self, conversation_id: uuid.UUID) -> Result:
         """
         Deletes a conversation session from the repository.
 
         Args:
             conversation_id (uuid.UUID): The unique ID of the conversation to delete.
-        """
-        self._repository.delete(conversation_id=conversation_id)
 
-    def download_conversation(self, conversation_id: uuid.UUID) -> None:
+        Returns:
+            Result: A Result indicating the outcome of the delete operation.
+        """
+        conversation_result = self.get_conversation_by_id(conversation_id)
+        if conversation_result.is_error:
+            return conversation_result
+
+        self._repository.delete(conversation_id)
+        return Result.success(None)
+
+    def download_conversation(self, conversation_id: uuid.UUID) -> Result:
         """
         Downloads the content of a conversation using the specified download service.
 
         Args:
             conversation_id (uuid.UUID): The unique ID of the conversation to download.
-        """
-        conversation = self._repository.get_by_id(conversation_id)
-        self._conversation_download_service.download_conversation(conversation)
 
-    def get_recent_messages(
-        self, conversation_id: uuid.UUID, max_recent: int = 5, token_limit: int = 500
-    ) -> list[Message]:
+        Returns:
+            Result: A Result indicating the outcome of the download operation.
+        """
+        conversation_result = self.get_conversation_by_id(conversation_id)
+        if conversation_result.is_error:
+            return conversation_result
+
+        conversation = conversation_result.value
+        self._conversation_downloader.download_conversation(conversation)
+        return Result.success(None)
+
+    def get_recent_messages(self, conversation_id: uuid.UUID, max_recent: int = 5, token_limit: int = 500) -> Result:
         """
         Retrieves recent messages from a conversation, respecting a token limit.
 
@@ -128,26 +163,43 @@ class ConversationApplicationGateway:
             token_limit (int, optional): The maximum token limit for the context. Defaults to 500.
 
         Returns:
-            list[Message]: A list of recent messages within the token limit.
+            Result: A Result containing a list of messages or an error.
         """
-        conversation: Conversation = self._repository.get_by_id(conversation_id)
-        return conversation.get_recent_messages(max_recent=max_recent, token_limit=token_limit)
+        conversation_result = self.get_conversation_by_id(conversation_id)
+        if conversation_result.is_error:
+            return conversation_result
+
+        conversation = conversation_result.value
+        recent_messages = conversation.get_recent_messages(max_recent=max_recent, token_limit=token_limit)
+        return Result.success(recent_messages)
 
     def read_plain_message_responses(
-        conversation_id: uuid.UUID, tokenizer: AbstractTokenizerService, max_recent: int = 5, token_limit: int = 500
-    ) -> list[Message]:
+        self, conversation_id: uuid.UUID, max_recent: int = 5, token_limit: int = 500
+    ) -> Result:
+        """
+        Retrieves the most recent plain message responses from a conversation.
 
-        conversation = self._repository.get_by_id(conversation_id)
+        Args:
+            conversation_id (uuid.UUID): The unique ID of the conversation.
+            max_recent (int, optional): The maximum number of recent messages to retrieve. Defaults to 5.
+            token_limit (int, optional): The maximum token limit for the context. Defaults to 500.
 
-        # Retrieve recent messages
-        last_messages = chat.get_last_n_messages(max_recent)
+        Returns:
+            Result: A Result containing a list of message responses or an error.
+        """
+        conversation_result = self.get_conversation_by_id(conversation_id)
+        if conversation_result.is_error:
+            return conversation_result
+
+        conversation = conversation_result.value
+        last_messages = conversation.get_last_n_messages(max_recent)
 
         selected_messages = []
         total_tokens = 0
 
         for message in reversed(last_messages):
-            prompt_tokens = tokenizer.tokenize(message.text)
-            response_tokens = tokenizer.tokenize(message.response.text if message.response else "")
+            prompt_tokens = self._tokenizer.tokenize(message.text)
+            response_tokens = self._tokenizer.tokenize(message.response.text if message.response else "")
             total = len(prompt_tokens) + len(response_tokens)
 
             if total_tokens + total > token_limit:
@@ -156,4 +208,4 @@ class ConversationApplicationGateway:
             selected_messages.insert(0, message)
             total_tokens += total
 
-        return selected_messages
+        return Result.success(selected_messages)

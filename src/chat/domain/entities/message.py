@@ -1,114 +1,120 @@
 from dataclasses import dataclass, field
+from datetime import datetime
 
 from src.shared.domain.entity import Entity
 
+from ....shared.domain.result import Result
 from ..exceptions import InValidOperationException
-from ..result_model import Result
 from ..value_objects.content import Content
 from ..value_objects.feedback import Feedback
 
 
 @dataclass
 class Message(Entity):
-    """Represents a series of messages and responses within a conversation."""
+    """Represents a series of contents and responses within a conversation."""
 
-    _messages: list[Content] = field(default_factory=list)
+    timestamp: datetime = field(default_factory=datetime.now)
+
+    _content: list[Content] = field(default_factory=list)
 
     # def __post_init__(self):
     #     """
-    #     Enforces the business rule: An message must have at least one message.
-    #     Raises a InValidOperationException if no messages are provided.
+    #     Enforces the business rule: An content must have at least one content.
+    #     Raises a InValidOperationException if no contents are provided.
     #     """
-    #     if not self._messages:
-    #         return Result(error=InValidOperationException("An message must contain at least one message."))
+    #     if not self._content:
+    #         return Result(error=InValidOperationException("An content must contain at least one content."))
 
     @property
-    def all_messages(self) -> list[Content]:
-        """Returns all messages in the message."""
-        return self._messages
+    def all_content(self) -> list[Content]:
+        """Returns all contents ."""
+        return self._content
 
     @property
-    def message_count(self) -> int:
-        """Returns the total number of messages in the message."""
-        return len(self._messages)
+    def content_count(self) -> int:
+        """Returns the total number of contents ."""
+        return len(self._content)
 
     @classmethod
-    def create(cls, initial_message: Content) -> Result:
+    def create(cls, initial_content: Content) -> Result:
         """
-        Factory method to create a new Message instance.
+        Factory method to create a new content instance.
 
         Args:
-            initial_message (Content): The initial message to include in the message.
+            initial_content (Content): The initial content to include .
 
         Returns:
-            Message: A new Message instance.
+            content: A new content instance.
         """
-        if not initial_message:
+        if not initial_content:
             return Result.failure(
-                InValidOperationException("An initial message must be supplied when creating an message.")
+                InValidOperationException("An initial content must be supplied when creating an content.")
             )
 
         obj = super().__new__(cls)
-        obj._messages = [initial_message]  # Initialize the messages list
+        obj._content = [initial_content]  # Initialize the contents list
 
-        return Result.success(obj)
+        obj = cls()
+        obj._content.append(initial_content)
 
-    def add_message(self, message: Content) -> None:
+        return Result.success(value=obj)
+
+    def add_content(self, content: Content) -> None:
         """
-        Adds a new message to this message.
+        Adds a new content to this content.
 
         Args:
-            message (Content): The message to add.
+            content (Content): The content to add.
         """
-        self._messages.append(message)
+        self._content.append(content)
 
-    def get_latest_message(self) -> Result:
-        """Returns the most recent message."""
-        if self._messages:
-            return Result.success(self._messages[-1])
-        return Result.failure(InValidOperationException("No messages available in the message."))
+    def get_latest_content(self) -> Result:
+        """Returns the most recent content."""
+        if self._content:
+            return Result.success(self._content[-1])
+        return Result.failure(InValidOperationException("No contents available ."))
 
-    def add_message_feedback(self, message_index: int, feedback: Feedback) -> None:
+    def add_content_feedback(self, content_index: int, feedback: Feedback) -> None:
         """
-        Adds feedback to a specific message within the message.
+        Adds feedback to a specific content with.
 
         Args:
-            message_index (int): The index of the message to add feedback to.
+            content_index (int): The index of the content to add feedback to.
             feedback (Feedback): The feedback object to add.
 
         Raises:
-            InValidOperationException: If the specified message index is invalid.
+            InValidOperationException: If the specified content index is invalid.
         """
-        message = self._get_message_by_index(message_index)
-        message.add_feedback(feedback)
+        content = self._get_content_by_index(content_index)
+        content.add_feedback(feedback)
 
-    def update_message_feedback(self, message_index: int, feedback: Feedback) -> None:
+    def update_content_feedback(self, content_index: int, feedback: Feedback) -> None:
         """
-        Updates feedback for a specific message within the message.
+        Updates feedback for a specific content with.
 
         Args:
-            message_index (int): The index of the message to update feedback for.
+            content_index (int): The index of the content to update feedback for.
             feedback (Feedback): The new feedback object.
 
         Raises:
-            InValidOperationException: If the specified message index is invalid.
+            InValidOperationException: If the specified content index is invalid.
         """
-        message = self._get_message_by_index(message_index)
-        message.update_feedback(feedback)
+        content = self._get_content_by_index(content_index)
+        content.update_feedback(feedback)
 
-    def _get_message_by_index(self, index: int) -> Result:
+    def _get_content_by_index(self, index: int) -> Result:
         """
-        Retrieves a specific message by its index in the message.
+        Retrieves a specific content by its index .
 
         Args:
-            index (int): The index of the message to retrieve.
+            index (int): The index of the content to retrieve.
 
         Returns:
-            Content: The message at the specified index.
+            Content: The content at the specified index.
 
         Raises:
             InValidOperationException: If the index is out of bounds.
         """
-        if index < 0 or index >= len(self._messages):
-            return Result.failure(InValidOperationException(f"Invalid message index: {index}"))
-        return Result.success(self._messages[index])
+        if index < 0 or index >= len(self._content):
+            return Result.failure(InValidOperationException(f"Invalid content index: {index}"))
+        return Result.success(self._content[index])

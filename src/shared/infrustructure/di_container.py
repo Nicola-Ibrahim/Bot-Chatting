@@ -1,6 +1,6 @@
 from dependency_injector import containers, providers
 
-from src.chat.infra.di_container import ChatDIContainer
+from src.chat.infra.di import ChatAppDIContainer
 
 
 class AppContainer(containers.DeclarativeContainer):
@@ -10,4 +10,4 @@ class AppContainer(containers.DeclarativeContainer):
         ]
     )
 
-    chat = providers.Container(ChatDIContainer)
+    chat = providers.Container(ChatAppDIContainer)

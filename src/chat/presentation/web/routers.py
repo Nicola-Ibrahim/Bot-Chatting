@@ -3,20 +3,41 @@ import os
 import threading
 
 import pandas as pd
-from app.bot.streamer import FlaskStreamer
-from flask import Blueprint, Response, abort, current_app, jsonify, render_template, request, send_file
-from generation.message.memory import MemoryManager
-from generation.message.runners import generate_answer_from_question
-from utils import text_helpers
+from dependency_injector.wiring import Provide, inject
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, responses, status
 
-from chat.application.interface.feedback import FileFeedbackManager
-from shared.infra.logging.loggers import FileLogger
+from src.shared.domain.result import Result
 
-file_feedback_manager = FileFeedbackManager('bot_feedback.txt')
+from ...application.services.conversation_service import ConversationApplicationService
+from ...infra.di import ChatAppDIContainer
+from ..contract.conversation import ConversationResponseSchema, MessageResponseSchema
+
+file_feedback_manager = FileFeedbackManager("bot_feedback.txt")
 memory_manager = MemoryManager()
-logger = FileLogger(__name__, 'prompt_pipeline_stage')
+logger = FileLogger(__name__, "prompt_pipeline_stage")
 
-chat_page = Blueprint('chat_page', __name__, template_folder='templates')
+
+router = APIRouter(
+    prefix="/v1/chat",
+    tags=["chats"],
+    responses={404: {"description": "Not found"}},
+)
+
+
+@router.get("/create", response_model=ConversationResponseSchema)
+@inject
+async def create_conversation(
+    conversation_service: ConversationApplicationService = Depends(Provide[ChatAppDIContainer.conversation_service]),
+) -> dict:
+    result: Result = conversation_service.create_conversation()
+
+    return result.match(
+        on_success=lambda conversation: ConversationResponseSchema(
+            id=str(conversation.id),
+            messages=[MessageResponseSchema(id=str(msg.id)) for msg in conversation.all_messages],
+        ),
+        on_error=lambda error: HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)),
+    )
 
 
 @chat_page.route("/")
@@ -40,9 +61,9 @@ def dataset():
     """
 
     structure = []
-    csv_folder = current_app.config['CSV_DATA_FOLDER']
+    csv_folder = current_app.config["CSV_DATA_FOLDER"]
     for filename in os.listdir(csv_folder):
-        if filename.endswith('.csv'):
+        if filename.endswith(".csv"):
             # Get the full file path
             file_path = os.path.join(csv_folder, filename)
             # Read the CSV file into a DataFrame
@@ -81,7 +102,7 @@ def generate_answer_from_prompt_api():
         str: HTML-formatted and highlighted answer to the user's query.
     """
     try:
-        message = request.args.get('msg')
+        message = request.args.get("msg")
 
         # Validate the input message using the valid_prompt function
         if not valid_prompt(message):
@@ -118,7 +139,7 @@ def generate_answer_from_prompt_api():
             answer = answer.replace("\n", "<br>")
             yield json.dumps({"chunk": "", "answer": answer})
 
-        return Response(generate(), mimetype='application/json')
+        return Response(generate(), mimetype="application/json")
 
     except Exception as e:
         logger.error("An Exception occured during processing the message: ", e)
@@ -159,43 +180,43 @@ def get_image(filename):
         Response: The image file in PNG format.
     """
     print(filename)
-    return send_file(f'image/{filename}.png', mimetype='image/png')
+    return send_file(f"image/{filename}.png", mimetype="image/png")
 
 
 # Route to get all feedbacks
-@chat_page.route('/feedbacks', methods=['GET'])
+@chat_page.route("/feedbacks", methods=["GET"])
 def get_all_feedback():
     feedbacks = file_feedback_manager.get_feedback()
     return jsonify(feedbacks), 200
 
 
 # Route to get a specific feedback by ID
-@chat_page.route('/feedbacks/<int:feedback_id>', methods=['GET'])
+@chat_page.route("/feedbacks/<int:feedback_id>", methods=["GET"])
 def get_feedback(feedback_id):
     feedbacks = file_feedback_manager.get_feedback()
-    feedback = next((fb for fb in feedbacks if fb['id'] == feedback_id), None)
+    feedback = next((fb for fb in feedbacks if fb["id"] == feedback_id), None)
     if feedback is None:
         return abort(404, description=f"Feedback with ID {feedback_id} not found.")
     return jsonify(feedback), 200
 
 
 # Route to add a new feedback (POST request)
-@chat_page.route('/feedbacks', methods=['POST'])
+@chat_page.route("/feedbacks", methods=["POST"])
 def add_feedback():
-    if not request.json or not 'feedback' in request.json:
+    if not request.json or not "feedback" in request.json:
         return abort(400, description="Invalid input. 'comment' field is required.")
 
-    feedback_data = {"user": request.json.get('user', 'Anonymous'), "feedback": request.json['feedback']}
+    feedback_data = {"user": request.json.get("user", "Anonymous"), "feedback": request.json["feedback"]}
 
     feedback_id = file_feedback_manager.add_feedback(feedback_data)
     return jsonify({"message": "Feedback added successfully!", "feedback_id": feedback_id}), 201
 
 
 # Route to delete a feedback by ID
-@chat_page.route('/feedbacks/<int:feedback_id>', methods=['DELETE'])
+@chat_page.route("/feedbacks/<int:feedback_id>", methods=["DELETE"])
 def delete_feedback(feedback_id):
     feedbacks = file_feedback_manager.get_feedback()
-    feedback = next((fb for fb in feedbacks if fb['id'] == feedback_id), None)
+    feedback = next((fb for fb in feedbacks if fb["id"] == feedback_id), None)
     if feedback is None:
         return abort(404, description=f"Feedback with ID {feedback_id} not found.")
 
@@ -227,13 +248,13 @@ def export_memory():
     try:
         base_dir = os.path.abspath(os.path.dirname(__file__))
 
-        json_path = os.path.join(os.getcwd(), 'chat_memory.json')
-        txt_path = os.path.join(os.getcwd(), 'chat_memory.txt')
+        json_path = os.path.join(os.getcwd(), "chat_memory.json")
+        txt_path = os.path.join(os.getcwd(), "chat_memory.txt")
 
-        with open(json_path, 'r') as f:
+        with open(json_path, "r") as f:
             memory_data = json.load(f)
 
-        with open(txt_path, 'w') as txt_file:
+        with open(txt_path, "w") as txt_file:
             for mem in memory_data:
                 txt_file.write(f"Q: {mem['question']}\nA: {mem['answer']}\n\n")
 

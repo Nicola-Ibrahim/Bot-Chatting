@@ -1,11 +1,11 @@
 import abc
-import dataclasses
+import uuid
+from dataclasses import dataclass, field
 from itertools import count
 from typing import Any
-from uuid import UUID
 
 
-@dataclasses.dataclass
+@dataclass
 class Entity(metaclass=abc.ABCMeta):
     """
     Abstract base class for all domain entities. Provides unique ID,
@@ -13,12 +13,11 @@ class Entity(metaclass=abc.ABCMeta):
     """
 
     _instance_id_generator = count()
-
-    _id: UUID
+    _id: uuid.UUID = field(default_factory=uuid.uuid4)
     _instance_id: int = next(_instance_id_generator)
 
-    def __init__(self):
-        raise TypeError("Direct instantiation is not allowed. " "Use the create() factory method instead.")
+    # def __init__(self):
+    #     raise TypeError("Direct instantiation is not allowed. " "Use the create() factory method instead.")
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -53,7 +52,7 @@ class Entity(metaclass=abc.ABCMeta):
         Create a copy of the entity, allowing specific attributes to be modified.
         This can be useful for creating a new version of the entity with updates.
         """
-        updated_data = dataclasses.asdict(self)
+        updated_data = asdict(self)
         updated_data.update(changes)
         return self.__class__(**updated_data)
 
@@ -61,10 +60,7 @@ class Entity(metaclass=abc.ABCMeta):
         """
         Convert the entity to a dictionary representation for easy serialization.
         """
-        return {
-            key: (value.to_dict() if isinstance(value, Entity) else value)
-            for key, value in dataclasses.asdict(self).items()
-        }
+        return {key: (value.to_dict() if isinstance(value, Entity) else value) for key, value in asdict(self).items()}
 
 
 class AggregateRoot(Entity):

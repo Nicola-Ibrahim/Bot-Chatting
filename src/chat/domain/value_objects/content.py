@@ -11,7 +11,6 @@ class Content:
 
     text: str
     response: str
-    timestamp: datetime = field(default_factory=datetime.now)
     feedback: Feedback | None = None
 
     def __post_init__(self):

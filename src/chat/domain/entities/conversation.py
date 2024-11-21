@@ -1,11 +1,12 @@
 import uuid
 from collections import OrderedDict
 from dataclasses import dataclass, field
+from datetime import datetime
 
 from src.shared.domain.entity import AggregateRoot
+from src.shared.domain.result import Result
 
 from ..exceptions import InValidOperationException
-from ..result_model import Result
 from ..value_objects.content import Content
 from ..value_objects.feedback import Feedback
 from .message import Message
@@ -17,6 +18,7 @@ class Conversation(AggregateRoot):
     Represents a chat session, handling multiple messages and responses.
     """
 
+    timestamp: datetime = field(default_factory=datetime.now)
     _messages: OrderedDict[uuid.UUID, Message] = field(default_factory=OrderedDict)
 
     @property
@@ -25,18 +27,33 @@ class Conversation(AggregateRoot):
         return list(self._messages.values())
 
     @classmethod
-    def create(cls) -> "Conversation":
+    def create(cls) -> Result:
         """
         Factory method to create a new Conversation instance.
 
         Returns:
             Conversation: A new, empty conversation instance.
         """
-        obj = super().__new__(cls)  # Bypass `__init__`
 
-        return Result.success(obj)
+        return Result.success(value=cls())
 
-    def add_message(self, text: str, response: str) -> None:
+    @classmethod
+    def from_existing(cls, conversation: "Conversation") -> Result:
+        """
+        Factory method to create a new Conversation instance based on an existing one.
+
+        Args:
+            conversation (Conversation): An existing conversation to load data from.
+
+        Returns:
+            Result: A new conversation initialized with data from the existing conversation.
+        """
+
+        # TODO: apply domain rules and checks
+
+        return Result.success(value=conversation)
+
+    def add_message(self, text: str, response: str) -> Result:
         """
         Creates a new message (message + response), adds it to the session.
 
@@ -48,6 +65,8 @@ class Conversation(AggregateRoot):
         message = Message.create(initial_message=message)
         message.add_message(message=message)
         self._messages[message.id] = message
+
+        return Result.success(value=message)
 
     def format(self):
         """format a response in specific formatting"""

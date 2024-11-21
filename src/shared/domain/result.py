@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Callable, Generic, TypeVar
 
-from src.shared.domain.exception import BaseDomainException
+from .exception import BaseDomainException
 
 T = TypeVar("T")  # Type of the success value
 E = TypeVar("E", bound=BaseDomainException)  # Type of the error (must be an exception)
