@@ -8,9 +8,9 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, responses, s
 
 from src.shared.domain.result import Result
 
-from ...application.services.conversation_service import ConversationApplicationService
-from ...infra.di import ChatAppDIContainer
-from ..contract.conversation import ConversationResponseSchema, MessageResponseSchema
+from ....application.services.conversation_service import ConversationApplicationService
+from ....infra.di import ChatAppDIContainer
+from ...contract.conversation import ConversationResponseSchema, MessageResponseSchema
 
 file_feedback_manager = FileFeedbackManager("bot_feedback.txt")
 memory_manager = MemoryManager()
