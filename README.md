@@ -1,60 +1,312 @@
+# 🤖 **Bot Chat System**
+
+## 🚀 **Overview**
+
+This repository contains a bot system built using **FastAPI** and applying **Domain-Driven Design (DDD)** principles. The system is designed to integrate core features like **authentication**, **user management**, and **bot conversations**, while maintaining modularity, scalability, and maintainability. Each feature is encapsulated in its own bounded context, following DDD best practices for separation of concerns.
+
+### 🌟 **Key Features**
+
+- **FastAPI**: A high-performance web framework used to build the API, providing asynchronous support and automatic API documentation via Swagger.
+- **Domain-Driven Design (DDD)**: The architecture follows DDD principles, ensuring that business logic and components like user management and authentication are isolated and clearly defined.
+- **Authentication & Authorization**: The system supports secure login via JWT tokens, enforcing role-based access control for users.
+- **Bot Conversations**: The bot engages in interactive conversations, handling user inputs, generating responses, and maintaining conversation states.
+- **Notifications**: The system sends notifications about key events, such as message updates or system alerts, keeping users informed in real-time.
 
 ```bash
-auth_service/
-├── app/
-│   ├── __init__.py
-│   ├── main.py                         # Entry point for the FastAPI app
+Bot-Chat/
+├── src/
+│   ├── chat/                                  # Bounded Context: Chat - Handles user interactions, messages, and chat-based logic
+│   │   ├── application/
+│   │   │   ├── interfaces/                     # Interfaces for chat services
+│   │   │   └── services/                       # Chat-related services (e.g., response handling)
+│   │   ├── domain/
+│   │   │   ├── entities/                       # Chat entities (e.g., message, conversation)
+│   │   │   ├── value_objects/                  # Value objects related to chat (e.g., message status)
+│   │   │   └── exceptions/                     # Exceptions related to chat processes
+│   │   ├── presentation/
+│   │   │   ├── contract/                       # Interfaces for chat API contracts
+│   │   │   └── web/                            # Web layer for chat (e.g., API routes)
+│   │   ├── infra/
+│   │   │   ├── repository/                     # Chat repository for storing data (e.g., messages, conversations)
+│   │   │   └── utils/                          # Utility functions for chat (e.g., message formatting)
 │
-│   ├── api/
-│   │   ├── v1/
-│   │   │   ├── endpoints/
-│   │   │   │   ├── auth.py             # Authentication API routes
-│   │   │   │   ├── users.py            # User management routes
-│   │   │   │   ├── orders.py           # Order management routes
-│   │   │   └── responses.py            # Standardized response models
-│   │   ├── dependencies/
-│   │   │   ├── auth_dependency.py      # Dependency for authentication
-│   │   │   └── user_dependency.py      # Dependency for user management
+│   ├── ai/                                    # Bounded Context: AI - Handles AI-related logic, like models for responses
+│   │   ├── application/
+│   │   │   ├── interfaces/                     # AI service interfaces
+│   │   │   └── services/                       # AI-related services (e.g., model inference)
+│   │   ├── domain/
+│   │   │   ├── entities/                       # AI-related entities
+│   │   │   ├── value_objects/                  # Value objects for AI, like model configuration
+│   │   │   └── exceptions/                     # AI-specific exceptions
+│   │   ├── presentation/
+│   │   │   ├── contract/                       # AI service contracts (e.g., input/output format)
+│   │   │   └── web/                            # AI web layer for API interaction
+│   │   ├── infra/
+│   │   │   ├── repository/                     # AI-related repository for storing models or configurations
+│   │   │   └── utils/                          # Utility functions for AI tasks (e.g., data preprocessing)
 │
-│   ├── core/                           # Business Logic Layer
-│   │   ├── services/
-│   │   │   ├── auth_service.py         # Business logic for authentication
-│   │   │   ├── user_service.py         # Business logic for user operations
-│   │   │   ├── order_service.py        # Business logic for order operations
-│   │   ├── schemas/
-│   │   │   ├── user_schema.py          # Pydantic schemas for user validation
-│   │   │   ├── auth_schema.py          # Pydantic schemas for authentication
-│   │   │   └── order_schema.py         # Pydantic schemas for orders
+│   ├── accounts/                              # Bounded Context: Accounts - Handles user registration, authentication, and profiles
+│   │   ├── application/
+│   │   │   ├── interfaces/                     # Interfaces for user-related services
+│   │   │   └── services/                       # User-related services (e.g., authentication, user management)
+│   │   ├── domain/
+│   │   │   ├── entities/                       # User entities (e.g., user, role)
+│   │   │   ├── value_objects/                  # Value objects for user (e.g., email, password)
+│   │   │   └── exceptions/                     # Exceptions related to user operations
+│   │   ├── presentation/
+│   │   │   ├── contract/                       # Contracts for user services (e.g., user creation API)
+│   │   │   └── web/                            # User API routes (e.g., login, registration)
+│   │   ├── infra/
+│   │   │   ├── repository/                     # User repository for DB interactions
+│   │   │   └── utils/                          # User-related utilities (e.g., password hashing)
 │
-│   ├── persistence/                    # Persistence Layer
-│   │   ├── database.py                 # Database setup and connection management
-│   │   ├── models/                     # ORM model definitions
-│   │   │   ├── user.py                 # User model
-│   │   │   └── role_model.py           # Role model (optional)
-│   │   ├── repositories/               # Repository for each model’s CRUD operations
-│   │   │   ├── user_repo.py            # User repository for DB interactions
-│   │   │   ├── order_repo.py           # Order repository for DB interactions
-│   │   │   └── role_repo.py            # Role repository (optional)
+│   ├── notification/                          # Bounded Context: Notifications - Handles system notifications to users
+│   │   ├── application/
+│   │   │   ├── interfaces/                     # Notification service interfaces
+│   │   │   └── services/                       # Notification services (e.g., email, SMS)
+│   │   ├── domain/
+│   │   │   ├── entities/                       # Notification-related entities
+│   │   │   ├── value_objects/                  # Value objects for notifications (e.g., notification types)
+│   │   │   └── exceptions/                     # Notification-specific exceptions
+│   │   ├── presentation/
+│   │   │   ├── contract/                       # Contracts for notification services
+│   │   │   └── web/                            # Notification API routes (e.g., send email, SMS)
+│   │   ├── infra/
+│   │   │   ├── repository/                     # Repository for storing notification records
+│   │   │   └── utils/                          # Notification utilities (e.g., template rendering)
 │
-│   ├── config/                         # Configuration and Environment
-│   │   ├── config.py                   # Configuration settings (e.g., database URL, JWT secret)
-│   │   ├── security.py                 # Security and encryption utilities (JWT handling, password hashing)
-│   │   ├── logging_config.py           # Centralized logging setup
+│   ├── access_control/                       # Bounded Context: Access Control - Handles authentication and authorization
+│   │   ├── application/
+│   │   │   ├── interfaces/                     # Access control service interfaces (e.g., permissions)
+│   │   │   └── services/                       # Access control services (e.g., user role management)
+│   │   ├── domain/
+│   │   │   ├── entities/                       # Entities related to roles and permissions
+│   │   │   ├── value_objects/                  # Value objects related to access control (e.g., role name)
+│   │   │   └── exceptions/                     # Access control-related exceptions
+│   │   ├── presentation/
+│   │   │   ├── contract/                       # Contracts for access control (e.g., role management API)
+│   │   │   └── web/                            # Access control API routes (e.g., login, permissions)
+│   │   ├── infra/
+│   │   │   ├── repository/                     # Repository for access control data (e.g., roles, permissions)
+│   │   │   └── utils/                          # Access control utilities (e.g., JWT token generation)
 │
-│   ├── utils/                          # Utilities and Helpers
-│   │   ├── helpers.py                  # Helper functions (e.g., email validation)
-│   │   └── constants.py                # Constants for shared values (e.g., role names)
+│   ├── shared/                                # Shared Modules - Common services, schemas, and utilities across contexts
+│   │   ├── services/                           # Shared business logic and common services
+│   │   ├── schemas/                            # Pydantic schemas for validation across contexts
+│   │   └── utils/                              # Utility functions used across multiple contexts
+│   │   ├── presentation/
+│   │   │   ├── api/                          # FastAPI app resides here for API layer across all contexts
+│   │   │   └── cli/                          # CLI app resides here for command-line interface across contexts
 │
-│   ├── tests/                          # Tests
-│   │   ├── test_auth.py                # Tests for authentication
-│   │   ├── test_users.py               # Tests for user management
-│   │   ├── test_orders.py              # Tests for order management
-│   │   └── fixtures.py                 # Common test fixtures
+│   ├── infrastructure/                        # Infrastructure Layer - Common infrastructure services
+│   │   ├── config/                            # Configuration setup for all services (e.g., DB URL, API keys)
+│   │   ├── security/                          # Security utilities (e.g., JWT handling, encryption)
+│   │   ├── logging_config/                    # Centralized logging setup for all services
+│   │   ├── repository/                        # Generic repository for interactions with data models
+│   │   └── utils/                             # Generic utilities used across infrastructure
 │
-├── .env                                # Environment variables
-├── pyproject.toml                      # Dependency management
-├── Dockerfile                          # Docker configuration for containerization
-├── pre_commit_config.yaml              # Pre-commit hooks configuration
-├── README.md                           # Documentation for the microservice
-└── .gitignore                          # Files and directories to ignore by Git
+├── .env                                       # Environment variables (e.g., database URLs, secrets)
+├── pyproject.toml                             # Dependency management for the project
+├── Dockerfile                                 # Docker configuration for containerization
+├── pre_commit_config.yaml                     # Pre-commit hooks configuration for code quality
+├── README.md                                  # Documentation for the microservice
+└── .gitignore                                 # Git ignore settings for unnecessary files
 ```
+
+# Bot System Documentation
+
+🚀 **Bot System** powered by **FastAPI** and **DDD**  
+The bot system follows Domain-Driven Design (DDD) principles, facilitating a clean and manageable architecture. It integrates key features like **authentication**, **conversations**, **notifications**, and more, using FastAPI for building high-performance APIs.
+
+---
+
+## 🛠️ **Core Layer: Domain Logic**
+
+The **Core Layer** handles the main business logic, domain models, and services. Each **bounded context** in the system, such as **chat**, **auth**, and **order**, has its own domain-driven services and entities.
+
+---
+
+### 🧑‍💻 **Authentication & Authorization**
+
+The system uses **JWT** for secure user authentication. Upon successful login, a token is issued, which must be provided in subsequent requests to validate user actions.
+
+#### **Endpoints**
+
+- **POST /auth/login**: User login endpoint to authenticate and return a JWT token.
+
+  - **Request Body:**
+
+    ```json
+    {
+      "username": "string",
+      "password": "string"
+    }
+    ```
+
+  - **Response:**
+
+    ```json
+    {
+      "access_token": "jwt_token",
+      "token_type": "bearer"
+    }
+    ```
+
+- **POST /auth/refresh**: Refresh JWT token.
+
+  - **Request Body:**
+
+    ```json
+    {
+      "refresh_token": "string"
+    }
+    ```
+
+  - **Response:**
+
+    ```json
+    {
+      "access_token": "new_jwt_token"
+    }
+    ```
+
+#### **Schema**
+
+- **auth_schema.py**: Defines validation schemas for authentication, including fields for username, password, and JWT tokens.
+
+---
+
+## 💬 **Bot Conversations**
+
+The **Conversation** entity manages the bot interactions with users, maintaining the conversation flow and ensuring state consistency.
+
+#### **Endpoints**
+
+- **GET /conversations/{conversation_id}**: Fetch a specific conversation by its ID.
+
+  - **Response:**
+
+    ```json
+    {
+      "conversation_id": "string",
+      "messages": [
+        {
+          "sender": "bot",
+          "content": "Hello, how can I assist you?"
+        }
+      ]
+    }
+    ```
+
+- **POST /conversations/{conversation_id}/messages**: Send a message to the conversation.
+
+  - **Request Body:**
+
+    ```json
+    {
+      "sender": "user",
+      "content": "I need help with my order"
+    }
+    ```
+
+  - **Response:**
+
+    ```json
+    {
+      "message_id": "string",
+      "status": "sent"
+    }
+    ```
+
+#### **Schema**
+
+- **conversation_schema.py**: Defines the structure of a conversation, including messages and sender information.
+
+---
+
+## 📣 **Notifications**
+
+The system can send notifications to users about new messages, order statuses, or other relevant events.
+
+#### **Endpoints**
+
+- **POST /notifications/email**: Send an email notification to a user.
+
+  - **Request Body:**
+
+    ```json
+    {
+      "to": "user@example.com",
+      "subject": "Order Status",
+      "body": "Your order has been shipped."
+    }
+    ```
+
+- **POST /notifications/sms**: Send an SMS notification to a user.
+
+  - **Request Body:**
+
+    ```json
+    {
+      "to": "+1234567890",
+      "message": "Your order has been shipped."
+    }
+    ```
+
+#### **Schema**
+
+- **notification_schema.py**: Defines the structure for notification details (e.g., email, SMS).
+
+---
+
+## 🛡️ **Configuration and Security**
+
+The system’s configuration is stored in environment variables, such as the database URL and the JWT secret. Security mechanisms include **password hashing** and **JWT** token generation and validation.
+
+#### **Key Files**
+
+- **config.py**: Configuration settings (e.g., JWT secret, database URL).
+- **security.py**: Contains utilities for securing passwords and handling JWT tokens.
+
+---
+
+## 🧪 **Testing**
+
+To ensure all features are functional, the bot system includes unit and integration tests.
+
+#### **Test Endpoints**
+
+- **POST /test/authentication**: Test user authentication.
+- **POST /test/orders**: Test order creation functionality.
+
+#### **Test Files**
+
+- **test_auth.py**: Unit tests for authentication logic.
+- **test_orders.py**: Unit tests for order-related functionality.
+
+---
+
+## 📄 **Running the Application**
+
+1. **Set Up Environment:**  
+   Create a `.env` file with the necessary environment variables, including `DATABASE_URL`, `JWT_SECRET_KEY`, etc.
+
+2. **Install Dependencies:**  
+   Run `pip install -r requirements.txt` to install all dependencies.
+
+3. **Start the Server:**  
+   Run the FastAPI server with:
+
+   ```bash
+   uvicorn app.main:app --reload
+   ```
+
+4. **Access API Docs:**  
+
+    Once the server is running, you can access the interactive API documentation through Swagger UI at:  
+    [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)  
+    This provides a user-friendly interface to explore and test all available API endpoints directly.
+
+## 🔧 **Conclusion**  
+
+By following **Domain-Driven Design** and utilizing **FastAPI**, this bot system is highly modular and easily extendable. With clear boundaries between different concerns (such as authentication, notifications, and conversations), it’s easy for new developers to contribute and expand the system. The detailed documentation and organized file structure will guide you through the system, making it simple to understand and interact with the project.
