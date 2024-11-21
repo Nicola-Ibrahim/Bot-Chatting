@@ -1,6 +1,6 @@
 from enum import Enum
 
-from apps.core.shared.base_exceptions import BaseException
+from apps.core.shared.base_exceptions import BaseDomainException
 from django.utils.translation import gettext as _
 
 
@@ -24,7 +24,7 @@ class ExceptionCode(Enum):
     USER_NOT_DELETED = "USER_NOT_DELETED"
 
 
-class RepositoryException(BaseException):
+class RepositoryException(BaseDomainException):
     """Base class for repository Exceptions."""
 
     def __init__(
@@ -42,7 +42,7 @@ class RepositoryException(BaseException):
         super().__init__(message=message, code=code, details=details)
 
 
-class BusinessRuleException(BaseException):
+class BusinessRuleException(BaseDomainException):
     """Base class for service-related Exceptions."""
 
     def __init__(

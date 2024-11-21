@@ -1,8 +1,8 @@
 import uuid
 
+from ...domain import MessageDomainService
 from ...domain.entities.conversation import Conversation
 from ...domain.entities.message import Message
-from ...domain.services.message_service import MessageDomainService
 from ..interfaces.ai_services import AbstractResponseGeneratorService, AbstractTokenizerService
 from ..interfaces.conversation_repository import AbstractConversationRepository
 
@@ -46,7 +46,7 @@ class ConversationApplicationGateway:
         Returns:
             Conversation: A newly created Conversation instance.
         """
-        conversation = Conversation()
+        conversation = Conversation.create()
         self._repository.save(conversation)
         return conversation
 

@@ -7,7 +7,7 @@ class ResponseGenerationService:
 
         # Check the length of text if exceed the available tokens in generator
         if not self.tokenizer.check_tokenization(text=text):
-            raise BusinessValidationException("The text its too long, consider to make it shorter")
+            raise InValidOperationException("The text its too long, consider to make it shorter")
 
         # call LLM to generate response for the model
         response = self.model.generate(text=text)

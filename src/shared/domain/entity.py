@@ -17,6 +17,9 @@ class Entity(metaclass=abc.ABCMeta):
     _id: UUID
     _instance_id: int = next(_instance_id_generator)
 
+    def __init__(self):
+        raise TypeError("Direct instantiation is not allowed. " "Use the create() factory method instead.")
+
     def __eq__(self, other: Any) -> bool:
         """
         Check equality based on type and unique ID.
@@ -37,6 +40,14 @@ class Entity(metaclass=abc.ABCMeta):
         """
         return f"<{self.__class__.__name__}(id={self._id})>"
 
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def instance_id(self):
+        return self._instance_id
+
     def copy(self, **changes) -> "Entity":
         """
         Create a copy of the entity, allowing specific attributes to be modified.
@@ -54,14 +65,6 @@ class Entity(metaclass=abc.ABCMeta):
             key: (value.to_dict() if isinstance(value, Entity) else value)
             for key, value in dataclasses.asdict(self).items()
         }
-
-    @property
-    def id(self):
-        return self._id
-
-    @property
-    def instance_id(self):
-        return self._instance_id
 
 
 class AggregateRoot(Entity):

@@ -4,7 +4,8 @@ from dataclasses import dataclass, field
 
 from src.shared.domain.entity import AggregateRoot
 
-from ..exceptions import BusinessValidationException
+from ..exceptions import InValidOperationException
+from ..result_model import Result
 from ..value_objects.content import Content
 from ..value_objects.feedback import Feedback
 from .message import Message
@@ -31,7 +32,9 @@ class Conversation(AggregateRoot):
         Returns:
             Conversation: A new, empty conversation instance.
         """
-        return cls()
+        obj = super().__new__(cls)  # Bypass `__init__`
+
+        return Result.success(obj)
 
     def add_message(self, text: str, response: str) -> None:
         """
@@ -60,7 +63,7 @@ class Conversation(AggregateRoot):
             response (str): The new generated response text.
 
         Raises:
-            BusinessValidationException: If the message ID is invalid.
+            InValidOperationException: If the message ID is invalid.
         """
         message = self._check_message_by_id(message_id)
 
@@ -79,11 +82,11 @@ class Conversation(AggregateRoot):
             Message: The matching message.
 
         Raises:
-            BusinessValidationException: If the message is not found.
+            InValidOperationException: If the message is not found.
         """
         message = self._messages.get(message_id)
         if not message:
-            raise BusinessValidationException(f"Message with ID {message_id} not found.")
+            raise InValidOperationException(f"Message with ID {message_id} not found.")
         return True
 
     def get_last_n_messages(self, n: int) -> list[Message]:
@@ -110,3 +113,40 @@ class Conversation(AggregateRoot):
         self._check_message_exist(message_id=message_id)
 
         self._messages[message_id].update_message_feedback(message_num=message_num, feedback=feedback)
+
+    def read_chat_partially(
+        self, tokenizer: AbstractTokenizerService, max_recent: int = 5, token_limit: int = 500
+    ) -> list[Content]:
+        """
+        Retrieve recent messages from a chat, respecting a token limit.
+
+        Args:
+            chat_id (uuid.UUID): The ID of the chat.
+            max_recent (int): The maximum number of recent messages to retrieve.
+            token_limit (int): The maximum token limit for the context.
+
+        Returns:
+            list[Content]: A list of recent messages within the token limit.
+
+        Raises:
+            InValidOperationException: If the chat does not exist.
+        """
+
+        # Retrieve recent messages
+        last_messages = chat.get_last_n_messages(max_recent)
+
+        selected_messages = []
+        total_tokens = 0
+
+        for message in reversed(last_messages):
+            prompt_tokens = tokenizer.tokenize(message.text)
+            response_tokens = tokenizer.tokenize(message.response.text if message.response else "")
+            total = len(prompt_tokens) + len(response_tokens)
+
+            if total_tokens + total > token_limit:
+                break
+
+            selected_messages.insert(0, message)
+            total_tokens += total
+
+        return selected_messages

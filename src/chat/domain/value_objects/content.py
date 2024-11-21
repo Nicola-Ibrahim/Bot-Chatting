@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from ..exceptions import BusinessValidationException
+from ..exceptions import InValidOperationException
 from .feedback import Feedback
 
 
@@ -17,9 +17,9 @@ class Content:
     def __post_init__(self):
         """Validates the message text and response text."""
         if not self.text or len(self.text) < 3:
-            raise BusinessValidationException("Content text must be at least 3 characters long.")
+            raise InValidOperationException("Content text must be at least 3 characters long.")
         if not self.response or len(self.response) < 3:
-            raise BusinessValidationException("Response text must be at least 3 characters long.")
+            raise InValidOperationException("Response text must be at least 3 characters long.")
 
     def __str__(self) -> str:
         return f"Content: {self.text}\nResponse: {self.response}"

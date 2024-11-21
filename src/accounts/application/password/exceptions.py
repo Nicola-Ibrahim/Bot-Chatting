@@ -1,8 +1,7 @@
 from enum import Enum
 
+from apps.core.shared.base_exceptions import BaseDomainException
 from django.utils.translation import gettext as _
-
-from apps.core.shared.base_exceptions import BaseException
 
 
 class ErrorCode(Enum):
@@ -14,7 +13,7 @@ class ErrorCode(Enum):
     PASSWORD_MISMATCH = "PASSWORD_MISMATCH"
 
 
-class PasswordMismatchError(BaseException):
+class PasswordMismatchError(BaseDomainException):
     """Exception raised when the two password fields don't match."""
 
     def __init__(
@@ -26,7 +25,7 @@ class PasswordMismatchError(BaseException):
         super().__init__(message=message, code=code.value, details=details)
 
 
-class IncorrectPasswordError(BaseException):
+class IncorrectPasswordError(BaseDomainException):
     """Exception raised when the provided password is incorrect."""
 
     def __init__(
@@ -40,7 +39,7 @@ class IncorrectPasswordError(BaseException):
         super().__init__(message=message, code=code.value, details=details)
 
 
-class PasswordTooShortError(BaseException):
+class PasswordTooShortError(BaseDomainException):
     """Exception raised when the provided password is too short."""
 
     def __init__(
@@ -56,7 +55,7 @@ class PasswordTooShortError(BaseException):
         super().__init__(message=message, code=code.value, details=details % {"min_length": self.min_length})
 
 
-class PasswordTooSimilarError(BaseException):
+class PasswordTooSimilarError(BaseDomainException):
     """Exception raised when the provided password is too similar to user attributes."""
 
     def __init__(
@@ -76,7 +75,7 @@ class PasswordTooSimilarError(BaseException):
         )
 
 
-class PasswordTooCommonError(BaseException):
+class PasswordTooCommonError(BaseDomainException):
     """Exception raised when the provided password is too common."""
 
     def __init__(
@@ -90,7 +89,7 @@ class PasswordTooCommonError(BaseException):
         super().__init__(message=message, code=code.value, details=details)
 
 
-class PasswordEntirelyNumericError(BaseException):
+class PasswordEntirelyNumericError(BaseDomainException):
     """Exception raised when the provided password is entirely numeric."""
 
     def __init__(
