@@ -1,21 +1,31 @@
-import uuid
-
 from pydantic import BaseModel
 
 
 class ConversationViewModel(BaseModel):
 
-    id: uuid
+    id: str
     name: str
 
 
 class MessageResponseSchema(BaseModel):
-    id: uuid
+    id: str
     text: str
     response: str
     feedback: str
 
 
 class ConversationResponseSchema(BaseModel):
-    id: uuid
+    id: str
     messages: list[MessageResponseSchema]
+
+
+class MessageRequestSchema(BaseModel):
+    text: str
+    response: str
+
+
+class CreateConversationRequestSchema(BaseModel):
+    messages: list[MessageRequestSchema]
+
+    def map_to_conversation(self):
+        pass

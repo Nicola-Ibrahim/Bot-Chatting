@@ -310,3 +310,11 @@ To ensure all features are functional, the bot system includes unit and integrat
 ## 🔧 **Conclusion**  
 
 By following **Domain-Driven Design** and utilizing **FastAPI**, this bot system is highly modular and easily extendable. With clear boundaries between different concerns (such as authentication, notifications, and conversations), it’s easy for new developers to contribute and expand the system. The detailed documentation and organized file structure will guide you through the system, making it simple to understand and interact with the project.
+
+## Useful Resources
+
+For further reading and strengthening DDD skills:
+
+- [ ] [implementing-dddomain-models](https://medium.com/vx-company/implementing-dddomain-models-ports-adapters-and-cqrs-with-c-2b81403f09f7)
+
+- [ ] [implementing-ports-CQRS](https://abstarreveld.medium.com/dddomain-models-ports-adapters-and-cqrs-reference-architecture-c-504817df65ec)

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class AbstractDownloaderDownloader(ABC):
+class AbstractConversationDownloader(ABC):
     @abstractmethod
-    def download_chat():
+    def download():
         pass

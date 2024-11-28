@@ -69,7 +69,7 @@ class JsonFileHandler:
 
         file_path = self._get_file_path(file_id)
         try:
-            with open(file_path, 'r') as file:
+            with open(file_path, "r") as file:
                 return json.load(file)
         except json.JSONDecodeError as e:
             raise ValueError(f"Invalid JSON format in file '{file_path}': {e}")
@@ -83,7 +83,7 @@ class JsonFileHandler:
             data (dict): The data to write to the file.
         """
         file_path = self._get_file_path(file_id)
-        with open(file_path, 'w') as file:
+        with open(file_path, "w") as file:
             json.dump(data, file, indent=4)
 
     def delete(self, file_id: str) -> None:

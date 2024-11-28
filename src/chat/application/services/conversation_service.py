@@ -1,12 +1,12 @@
 import uuid
 
-from chat.domain.entities.conversation import Conversation
-from chat.domain.entities.message import Message
-from src.shared.domain.exception import InValidOperationException
-from src.shared.domain.result import Result
+from shared.infra.utils.result import Result
 
-from ..interfaces.ai_services import AbstractResponseGeneratorService
+from ...domain.entities.conversation import Conversation
+from ...domain.entities.message import Message
+from ...domain.value_objects.content import Content
 from ..interfaces.conversation_repository import AbstractConversationRepository
+from ..interfaces.downloader import AbstractConversationDownloader
 
 
 class ConversationApplicationService:
@@ -19,10 +19,8 @@ class ConversationApplicationService:
 
     def __init__(
         self,
-        conversation_downloader: ConversationDownloader,
+        conversation_downloader: AbstractConversationDownloader,
         repository: AbstractConversationRepository,
-        response_generator: AbstractResponseGeneratorService,
-        tokenizer: AbstractTokenizerService,
     ):
         """
         Initializes the gateway with necessary services and repositories.
@@ -30,15 +28,13 @@ class ConversationApplicationService:
         Args:
             conversation_downloader (ConversationDownloader): Service for downloading conversation data.
             repository (AbstractConversationRepository): Repository for storing and retrieving conversations.
-            response_generator (AbstractResponseGeneratorService): Service for generating responses.
-            tokenizer (AbstractTokenizerService): Tokenizer for managing token-related constraints.
         """
         self._conversation_downloader = conversation_downloader
         self._repository = repository
         self._response_generator = response_generator
         self._tokenizer = tokenizer
 
-    def create_conversation(self) -> Result:
+    def create(self) -> Result[Conversation, Exception]:
         """
         Creates a new conversation session and stores it in the repository.
 
@@ -52,7 +48,14 @@ class ConversationApplicationService:
 
         return result
 
-    def get_conversation_by_id(self, conversation_id: uuid.UUID) -> Result:
+    def update(self, conversation: Conversation):
+        # Validate new conversation values and attrs
+        # Return result as error if the validation went wrong
+
+        # otherwise, return result with new updated conversation value
+        return result
+
+    def get_by_id(self, conversation_id: uuid.UUID) -> Result:
         """
         Retrieves a conversation by its unique identifier.
 
@@ -64,9 +67,16 @@ class ConversationApplicationService:
         """
         conversation = self._repository.get_by_id(conversation_id)
 
-        result = Conversation.from_existing(conversation=conversation)
+        if not conversation:
+            return Result.fail()
 
-        return result
+        # here it should return a ViewModel or ResponseModel to represent the data
+        conversation_view_model = ConversationViewModel(
+            conversation_id=,
+            messages=,
+            ...
+        )
+        return Result.ok(conversation_view_model)
 
     def add_message(self, conversation_id: uuid.UUID, text: str) -> Result:
         """
@@ -80,15 +90,35 @@ class ConversationApplicationService:
             Result: A Result containing the created message or an error.
         """
 
+
+        # Get the conversation from the repository, taking into account the limited number of the last messages
+        # we should get from the repository, since we might need only last 4, 5, or etc messages
+        # rule of thumb: only get the data that we need
+
         conversation = self._repository.get_by_id(conversation_id)
 
-        conversation: Conversation = Conversation.from_existing(conversation=conversation)
+        if not conversation:
+            return Result.fail()
+
 
         response = self._response_generator.generate_answer(text)
+        if not response:
+            return Result.fail()
 
-        # Add the message and generate the response
-        result = conversation.add_message(text=text, response=response)
+        # Create content
+        content_result = Content.create(text=text, response=response)
+        if content_result.is_failure():
+            return content_result
 
+        # Create message
+        message_result = Message.create(initial_content=content_result.value)
+        if message_result.is_failure():
+            return message_result
+
+        # Add the message to the conversation
+        result = conversation.add_message(message=message_result.value)
+
+        # Commit changes and updates to DB
         self._repository.save(conversation=conversation)
 
         return result
@@ -105,7 +135,7 @@ class ConversationApplicationService:
         Returns:
             Result: A Result containing the regenerated response or an error.
         """
-        conversation_result = self.get_conversation_by_id(conversation_id)
+        conversation_result = self.get_by_id(conversation_id)
         if conversation_result.is_error:
             return conversation_result
 
@@ -116,9 +146,9 @@ class ConversationApplicationService:
         conversation.regenerate_or_edit_message(message_id=message_id, text=text, response=new_response)
         self._repository.save(conversation)
 
-        return Result.success(new_response)
+        return Result.ok(new_response)
 
-    def delete_conversation(self, conversation_id: uuid.UUID) -> Result:
+    def delete(self, conversation_id: uuid.UUID) -> Result:
         """
         Deletes a conversation session from the repository.
 
@@ -128,14 +158,14 @@ class ConversationApplicationService:
         Returns:
             Result: A Result indicating the outcome of the delete operation.
         """
-        conversation_result = self.get_conversation_by_id(conversation_id)
+        conversation_result = self.get_by_id(conversation_id)
         if conversation_result.is_error:
             return conversation_result
 
         self._repository.delete(conversation_id)
-        return Result.success(None)
+        return Result.ok(None)
 
-    def download_conversation(self, conversation_id: uuid.UUID) -> Result:
+    def download(self, conversation_id: uuid.UUID) -> Result:
         """
         Downloads the content of a conversation using the specified download service.
 
@@ -145,13 +175,13 @@ class ConversationApplicationService:
         Returns:
             Result: A Result indicating the outcome of the download operation.
         """
-        conversation_result = self.get_conversation_by_id(conversation_id)
+        conversation_result = self.get_by_id(conversation_id)
         if conversation_result.is_error:
             return conversation_result
 
         conversation = conversation_result.value
-        self._conversation_downloader.download_conversation(conversation)
-        return Result.success(None)
+        self._conversation_downloader.download(conversation)
+        return Result.ok(None)
 
     def get_recent_messages(self, conversation_id: uuid.UUID, max_recent: int = 5, token_limit: int = 500) -> Result:
         """
@@ -165,13 +195,13 @@ class ConversationApplicationService:
         Returns:
             Result: A Result containing a list of messages or an error.
         """
-        conversation_result = self.get_conversation_by_id(conversation_id)
+        conversation_result = self.get_by_id(conversation_id)
         if conversation_result.is_error:
             return conversation_result
 
         conversation = conversation_result.value
         recent_messages = conversation.get_recent_messages(max_recent=max_recent, token_limit=token_limit)
-        return Result.success(recent_messages)
+        return Result.ok(recent_messages)
 
     def read_plain_message_responses(
         self, conversation_id: uuid.UUID, max_recent: int = 5, token_limit: int = 500
@@ -187,7 +217,7 @@ class ConversationApplicationService:
         Returns:
             Result: A Result containing a list of message responses or an error.
         """
-        conversation_result = self.get_conversation_by_id(conversation_id)
+        conversation_result = self.get_by_id(conversation_id)
         if conversation_result.is_error:
             return conversation_result
 
@@ -208,4 +238,4 @@ class ConversationApplicationService:
             selected_messages.insert(0, message)
             total_tokens += total
 
-        return Result.success(selected_messages)
+        return Result.ok(selected_messages)

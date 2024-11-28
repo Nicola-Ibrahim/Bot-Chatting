@@ -50,7 +50,7 @@ migrate:  # Create and apply database migrations for schema changes
 
 start:  # Start the FastAPI server for development
 	@echo "Starting server..."
-	fastapi run src/fastapi/main.py --reload
+	fastapi run src/shared/presentation/web/fastapi/main.py --reload
 
 install:  # Install project dependencies from Poetry
 	@echo "Installing dependencies..."

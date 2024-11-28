@@ -4,9 +4,8 @@ from .utils.import_helpers import get_member_from_package
 
 # Absolute paths of endpoint packages
 PACKAGE_PATHS = [
-    "src.accounts.presentation.api.v1.endpoints",
+    "src.chat.presentation.web.fastapi.v1.endpoints",
 ]
-
 MEMBER_TYPE = APIRouter
 
 

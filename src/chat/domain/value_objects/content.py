@@ -1,12 +1,14 @@
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass
 
-from ..exceptions import InValidOperationException
+from shared.infra.utils.result import Result
+from src.shared.domain.value_object import ValueObject
+
+from ..exceptions.operation import InValidOperationException
 from .feedback import Feedback
 
 
 @dataclass(frozen=True)
-class Content:
+class Content(ValueObject):
     """Represents a user's question and the corresponding generated response."""
 
     text: str
@@ -20,9 +22,12 @@ class Content:
         if not self.response or len(self.response) < 3:
             raise InValidOperationException("Response text must be at least 3 characters long.")
 
-    def __str__(self) -> str:
-        return f"Content: {self.text}\nResponse: {self.response}"
-
     @classmethod
-    def create(cls, text: str, response: str):
-        return cls(text=text, response=response)
+    def create(cls, text: str, response: str) -> Result:
+        """Factory method to create content."""
+        if not text or len(text) < 3:
+            return Result.fail(InValidOperationException("Content text must be at least 3 characters long."))
+        if not response or len(response) < 3:
+            return Result.fail(InValidOperationException("Response text must be at least 3 characters long."))
+
+        return Result.ok(cls(text=text, response=response))

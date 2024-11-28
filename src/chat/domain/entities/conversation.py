@@ -3,12 +3,13 @@ from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import datetime
 
+from shared.infra.utils.result import Result
 from src.shared.domain.entity import AggregateRoot
-from src.shared.domain.result import Result
 
-from ..exceptions import InValidOperationException
+from ..exceptions.operation import InValidOperationException
 from ..value_objects.content import Content
 from ..value_objects.feedback import Feedback
+from ..value_objects.ids import ConversationId
 from .message import Message
 
 
@@ -18,13 +19,14 @@ class Conversation(AggregateRoot):
     Represents a chat session, handling multiple messages and responses.
     """
 
-    timestamp: datetime = field(default_factory=datetime.now)
+    _id: ConversationId = field(default=ConversationId.of(uuid.uuid4()))
     _messages: OrderedDict[uuid.UUID, Message] = field(default_factory=OrderedDict)
+    timestamp: datetime = field(default_factory=datetime.now)
 
     @property
-    def all_messages(self) -> list[Message]:
+    def all_messages(self) -> Result:
         """Get all messages in the chat."""
-        return list(self._messages.values())
+        return Result.ok(list(self._messages.values()))
 
     @classmethod
     def create(cls) -> Result:
@@ -32,10 +34,9 @@ class Conversation(AggregateRoot):
         Factory method to create a new Conversation instance.
 
         Returns:
-            Conversation: A new, empty conversation instance.
+            Result: Success with a new, empty conversation instance.
         """
-
-        return Result.success(value=cls())
+        return Result.ok(cls())
 
     @classmethod
     def from_existing(cls, conversation: "Conversation") -> Result:
@@ -46,69 +47,56 @@ class Conversation(AggregateRoot):
             conversation (Conversation): An existing conversation to load data from.
 
         Returns:
-            Result: A new conversation initialized with data from the existing conversation.
+            Result: Success with the new conversation initialized with existing data.
         """
+        # TODO: Apply domain rules and checks before returning the object
+        return Result.ok(conversation)
 
-        # TODO: apply domain rules and checks
+    def add_message(self, message: Message) -> Result:
 
-        return Result.success(value=conversation)
-
-    def add_message(self, text: str, response: str) -> Result:
-        """
-        Creates a new message (message + response), adds it to the session.
-
-        Args:
-            message_text (str): The content of the user's message.
-            response_text (str): The content of the generated response.
-        """
-        message = Content(text=text, response=response)
-        message = Message.create(initial_message=message)
-        message.add_message(message=message)
         self._messages[message.id] = message
 
-        return Result.success(value=message)
+        return message
 
-    def format(self):
-        """format a response in specific formatting"""
-        pass
-
-    def regenerate_or_edit_message(self, message_id: uuid.UUID, text: str, response: str) -> None:
+    def regenerate_or_edit_message(self, message_id: uuid.UUID, text: str, response: str) -> Result:
         """
         Regenerates the response or updates the message text in the message.
 
         Args:
             message_id (uuid.UUID): The ID of the message to update.
-            text (str): The new message (question) text.
+            text (str): The new message text.
             response (str): The new generated response text.
 
-        Raises:
-            InValidOperationException: If the message ID is invalid.
+        Returns:
+            Result: Success or failure with an appropriate message.
         """
-        message = self._check_message_by_id(message_id)
+        check_result = self._check_message_exist(message_id)
+        if check_result.is_failure():
+            return check_result
 
-        # Add the new message and response as a new Content object
-        new_message = Content(text=text, response=response)
-        self._messages[message_id].add_message(new_message)
+        # Add the new content to the existing message
+        content_result = Content.create(text=text, response=response)
+        if content_result.is_failure():
+            return content_result
 
-    def _check_message_exist(self, message_id: uuid.UUID) -> bool:
+        self._messages[message_id].add_message(content_result.value)
+        return Result.ok(self._messages[message_id])
+
+    def _check_message_exist(self, message_id: uuid.UUID) -> Result:
         """
-        Finds an message by its ID.
+        Checks if a message exists by its ID.
 
         Args:
-            message_id (uuid.UUID): The ID of the message to find.
+            message_id (uuid.UUID): The ID of the message to check.
 
         Returns:
-            Message: The matching message.
-
-        Raises:
-            InValidOperationException: If the message is not found.
+            Result: Success or failure with an error message.
         """
-        message = self._messages.get(message_id)
-        if not message:
-            raise InValidOperationException(f"Message with ID {message_id} not found.")
-        return True
+        if message_id not in self._messages:
+            return Result.fail(InValidOperationException(f"Message with ID {message_id} not found."))
+        return Result.ok(True)
 
-    def get_last_n_messages(self, n: int) -> list[Message]:
+    def get_last_n_messages(self, n: int) -> Result:
         """
         Retrieves the last `n` messages in the chat.
 
@@ -116,43 +104,43 @@ class Conversation(AggregateRoot):
             n (int): The number of recent messages to retrieve.
 
         Returns:
-            list[Message]: The most recent `n` messages.
+            Result: Success with the list of most recent `n` messages.
         """
-        return list(self._messages.values())[-n:]
+        return Result.ok(list(self._messages.values())[-n:])
 
-    def add_feedback_message(self, message_id: uuid.UUID, rating: str, comment: str = None):
+    def add_feedback_message(self, message_id: uuid.UUID, rating: str, comment: str = None) -> Result:
+        """
+        Adds feedback to a specific message.
+
+        Args:
+            message_id (uuid.UUID): The ID of the message to update.
+            rating (str): The feedback rating.
+            comment (str, optional): Additional comments for feedback.
+
+        Returns:
+            Result: Success or failure with an appropriate message.
+        """
+        check_result = self._check_message_exist(message_id)
+        if check_result.is_failure():
+            return check_result
+
         feedback = Feedback(rating=rating, comment=comment)
+        self._messages[message_id].add_message_feedback(feedback)
+        return Result.ok(True)
 
-        self._check_message_exist(message_id=message_id)
-
-        self._messages[message_id].add_message_feedback(feedback=feedback)
-
-    def update_feedback_message(self, message_id: uuid.UUID, message_num: str, rating: str, comment: str = None):
-
-        self._check_message_exist(message_id=message_id)
-
-        self._messages[message_id].update_message_feedback(message_num=message_num, feedback=feedback)
-
-    def read_chat_partially(
-        self, tokenizer: AbstractTokenizerService, max_recent: int = 5, token_limit: int = 500
-    ) -> list[Content]:
+    def read_chat_partially(self, tokenizer, max_recent: int = 5, token_limit: int = 500) -> Result:
         """
         Retrieve recent messages from a chat, respecting a token limit.
 
         Args:
-            chat_id (uuid.UUID): The ID of the chat.
+            tokenizer (AbstractTokenizerService): Tokenizer service to calculate tokens.
             max_recent (int): The maximum number of recent messages to retrieve.
             token_limit (int): The maximum token limit for the context.
 
         Returns:
-            list[Content]: A list of recent messages within the token limit.
-
-        Raises:
-            InValidOperationException: If the chat does not exist.
+            Result: Success with a list of recent messages within the token limit or failure.
         """
-
-        # Retrieve recent messages
-        last_messages = chat.get_last_n_messages(max_recent)
+        last_messages = self.get_last_n_messages(max_recent).value
 
         selected_messages = []
         total_tokens = 0
@@ -168,4 +156,4 @@ class Conversation(AggregateRoot):
             selected_messages.insert(0, message)
             total_tokens += total
 
-        return selected_messages
+        return Result.ok(selected_messages)

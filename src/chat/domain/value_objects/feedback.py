@@ -1,44 +1,33 @@
 from dataclasses import dataclass
-from enum import Enum
 from typing import Optional
 
+from shared.infra.utils.result import Result
+from src.shared.domain.value_object import ValueObject
 
-class RatingType(Enum):
-    LIKE = "like"
-    DISLIKE = "dislike"
+from ..enums.rating import RatingType
 
 
 @dataclass(frozen=True)
-class Feedback:
-    """
-    Value object representing feedback provided on an message or message.
-    """
+class Feedback(ValueObject):
+    """Represents feedback provided on a message."""
 
     rating: RatingType
     comment: Optional[str] = None
 
     def __post_init__(self):
-        """
-        Validates the business rules for feedback.
-        """
-        # Ensure comments are non-empty if provided
+        """Validates the business rules for feedback."""
         if self.comment and not self.comment.strip():
             raise ValueError("Comment cannot be an empty string.")
 
-        # Enforce length constraints for comments
         if self.comment and len(self.comment) > 500:
             raise ValueError("Comment cannot exceed 500 characters.")
 
     @classmethod
-    def create(cls) -> 'Feedback':
-        """
-        Creates a new Feedback instance with updated values (immutability preserved).
+    def create(cls, rating: RatingType, comment: Optional[str] = None) -> Result:
+        """Factory method to create feedback."""
+        if comment and len(comment) > 500:
+            return Result.fail(ValueError("Comment cannot exceed 500 characters."))
 
-        Args:
-            rating (RatingType): The updated feedback type.
-            comment (Optional[str]): The updated comment.
+        return Result.ok(cls(rating=rating, comment=comment))
 
-        Returns:
-            Feedback: A new Feedback instance with updated values.
-        """
-        return cls(type=rating, comment=comment)
+        return Result.ok(cls(rating=rating, comment=comment))

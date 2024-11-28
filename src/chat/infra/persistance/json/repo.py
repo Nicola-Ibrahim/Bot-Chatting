@@ -1,4 +1,6 @@
-from ....application.interfaces.conversation_repository import AbstractConversationRepository
+from ....application.interfaces.conversation_repository import (
+    AbstractConversationRepository,
+)
 from ....domain.entities.conversation import Conversation
 from .file_handler import JsonFileHandler
 from .mapper import JsonConversationMapper
@@ -10,7 +12,7 @@ class JsonFileConversationRepository(AbstractConversationRepository):
     """
 
     def __init__(self):
-        self.file_handler = JsonFileHandler("conversation_data")
+        self.file_handler = JsonFileHandler(directory="conversation_data")
 
     def get_by_id(self, conversation_id: str) -> Conversation:
         """
