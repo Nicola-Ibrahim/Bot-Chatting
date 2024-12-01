@@ -315,6 +315,14 @@ By following **Domain-Driven Design** and utilizing **FastAPI**, this bot system
 
 For further reading and strengthening DDD skills:
 
+- [ ] [Domain-Driven Design](https://herbertograca.com/2017/09/07/domain-driven-design/)
+- [ ] [Onion Architecture](https://medium.com/expedia-group-tech/onion-architecture-deed8a554423)
 - [ ] [implementing-dddomain-models](https://medium.com/vx-company/implementing-dddomain-models-ports-adapters-and-cqrs-with-c-2b81403f09f7)
-
 - [ ] [implementing-ports-CQRS](https://abstarreveld.medium.com/dddomain-models-ports-adapters-and-cqrs-reference-architecture-c-504817df65ec)
+- [ ] [clean-lessonsUse cases](https://medium.com/unil-ci-software-engineering/clean-ddd-lessons-use-cases-e9d11f64a0e9)
+- [ ] [Clean Domain-Driven Design](https://medium.com/unil-ci-software-engineering/clean-domain-driven-design-2236f5430a05)
+- [ ] [Always-Valid Domain Model](https://vkhorikov.medium.com/always-valid-domain-model-706e5f3d24b0)
+- [ ] [DDD Value Objects: Mastering Data Validation in Python](https://scresh.hashnode.dev/ddd-value-objects-mastering-data-validation-in-python)
+- [ ] [Domain-Driven Design (DDD) and Hexagonal Architecture in Java](https://vaadin.com/blog/ddd-part-3-domain-driven-design-and-the-hexagonal-architecture)
+- [ ] [DTO pattern (Data Transfer Object)](https://www.baeldung.com/java-dto-pattern)
+- [ ] [Domain model with SQLAlchemy](https://blog.szymonmiks.pl/p/domain-model-with-sqlalchemy/)

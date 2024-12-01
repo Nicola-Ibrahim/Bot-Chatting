@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from shared.infra.utils.result import Result
-from src.shared.domain.value_object import ValueObject
-
+from ...infra.utils.result import Result
 from ..enums.rating import RatingType
+from .value_object import ValueObject
 
 
 @dataclass(frozen=True)
@@ -27,7 +26,5 @@ class Feedback(ValueObject):
         """Factory method to create feedback."""
         if comment and len(comment) > 500:
             return Result.fail(ValueError("Comment cannot exceed 500 characters."))
-
-        return Result.ok(cls(rating=rating, comment=comment))
 
         return Result.ok(cls(rating=rating, comment=comment))

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Callable, Generic, TypeVar
+from typing import Any, Callable, Generic, TypeVar, Union
 
 from ...domain.exception import BaseDomainException
 
@@ -14,8 +14,8 @@ class Result(Generic[T, E]):
     which can either succeed (SuccessResult) or fail (ErrorResult).
     """
 
-    _value: T = None
-    _error: E = None
+    _value: Union[T, None] = None
+    _error: Union[E, None] = None
 
     def __post_init__(self):
         if self._value is not None and self._error is not None:
@@ -61,6 +61,70 @@ class Result(Generic[T, E]):
         if self.is_ok:
             return on_success(self.value)
         return on_failure(self.error)
+
+    def map(self, fn: Callable[[T], T]) -> "Result[T, E]":
+        """
+        Transforms the value of a successful result.
+
+        Args:
+            fn (Callable): Function to apply on the success value.
+
+        Returns:
+            Result[T, E]: A new result with the transformed value.
+        """
+        if self.is_ok:
+            return Result.ok(fn(self.value))
+        return self
+
+    def flat_map(self, fn: Callable[[T], "Result[Any, E]"]) -> "Result[Any, E]":
+        """
+        Applies a function that returns a `Result` and flattens the result.
+
+        Args:
+            fn (Callable): Function that returns a `Result`.
+
+        Returns:
+            Result[Any, E]: A flattened result.
+        """
+        if self.is_ok:
+            return fn(self.value)
+        return self
+
+    def on_failure(self, fn: Callable[[E], Any]) -> "Result[T, E]":
+        """
+        Executes a function when the result is a failure (i.e., has an error).
+
+        Args:
+            fn (Callable): Function to execute on failure.
+
+        Returns:
+            Result[T, E]: This result (unchanged).
+        """
+        if self.is_failure:
+            fn(self.error)
+        return self
+
+    def unwrap(self) -> T:
+        """
+        Returns the success value or raises an error if the result is a failure.
+
+        Returns:
+            T: The success value.
+
+        Raises:
+            ValueError: If the result is a failure.
+        """
+        if self.is_failure:
+            raise ValueError(f"Unwrap failed with error: {self.error}")
+        return self.value
+
+    def __repr__(self) -> str:
+        """
+        Custom repr for better debugging.
+        """
+        if self.is_ok:
+            return f"Result.ok({repr(self._value)})"
+        return f"Result.fail({repr(self._error)})"
 
     @classmethod
     def ok(cls, value: T) -> "Result[T, E]":

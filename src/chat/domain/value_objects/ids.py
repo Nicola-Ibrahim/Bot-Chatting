@@ -1,22 +1,74 @@
+import abc
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
-from src.shared.domain.value_object import ValueObject
+from .value_object import ValueObject
+
+
+# Abstract Base Class for ID
+class ID(ValueObject):
+    """
+    Abstract base class for any type of ID.
+    It ensures consistency across different ID types.
+    """
+
+    @abc.abstractmethod
+    def __eq__(self, other: "ID") -> bool:
+        """Equality check based on ID value."""
+
+    @abc.abstractmethod
+    def __hash__(self) -> int:
+        """Hash the ID."""
+
+    @abc.abstractmethod
+    def __repr__(self) -> str:
+        """String representation of the ID."""
+
+
+# Concrete implementations of ID
+@dataclass(frozen=True)
+class UUIDID(ID):
+    """Concrete implementation of ID for UUIDs."""
+
+    value: uuid.UUID
+
+    def __eq__(self, other: ID) -> bool:
+        return isinstance(other, UUIDID) and self.value == other.value
+
+    def __hash__(self) -> int:
+        return hash(self.value)
+
+    def __repr__(self) -> str:
+        return f"UUIDID({self.value})"
 
 
 @dataclass(frozen=True)
-class ConversationId(ValueObject):
-    value: uuid.UUID = field(default_factory=uuid.uuid4)
+class IntID(ID):
+    """Concrete implementation of ID for integers."""
 
-    @classmethod
-    def of(cls, conversation_uuid: uuid.UUID):
-        return cls(value=conversation_uuid)
+    value: int
+
+    def __eq__(self, other: ID) -> bool:
+        return isinstance(other, IntID) and self.value == other.value
+
+    def __hash__(self) -> int:
+        return hash(self.value)
+
+    def __repr__(self) -> str:
+        return f"IntID({self.value})"
 
 
 @dataclass(frozen=True)
-class MessageId(ValueObject):
-    value: uuid.UUID = field(default_factory=uuid.uuid4)
+class StringID(ID):
+    """Concrete implementation of ID for strings."""
 
-    @classmethod
-    def of(cls, message_uuid: uuid.UUID):
-        return cls(value=message_uuid)
+    value: str
+
+    def __eq__(self, other: ID) -> bool:
+        return isinstance(other, StringID) and self.value == other.value
+
+    def __hash__(self) -> int:
+        return hash(self.value)
+
+    def __repr__(self) -> str:
+        return f"StringID({self.value})"

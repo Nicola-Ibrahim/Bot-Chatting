@@ -1,120 +1,74 @@
-import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from src.shared.domain.entity import Entity
-
-from ....shared.infra.utils.result import Result
+from ...infra.utils.result import Result
 from ..exceptions.operation import InValidOperationException
+
+# Domain-specific imports
 from ..value_objects.content import Content
 from ..value_objects.feedback import Feedback
-from ..value_objects.ids import MessageId
 
 
 @dataclass
-class Message(Entity):
-    """Represents a series of contents and responses within a conversation."""
+class Message:
+    """
+    Represents a message containing multiple contents.
+    """
 
-    _id: MessageId = field(default=MessageId.of(uuid.uuid4()))
     _contents: list[Content] = field(default_factory=list)
     timestamp: datetime = field(default_factory=datetime.now)
 
-    @property
-    def all_contents(self) -> list[Content]:
-        """Returns all contents."""
-        return self._contents
-
-    @property
-    def content_count(self) -> int:
-        """Returns the total number of contents."""
-        return len(self._contents)
-
-    @classmethod
-    def create(cls, contents: list[Content]) -> Result:
+    @staticmethod
+    def create(content: Content) -> Result:
         """
-        Factory method to create a new message instance with an initial content.
-
-        Args:
-            content (Content): The initial content to include.
-
-        Returns:
-            Result: Success with the new Message instance or failure with an error.
+        Factory method to create a new message instance.
         """
-        if not contents:
-            return Result.fail(
-                InValidOperationException("An initial content must be supplied when creating a message.")
-            )
+        if not content:
+            return Result.fail(InValidOperationException("Initial content must be provided."))
 
-        obj = cls(_contents=contents)
-        return Result.ok(obj)
+        return Result.ok(Message(_contents=[content]))
 
     def add_content(self, content: Content) -> Result:
         """
-        Adds a new content to this message.
-
-        Args:
-            content (Content): The content to add.
-
-        Returns:
-            Result: Success or failure of adding content.
+        Adds a new content to the message.
         """
         if not content:
-            return Result.fail(InValidOperationException("Content cannot be null or empty."))
+            return Result.fail(InValidOperationException("Content cannot be null."))
 
         self._contents.append(content)
         return Result.ok(self)
 
     def get_latest_content(self) -> Result:
-        """Returns the most recent content."""
-        if self._contents:
-            return Result.ok(self._contents[-1])
-        return Result.fail(InValidOperationException("No contents available."))
+        """
+        Retrieves the most recent content in the message.
+        """
+        if not self._contents:
+            return Result.fail(InValidOperationException("No content available."))
+
+        return Result.ok(self._contents[-1])
 
     def add_content_feedback(self, content_index: int, feedback: Feedback) -> Result:
         """
-        Adds feedback to a specific content.
-
-        Args:
-            content_index (int): The index of the content to add feedback to.
-            feedback (Feedback): The feedback object to add.
-
-        Returns:
-            Result: Success or failure with an error message.
+        Adds feedback to a specific content by creating a new Content instance
+        with the updated feedback and replacing the old content.
         """
         content_result = self._get_content_by_index(content_index)
         if content_result.is_failure():
             return content_result
 
-        content_result.value.add_feedback(feedback)
-        return Result.ok(content_result.value)
+        # Create a new Content with feedback
+        content = content_result.value
+        new_content_result = Content.with_feedback(content.text, content.response, feedback)
+        if new_content_result.is_failure():
+            return new_content_result
 
-    def update_content_feedback(self, content_index: int, feedback: Feedback) -> Result:
-        """
-        Updates feedback for a specific content.
-
-        Args:
-            content_index (int): The index of the content to update feedback for.
-            feedback (Feedback): The new feedback object.
-
-        Returns:
-            Result: Success or failure with an error message.
-        """
-        content_result = self._get_content_by_index(content_index)
-        if content_result.is_failure():
-            return content_result
-
-        content_result.value.update_feedback(feedback)
-        return Result.ok(content_result.value)
+        # Replace the old content with the new one
+        self._contents[content_index] = new_content_result.value
+        return Result.ok(new_content_result.value)
 
     def _get_content_by_index(self, index: int) -> Result:
         """
         Retrieves a specific content by its index.
-
-        Args:
-            index (int): The index of the content to retrieve.
-
-        Returns:
-            Result: Success with the content or failure if index is out of bounds.
         """
         if index < 0 or index >= len(self._contents):
             return Result.fail(InValidOperationException(f"Invalid content index: {index}"))

@@ -1,6 +1,6 @@
 import uuid
 
-from shared.infra.utils.result import Result
+from ...infra.utils.result import Result
 
 from ...domain.entities.conversation import Conversation
 from ...domain.entities.message import Message
@@ -8,7 +8,8 @@ from ...domain.value_objects.content import Content
 from ..interfaces.conversation_repository import AbstractConversationRepository
 from ..interfaces.downloader import AbstractConversationDownloader
 
-
+from ...domain.value_objects.feedback import Feedback
+from ...domain.enums.rating import RatingType
 class ConversationApplicationService:
     """
     Orchestrator for managing conversation-related operations. This class handles messages
@@ -239,3 +240,21 @@ class ConversationApplicationService:
             total_tokens += total
 
         return Result.ok(selected_messages)
+
+
+    def add_feedback_to_message(self, conversation_id:str, message_id:str, rating:RatingType, comment:str):
+
+        conversation = self._repository.get_by_id(conversation_id)
+
+        if not conversation:
+            return Result.fail()
+
+
+        feedback = Feedback.create(rating=rating, comment=comment)
+
+
+        result = conversation.add_feedback_message(message_id=message_id, feedback=feedback)
+
+        self._repository.save(conversation_id)
+
+        return result

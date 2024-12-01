@@ -4,7 +4,7 @@ from ai.infra.pipe.base import PipelineStage
 from models.model_wrappers import EmbeddingModel, HuggingFaceLargeLanguageModel, LlmModel
 from models.tokenizer_wrappers import LlmTokenizer, PunktTokenizer, SpaCyTokenizer
 from shared.infra.config import PROCESSED_DATA_DIR
-from shared.infra.logging.loggers import FileLogger
+from src.chat.infra.logging.loggers import FileLogger
 
 from .generator import AnswerGenerator
 from .retriever import DocumentRetriever

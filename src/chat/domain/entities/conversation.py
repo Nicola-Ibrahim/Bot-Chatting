@@ -3,145 +3,112 @@ from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from shared.infra.utils.result import Result
-from src.shared.domain.entity import AggregateRoot
-
+from ...infra.utils.result import Result
 from ..exceptions.operation import InValidOperationException
+
+# Domain-specific imports
 from ..value_objects.content import Content
 from ..value_objects.feedback import Feedback
-from ..value_objects.ids import ConversationId
 from .message import Message
 
 
 @dataclass
-class Conversation(AggregateRoot):
+class Conversation:
     """
-    Represents a chat session, handling multiple messages and responses.
+    Represents a conversation, handling multiple messages.
     """
 
-    _id: ConversationId = field(default=ConversationId.of(uuid.uuid4()))
     _messages: OrderedDict[uuid.UUID, Message] = field(default_factory=OrderedDict)
     timestamp: datetime = field(default_factory=datetime.now)
 
-    @property
-    def all_messages(self) -> Result:
-        """Get all messages in the chat."""
-        return Result.ok(list(self._messages.values()))
-
-    @classmethod
-    def create(cls) -> Result:
+    @staticmethod
+    def start() -> Result:
         """
-        Factory method to create a new Conversation instance.
-
-        Returns:
-            Result: Success with a new, empty conversation instance.
+        Factory method to create a new conversation instance.
         """
-        return Result.ok(cls())
+        return Result.ok(Conversation())
 
-    @classmethod
-    def from_existing(cls, conversation: "Conversation") -> Result:
+    def add_message(self, content: Content) -> Result:
         """
-        Factory method to create a new Conversation instance based on an existing one.
-
-        Args:
-            conversation (Conversation): An existing conversation to load data from.
-
-        Returns:
-            Result: Success with the new conversation initialized with existing data.
+        Adds a new message to the conversation.
+        Handles creation of the Message entity and ensures that the
+        text and response are valid before adding it.
         """
-        # TODO: Apply domain rules and checks before returning the object
-        return Result.ok(conversation)
 
-    def add_message(self, message: Message) -> Result:
+        # Validate the text and response
+        if not content.text or len(content.text) < 3:
+            return Result.fail(InValidOperationException("Message text must be at least 3 characters long."))
 
+        if not content.response or len(content.response) < 3:
+            return Result.fail(InValidOperationException("Response text must be at least 3 characters long."))
+
+        # Create the message entity from the provided text and response
+        message_result = Message.create(content)
+        if message_result.is_failure:
+            return Result.fail(message_result.error)
+
+        message = message_result.value
+
+        # Add the created message to the conversation
         self._messages[message.id] = message
+        return Result.ok(message)
 
-        return message
-
-    def regenerate_or_edit_message(self, message_id: uuid.UUID, text: str, response: str) -> Result:
+    def regenerate_or_edit_message(self, message_id: uuid.UUID, content: Content) -> Result:
         """
-        Regenerates the response or updates the message text in the message.
-
-        Args:
-            message_id (uuid.UUID): The ID of the message to update.
-            text (str): The new message text.
-            response (str): The new generated response text.
-
-        Returns:
-            Result: Success or failure with an appropriate message.
+        Regenerates or edits an existing message's content using the provided Content object.
         """
-        check_result = self._check_message_exist(message_id)
-        if check_result.is_failure():
+
+        # First, check if the message exists
+        check_result = self._check_message_exists(message_id)
+        if check_result.is_failure:
             return check_result
 
-        # Add the new content to the existing message
-        content_result = Content.create(text=text, response=response)
-        if content_result.is_failure():
-            return content_result
+        # Validate the provided content
+        if content.is_invalid():
+            return Result.fail(
+                InValidOperationException("Message text and response must be at least 3 characters long.")
+            )
 
-        self._messages[message_id].add_message(content_result.value)
-        return Result.ok(self._messages[message_id])
+        # Retrieve the message and update its content
+        message = self._messages[message_id]
+        return message.add_content(content)
 
-    def _check_message_exist(self, message_id: uuid.UUID) -> Result:
+    def _check_message_exists(self, message_id: uuid.UUID) -> Result:
         """
-        Checks if a message exists by its ID.
-
-        Args:
-            message_id (uuid.UUID): The ID of the message to check.
-
-        Returns:
-            Result: Success or failure with an error message.
+        Checks if a message with the given ID exists in the conversation.
         """
         if message_id not in self._messages:
             return Result.fail(InValidOperationException(f"Message with ID {message_id} not found."))
-        return Result.ok(True)
+        return Result.ok(self._messages[message_id])
 
     def get_last_n_messages(self, n: int) -> Result:
         """
-        Retrieves the last `n` messages in the chat.
-
-        Args:
-            n (int): The number of recent messages to retrieve.
-
-        Returns:
-            Result: Success with the list of most recent `n` messages.
+        Retrieves the last `n` messages in the conversation.
         """
+        if n <= 0:
+            return Result.fail(InValidOperationException("Number of messages must be positive."))
         return Result.ok(list(self._messages.values())[-n:])
 
-    def add_feedback_message(self, message_id: uuid.UUID, rating: str, comment: str = None) -> Result:
+    def add_feedback_message(self, message_id: uuid.UUID, content_pos: int, feedback: Feedback) -> Result:
         """
-        Adds feedback to a specific message.
-
-        Args:
-            message_id (uuid.UUID): The ID of the message to update.
-            rating (str): The feedback rating.
-            comment (str, optional): Additional comments for feedback.
-
-        Returns:
-            Result: Success or failure with an appropriate message.
+        Adds feedback to a specific message in the conversation.
         """
-        check_result = self._check_message_exist(message_id)
+        check_result = self._check_message_exists(message_id)
         if check_result.is_failure():
             return check_result
 
-        feedback = Feedback(rating=rating, comment=comment)
-        self._messages[message_id].add_message_feedback(feedback)
-        return Result.ok(True)
+        message = check_result.value
+        return message.add_content_feedback(content_pos, feedback)
 
     def read_chat_partially(self, tokenizer, max_recent: int = 5, token_limit: int = 500) -> Result:
         """
-        Retrieve recent messages from a chat, respecting a token limit.
-
-        Args:
-            tokenizer (AbstractTokenizerService): Tokenizer service to calculate tokens.
-            max_recent (int): The maximum number of recent messages to retrieve.
-            token_limit (int): The maximum token limit for the context.
-
-        Returns:
-            Result: Success with a list of recent messages within the token limit or failure.
+        Retrieves recent messages from the conversation within a token limit.
         """
-        last_messages = self.get_last_n_messages(max_recent).value
+        last_messages_result = self.get_last_n_messages(max_recent)
+        if last_messages_result.is_failure():
+            return last_messages_result
 
+        last_messages = last_messages_result.value
         selected_messages = []
         total_tokens = 0
 
