@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from ...infra.utils.result import Result
 from ..enums.rating import RatingType
+from ..exceptions.operation import InValidOperationException
 from .value_object import ValueObject
 
 
@@ -13,18 +13,24 @@ class Feedback(ValueObject):
     rating: RatingType
     comment: Optional[str] = None
 
-    def __post_init__(self):
-        """Validates the business rules for feedback."""
+    def validate(self) -> bool:
+        """
+        Validates the business rules for feedback.
+
+        Returns:
+            bool: True if valid, raises an exception otherwise.
+        """
         if self.comment and not self.comment.strip():
-            raise ValueError("Comment cannot be an empty string.")
+            raise InValidOperationException.validation("Comment cannot be an empty string.")
 
         if self.comment and len(self.comment) > 500:
-            raise ValueError("Comment cannot exceed 500 characters.")
+            raise InValidOperationException.validation("Comment cannot exceed 500 characters.")
+
+        return True
 
     @classmethod
-    def create(cls, rating: RatingType, comment: Optional[str] = None) -> Result:
+    def create(cls, rating: RatingType, comment: Optional[str] = None) -> "Feedback":
         """Factory method to create feedback."""
-        if comment and len(comment) > 500:
-            return Result.fail(ValueError("Comment cannot exceed 500 characters."))
-
-        return Result.ok(cls(rating=rating, comment=comment))
+        feedback = cls(rating=rating, comment=comment)
+        feedback.validate()  # Validate the feedback upon creation
+        return feedback

@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from ...infra.utils.result import Result
 from ..exceptions.operation import InValidOperationException
 from .feedback import Feedback
 from .value_object import ValueObject
@@ -15,8 +14,21 @@ class Content(ValueObject):
     response: str
     feedback: Optional[Feedback] = None
 
+    def validate(self) -> bool:
+        """
+        Validates the business rules for content.
+
+        Returns:
+            bool: True if valid, raises an exception otherwise.
+        """
+        if not self.text or len(self.text) < 3:
+            raise InValidOperationException.validation("Content text must be at least 3 characters long.")
+        if not self.response or len(self.response) < 3:
+            raise InValidOperationException.validation("Response text must be at least 3 characters long.")
+        return True
+
     @classmethod
-    def create(cls, text: str, response: str) -> Result["Content", InValidOperationException]:
+    def create(cls, text: str, response: str) -> "Content":
         """
         Factory method to create a content instance with validation.
 
@@ -25,32 +37,25 @@ class Content(ValueObject):
             response (str): The generated response text.
 
         Returns:
-            Result: Success with the created `Content` or failure with an error message.
+            Content: A new `Content` object if valid, otherwise raises an exception.
         """
-        # Validate the text and response lengths
-        if not text or len(text) < 3:
-            return Result.fail(InValidOperationException("Content text must be at least 3 characters long."))
-        if not response or len(response) < 3:
-            return Result.fail(InValidOperationException("Response text must be at least 3 characters long."))
-
-        # Return the result with a valid Content object
-        return Result.ok(cls(text=text, response=response))
+        content = cls(text=text, response=response)
+        content.validate()
+        return content
 
     @classmethod
     def with_feedback(cls, text: str, response: str, feedback: Feedback) -> "Content":
         """
-        Creates a new Content object with the provided feedback.
+        Creates a new `Content` object with the provided feedback.
 
         Args:
+            text (str): The content text (question).
+            response (str): The generated response text.
             feedback (Feedback): The feedback for the content.
 
         Returns:
-            Content: A new `Content` object with the added feedback.
+            Content: A new `Content` object with the added feedback if valid.
         """
-        # Validate the text and response lengths
-        if not text or len(text) < 3:
-            return Result.fail(InValidOperationException("Content text must be at least 3 characters long."))
-        if not response or len(response) < 3:
-            return Result.fail(InValidOperationException("Response text must be at least 3 characters long."))
-
-        return Result.ok(cls(text=text, response=response, feedback=feedback))
+        content = cls(text=text, response=response, feedback=feedback)
+        content.validate()
+        return content

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from typing import Any, Callable, Generic, TypeVar, Union
+from typing import Any, Callable, Generic, TypeVar
 
-from ...domain.exception import BaseDomainException
+from ...domain.exceptions.exception import BaseDomainException
 
 T = TypeVar("T")  # Type of the success value
 E = TypeVar("E", bound=BaseDomainException)  # Type of the error (must be an exception)
@@ -14,8 +14,8 @@ class Result(Generic[T, E]):
     which can either succeed (SuccessResult) or fail (ErrorResult).
     """
 
-    _value: Union[T, None] = None
-    _error: Union[E, None] = None
+    _value: T | None = None
+    _error: E | None = None
 
     def __post_init__(self):
         if self._value is not None and self._error is not None:

@@ -32,6 +32,10 @@ class UUIDID(ID):
 
     value: uuid.UUID
 
+    @classmethod
+    def create(cls):
+        cls(value=uuid.uuid4())
+
     def __eq__(self, other: ID) -> bool:
         return isinstance(other, UUIDID) and self.value == other.value
 

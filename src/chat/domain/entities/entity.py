@@ -4,6 +4,8 @@ from typing import Any, TypeVar
 
 from ..value_objects.ids import ID
 
+IDType = TypeVar("E", bound=ID)
+
 
 @dataclass
 class Entity:
@@ -13,7 +15,7 @@ class Entity:
     Supports flexible ID types.
     """
 
-    _id: ID
+    _id: IDType
     _instance_id: int = field(default_factory=lambda: next(count()))
 
     def __eq__(self, other: Any) -> bool:
