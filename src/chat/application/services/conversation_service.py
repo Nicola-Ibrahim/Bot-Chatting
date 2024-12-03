@@ -1,15 +1,17 @@
 import uuid
 
-from ...infra.utils.result import Result
-
 from ...domain.entities.conversation import Conversation
-from ...domain.entities.message import Message
+from ...domain.enums.rating import RatingType
+from ...domain.exceptions.base import BaseDomainException
 from ...domain.value_objects.content import Content
+from ...domain.value_objects.feedback import Feedback
+from ...infra.persistence.exceptions import RepositoryException
+from ...infra.utils.result import Result
+from ..dtos.conversation import ConversationDTO
 from ..interfaces.conversation_repository import AbstractConversationRepository
 from ..interfaces.downloader import AbstractConversationDownloader
 
-from ...domain.value_objects.feedback import Feedback
-from ...domain.enums.rating import RatingType
+
 class ConversationApplicationService:
     """
     Orchestrator for managing conversation-related operations. This class handles messages
@@ -22,6 +24,8 @@ class ConversationApplicationService:
         self,
         conversation_downloader: AbstractConversationDownloader,
         repository: AbstractConversationRepository,
+        response_generator,
+        tokenizer,
     ):
         """
         Initializes the gateway with necessary services and repositories.
@@ -35,28 +39,21 @@ class ConversationApplicationService:
         self._response_generator = response_generator
         self._tokenizer = tokenizer
 
-    def create(self) -> Result[Conversation, Exception]:
+    def create(self) -> Result:
         """
         Creates a new conversation session and stores it in the repository.
 
         Returns:
             Result: A Result containing either the created Conversation or an error.
         """
-        result = Conversation.create()
+        try:
+            conversation = Conversation.start()
+            self._repository.save(conversation)
+            return Result.ok(ConversationDTO.from_domain(conversation))
+        except BaseDomainException as e:
+            return Result.fail(e)
 
-        # Save the conversation to the repository
-        self._repository.save(result.value)
-
-        return result
-
-    def update(self, conversation: Conversation):
-        # Validate new conversation values and attrs
-        # Return result as error if the validation went wrong
-
-        # otherwise, return result with new updated conversation value
-        return result
-
-    def get_by_id(self, conversation_id: uuid.UUID) -> Result:
+    def retrieve_by_id(self, conversation_id: uuid.UUID) -> Result:
         """
         Retrieves a conversation by its unique identifier.
 
@@ -67,17 +64,9 @@ class ConversationApplicationService:
             Result: A Result containing the retrieved Conversation or an error.
         """
         conversation = self._repository.get_by_id(conversation_id)
-
         if not conversation:
-            return Result.fail()
-
-        # here it should return a ViewModel or ResponseModel to represent the data
-        conversation_view_model = ConversationViewModel(
-            conversation_id=,
-            messages=,
-            ...
-        )
-        return Result.ok(conversation_view_model)
+            return Result.fail(ValueError("Conversation not found."))
+        return Result.ok(ConversationDTO.from_domain(conversation))
 
     def add_message(self, conversation_id: uuid.UUID, text: str) -> Result:
         """
@@ -90,64 +79,53 @@ class ConversationApplicationService:
         Returns:
             Result: A Result containing the created message or an error.
         """
+        try:
+            conversation = self._repository.get_by_id(conversation_id)
+            if not conversation:
+                return Result.fail(RepositoryException.entity_not_found("Conversation not found."))
 
+            response = self._response_generator.generate_answer(text)
+            if not response:
+                return Result.fail(ValueError("Failed to generate a response."))
 
-        # Get the conversation from the repository, taking into account the limited number of the last messages
-        # we should get from the repository, since we might need only last 4, 5, or etc messages
-        # rule of thumb: only get the data that we need
+            content = Content.create(text=text, response=response)
+            conversation.add_message(content=content)
+            self._repository.save(conversation)
+            return Result.ok(ConversationDTO.from_domain(conversation))
+        except BaseDomainException as e:
+            return Result.fail(e)
 
-        conversation = self._repository.get_by_id(conversation_id)
-
-        if not conversation:
-            return Result.fail()
-
-
-        response = self._response_generator.generate_answer(text)
-        if not response:
-            return Result.fail()
-
-        # Create content
-        content_result = Content.create(text=text, response=response)
-        if content_result.is_failure():
-            return content_result
-
-        # Create message
-        message_result = Message.create(initial_content=content_result.value)
-        if message_result.is_failure():
-            return message_result
-
-        # Add the message to the conversation
-        result = conversation.add_message(message=message_result.value)
-
-        # Commit changes and updates to DB
-        self._repository.save(conversation=conversation)
-
-        return result
-
-    def regenerate_or_edit_message(self, conversation_id: uuid.UUID, message_id: uuid.UUID, text: str) -> Result:
+    def add_feedback_to_message(
+        self,
+        conversation_id: uuid.UUID,
+        message_id: uuid.UUID,
+        content_pos: int,
+        rating: RatingType,
+        comment: str,
+    ) -> Result:
         """
-        Regenerates the response for a specific message in a conversation.
+        Adds feedback to a specific message within a conversation.
 
         Args:
             conversation_id (uuid.UUID): The unique ID of the conversation.
             message_id (uuid.UUID): The unique ID of the message.
-            text (str): The new message text for the response generation.
+            rating (RatingType): The rating provided in the feedback.
+            comment (str): The optional comment for the feedback.
 
         Returns:
-            Result: A Result containing the regenerated response or an error.
+            Result: A Result indicating the outcome of the operation.
         """
-        conversation_result = self.get_by_id(conversation_id)
-        if conversation_result.is_error:
-            return conversation_result
+        try:
+            conversation = self._repository.get_by_id(conversation_id)
+            if not conversation:
+                return Result.fail(RepositoryException.entity_not_found("Conversation not found."))
 
-        conversation = conversation_result.value
-        new_response = self._response_generator.generate(text)
-
-        # Edit or regenerate the message
-        conversation.regenerate_or_edit_message(message_id=message_id, text=text, response=new_response)
-        self._repository.save(conversation)
-
-        return Result.ok(new_response)
+            feedback = Feedback.create(rating=rating, comment=comment)
+            conversation.add_feedback_message(message_id=message_id, content_pos=content_pos, feedback=feedback)
+            self._repository.save(conversation)
+            return Result.ok(ConversationDTO.from_domain(conversation))
+        except BaseDomainException as e:
+            return Result.fail(e)
 
     def delete(self, conversation_id: uuid.UUID) -> Result:
         """
@@ -159,12 +137,15 @@ class ConversationApplicationService:
         Returns:
             Result: A Result indicating the outcome of the delete operation.
         """
-        conversation_result = self.get_by_id(conversation_id)
-        if conversation_result.is_error:
-            return conversation_result
+        try:
+            conversation = self._repository.get_by_id(conversation_id)
+            if not conversation:
+                return Result.fail(RepositoryException.entity_not_found("Conversation not found."))
 
-        self._repository.delete(conversation_id)
-        return Result.ok(None)
+            self._repository.delete(conversation_id)
+            return Result.ok(None)
+        except BaseDomainException as e:
+            return Result.fail(e)
 
     def download(self, conversation_id: uuid.UUID) -> Result:
         """
@@ -176,85 +157,12 @@ class ConversationApplicationService:
         Returns:
             Result: A Result indicating the outcome of the download operation.
         """
-        conversation_result = self.get_by_id(conversation_id)
-        if conversation_result.is_error:
-            return conversation_result
+        try:
+            conversation = self._repository.get_by_id(conversation_id)
+            if not conversation:
+                return Result.fail(RepositoryException.entity_not_found("Conversation not found."))
 
-        conversation = conversation_result.value
-        self._conversation_downloader.download(conversation)
-        return Result.ok(None)
-
-    def get_recent_messages(self, conversation_id: uuid.UUID, max_recent: int = 5, token_limit: int = 500) -> Result:
-        """
-        Retrieves recent messages from a conversation, respecting a token limit.
-
-        Args:
-            conversation_id (uuid.UUID): The unique ID of the conversation.
-            max_recent (int, optional): The maximum number of recent messages to retrieve. Defaults to 5.
-            token_limit (int, optional): The maximum token limit for the context. Defaults to 500.
-
-        Returns:
-            Result: A Result containing a list of messages or an error.
-        """
-        conversation_result = self.get_by_id(conversation_id)
-        if conversation_result.is_error:
-            return conversation_result
-
-        conversation = conversation_result.value
-        recent_messages = conversation.get_recent_messages(max_recent=max_recent, token_limit=token_limit)
-        return Result.ok(recent_messages)
-
-    def read_plain_message_responses(
-        self, conversation_id: uuid.UUID, max_recent: int = 5, token_limit: int = 500
-    ) -> Result:
-        """
-        Retrieves the most recent plain message responses from a conversation.
-
-        Args:
-            conversation_id (uuid.UUID): The unique ID of the conversation.
-            max_recent (int, optional): The maximum number of recent messages to retrieve. Defaults to 5.
-            token_limit (int, optional): The maximum token limit for the context. Defaults to 500.
-
-        Returns:
-            Result: A Result containing a list of message responses or an error.
-        """
-        conversation_result = self.get_by_id(conversation_id)
-        if conversation_result.is_error:
-            return conversation_result
-
-        conversation = conversation_result.value
-        last_messages = conversation.get_last_n_messages(max_recent)
-
-        selected_messages = []
-        total_tokens = 0
-
-        for message in reversed(last_messages):
-            prompt_tokens = self._tokenizer.tokenize(message.text)
-            response_tokens = self._tokenizer.tokenize(message.response.text if message.response else "")
-            total = len(prompt_tokens) + len(response_tokens)
-
-            if total_tokens + total > token_limit:
-                break
-
-            selected_messages.insert(0, message)
-            total_tokens += total
-
-        return Result.ok(selected_messages)
-
-
-    def add_feedback_to_message(self, conversation_id:str, message_id:str, rating:RatingType, comment:str):
-
-        conversation = self._repository.get_by_id(conversation_id)
-
-        if not conversation:
-            return Result.fail()
-
-
-        feedback = Feedback.create(rating=rating, comment=comment)
-
-
-        result = conversation.add_feedback_message(message_id=message_id, feedback=feedback)
-
-        self._repository.save(conversation_id)
-
-        return result
+            self._conversation_downloader.download(conversation)
+            return Result.ok(None)
+        except BaseDomainException as e:
+            return Result.fail(e)
