@@ -122,7 +122,7 @@ The bot system follows Domain-Driven Design (DDD) principles, facilitating a cle
 
 ## 🛠️ **Core Layer: Domain Logic**
 
-The **Core Layer** handles the main business logic, domain models, and services. Each **bounded context** in the system, such as **chat**, **auth**, and **order**, has its own domain-driven services and entities.
+The **Core Layer** handles the main business logic, domain models, and services. Each **bounded context** in the system, such as **chat**, and **auth** has its own domain-driven services and entities.
 
 ---
 

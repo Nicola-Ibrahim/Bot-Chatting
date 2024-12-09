@@ -1,10 +1,9 @@
 from dataclasses import asdict, dataclass, field
 from itertools import count
-from typing import Any, TypeVar
+from typing import Any
 
-from ..value_objects.ids import ID
-
-IDType = TypeVar("E", bound=ID)
+from ...chat.domain.event.base import DomainEvent
+from .identifier import Identifier
 
 
 @dataclass
@@ -15,8 +14,17 @@ class Entity:
     Supports flexible ID types.
     """
 
-    _id: IDType
+    _id: Identifier
     _instance_id: int = field(default_factory=lambda: next(count()))
+
+    @property
+    def id(self) -> IDType:
+        """Get the ID of the entity."""
+        return self._id
+
+    @property
+    def instance_id(self) -> int:
+        """Get the instance-specific ID."""
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -38,14 +46,6 @@ class Entity:
         """
         return f"<{self.__class__.__name__}(id={self._id}, instance_id={self._instance_id})>"
 
-    @property
-    def id(self) -> IDType:
-        """Get the ID of the entity."""
-        return self._id
-
-    @property
-    def instance_id(self) -> int:
-        """Get the instance-specific ID."""
         return self._instance_id
 
     def copy(self, **changes) -> "Entity":
@@ -73,10 +73,19 @@ class Entity:
         return cls(**kwargs)
 
 
+@dataclass
 class AggregateRoot(Entity):
     """
     A special type of Entity that serves as the root of an aggregate in DDD.
     This class does not introduce additional logic, but it can be extended in the future.
     """
 
-    pass
+    _events: list = field(default_factory=list)
+
+    def _record_event(self, event: DomainEvent):
+        self._events.append(event)
+
+    def collect_events(self) -> list[DomainEvent]:
+        events = self._events[:]
+        self._events = []
+        return events

@@ -1,17 +1,25 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from ....domain.primitive.value_object import ValueObject
 from ..enums.rating import RatingType
 from ..exceptions.operation import InValidOperationException
-from .value_object import ValueObject
 
 
 @dataclass(frozen=True)
 class Feedback(ValueObject):
     """Represents feedback provided on a message."""
 
-    rating: RatingType
-    comment: Optional[str] = None
+    _rating: RatingType
+    _comment: Optional[str] = None
+
+    @property
+    def rating(self):
+        return self._rating
+
+    @property
+    def comment(self):
+        return self._comment
 
     def validate(self) -> bool:
         """
@@ -20,17 +28,23 @@ class Feedback(ValueObject):
         Returns:
             bool: True if valid, raises an exception otherwise.
         """
-        if self.comment and not self.comment.strip():
-            raise InValidOperationException.validation("Comment cannot be an empty string.")
+        # Validate rating
+        if not isinstance(self._rating, RatingType):
+            raise InValidOperationException.validation(
+                "Invalid rating type provided. Must be a valid RatingType enum."
+            )
 
-        if self.comment and len(self.comment) > 500:
-            raise InValidOperationException.validation("Comment cannot exceed 500 characters.")
+        # Validate comment
+        if self._comment is not None:
+            trimmed_comment = self._comment.strip()
+            if not trimmed_comment:
+                raise InValidOperationException.validation("Comment cannot be empty or whitespace.")
+            if len(trimmed_comment) > 500:
+                raise InValidOperationException.validation("Comment cannot exceed 500 characters.")
 
         return True
 
     @classmethod
     def create(cls, rating: RatingType, comment: Optional[str] = None) -> "Feedback":
         """Factory method to create feedback."""
-        feedback = cls(rating=rating, comment=comment)
-        feedback.validate()  # Validate the feedback upon creation
-        return feedback
+        return cls(_rating=rating, _comment=comment)

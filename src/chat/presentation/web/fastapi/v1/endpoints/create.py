@@ -24,7 +24,6 @@ async def create(
     request: CreateConversationRequestSchema,
     conversation_service: ConversationApplicationService = Depends(Provide[ChatAppDIContainer.conversation_service]),
 ):
-
     conversation = request.map_to_conversation()
 
     result: Result = conversation_service.create(conversation=conversation)

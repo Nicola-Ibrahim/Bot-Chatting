@@ -2,7 +2,7 @@ import json
 import os
 
 from chat.application.interface.feedback_repository import AbstractFeedbackRepository
-from shared.infra.config import FEEDBACK_DIR
+from common.infra.config import FEEDBACK_DIR
 
 
 class JsonFileFeedbackRepository(AbstractFeedbackRepository):

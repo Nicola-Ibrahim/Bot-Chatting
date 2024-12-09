@@ -1,7 +1,7 @@
 from ai.infra.pipe.base import Pipeline
 from models.model_wrappers import LlmModel
 from models.tokenizer_wrappers import LlmTokenizer
-from shared.infra.config import EXTERNAL_DATA_DIR, PROCESSED_DATA_DIR
+from common.infra.config import EXTERNAL_DATA_DIR, PROCESSED_DATA_DIR
 
 from .generator import AnswerGenerator
 from .preprocessor import Preprocessor

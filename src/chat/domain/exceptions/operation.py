@@ -1,4 +1,4 @@
-from .base import BaseDomainException
+from ....domain.primitive.exception import BaseDomainException
 
 
 class InValidOperationException(BaseDomainException):

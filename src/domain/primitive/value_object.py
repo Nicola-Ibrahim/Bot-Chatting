@@ -7,6 +7,9 @@ from typing import Any
 class ValueObject(ABC):
     """Base class for Value Objects in DDD, providing equality, hashing, and string representation."""
 
+    def __post_init__(self):
+        self.validate()
+
     @abstractmethod
     def __eq__(self, other: Any) -> bool:
         """Override equality comparison to compare values of the object."""

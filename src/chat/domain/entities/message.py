@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
+from ....domain.primitive.entity import Entity, IDType
+from ....domain.primitive.identifier import UUIDID
 from ..exceptions.operation import InValidOperationException
 from ..value_objects.content import Content
 from ..value_objects.feedback import Feedback
-from ..value_objects.ids import UUIDID
-from .entity import Entity, IDType
 
 
 @dataclass
@@ -17,6 +17,10 @@ class Message(Entity):
     _id: IDType = field(default_factory=UUIDID.create)
     _contents: list[Content] = field(default_factory=list)
     timestamp: datetime = field(default_factory=datetime.now)
+
+    @property
+    def contents(self):
+        return self._contents
 
     @classmethod
     def create(cls, content: Content):
@@ -36,7 +40,17 @@ class Message(Entity):
             raise InValidOperationException.validation("Content cannot be null.")
 
         self._contents.append(content)
-        return self
+        return content
+
+    def update_message(self, content: Content):
+        """
+        Adds a new content to the message.
+        """
+        if not content:
+            raise InValidOperationException.validation("Content cannot be null.")
+
+        self._contents.append(content)
+        return content
 
     def get_latest_content(self):
         """
@@ -54,7 +68,7 @@ class Message(Entity):
         content = self._get_content_by_index(content_index)
 
         # Create a new Content with feedback
-        new_content = Content.with_feedback(content.text, content.response, feedback)
+        new_content = Content.create(content.text, content.response, feedback)
 
         # Replace the old content with the new one
         self._contents[content_index] = new_content

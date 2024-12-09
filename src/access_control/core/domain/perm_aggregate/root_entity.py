@@ -1,7 +1,7 @@
 import dataclasses
 from typing import Optional
 
-from .....shared.domain.entity import Entity
+from .....common.domain.entity import Entity
 
 
 @dataclasses.dataclass

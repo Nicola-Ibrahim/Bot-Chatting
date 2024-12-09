@@ -1,7 +1,7 @@
 import dataclasses
 from typing import Optional
 
-from src.shared.domain.entity import RootEntity
+from src.common.domain.entity import RootEntity
 
 from .other_entity import UserProfile, UserSettings
 from .value_objects import Address, Name, Password, Phone
