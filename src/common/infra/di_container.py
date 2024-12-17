@@ -1,6 +1,6 @@
 from dependency_injector import containers, providers
 
-from chat.infra.common.di import ChatAppDIContainer
+from chats.infra.common.di import ChatAppDIContainer
 
 
 class AppContainer(containers.DeclarativeContainer):

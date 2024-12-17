@@ -1,4 +1,11 @@
-lang := en  # Language for translation
+# Language for translation
+lang := en
+
+# Common Docker flags
+DOCKER_COMPOSE_FLAGS := -f docker-compose.yml
+DOCKER_COMPOSE_DEV_FLAGS := -f docker-compose.dev.yml
+DOCKER_BUILD_FLAGS := --build -d --force-recreate
+DOCKER_RUN_FLAGS := --rm -p $(HOST_PORT):$(CONTAINER_PORT)
 
 # Catch all targets and store them in a variable
 COMMANDS := $(shell grep -E '^[a-zA-Z0-9_-]+:' Makefile | sed 's/:.*//')
@@ -16,9 +23,11 @@ IMAGE_NAME := myapp
 HOST_PORT := 8000
 CONTAINER_PORT := 8000
 
+UV := uv run
+
 .PHONY: $(COMMANDS)  # Declare all commands as PHONY
 
-list:  # List all commands
+list:  # List all commands and their descriptions
 	@echo "$(YELLOW)===========================$(RESET)"
 	@echo "$(YELLOW)      Available Commands    $(RESET)"
 	@echo "$(YELLOW)===========================$(RESET)"
@@ -32,34 +41,34 @@ list:  # List all commands
 
 create-user:  # Create a superuser with administrative privileges
 	@echo "Creating superuser..."
-	poetry run python src/scripts/create_superuser.py
+	$(UV) python src/scripts/create_superuser.py
 
 gen-sample-users:  # Generate a predefined set of sample users for testing
 	@echo "Generating sample users..."
-	poetry run python src/scripts/generate_users.py
+	$(UV) python src/scripts/generate_users.py
 
 lint:  # Run linters to ensure code quality and style consistency
 	@echo "Running linters..."
-	poetry run pre-commit run --all-files
+	$(UV) pre-commit run --all-files
 
 migrate:  # Create and apply database migrations for schema changes
 	@echo "Creating migrations..."
-	poetry run alembic revision --autogenerate -m "Migration"
+	$(UV) alembic revision --autogenerate -m "Migration"
 	@echo "Applying migrations..."
-	poetry run alembic upgrade head
+	$(UV) alembic upgrade head
 
-start:  # Start the FastAPI server for development
+start:  # Start the FastAPI server with auto-reload in development
 	@echo "Starting server..."
 	fastapi run src/shared/presentation/web/fastapi/main.py --reload
 
-install:  # Install project dependencies from Poetry
+install:  # Install project dependencies using Poetry
 	@echo "Installing dependencies..."
 	poetry install
 
 install-hooks:  # Install pre-commit hooks to automate code checks
 	@echo "Installing hooks..."
-	poetry run pre-commit uninstall
-	poetry run pre-commit install
+	$(UV) pre-commit uninstall
+	$(UV) pre-commit install
 
 update-db:  # Create and apply migrations, then install hooks
 	@echo "Updating database..."
@@ -68,40 +77,40 @@ update-db:  # Create and apply migrations, then install hooks
 
 shell:  # Open a Django shell for interactive management
 	@echo "Opening shell..."
-	poetry run python src/scripts/shell.py
+	$(UV) python src/scripts/shell.py
 
 flush-tokens:  # Remove expired tokens from the database
 	@echo "Flushing expired tokens..."
-	poetry run python src/scripts/flush_expired_tokens.py
+	$(UV) python src/scripts/flush_expired_tokens.py
 
 check:  # Verify the readiness of the deployment environment
 	@echo "Checking deployment..."
-	poetry run python src/scripts/check_deploy.py
+	$(UV) python src/scripts/check_deploy.py
 
 test:  # Run all tests to ensure application functionality
 	@echo "Running tests..."
-	poetry run pytest -v -rs -s -n auto --show-capture=no
+	$(UV) pytest -v -rs -s -n auto --show-capture=no
 
 test-coverage:  # Run tests with coverage reporting to track code coverage
 	@echo "Running tests with coverage..."
-	poetry run pytest --cov
-	poetry run coverage html
+	$(UV) pytest --cov
+	$(UV) coverage html
 
 dev-docker:  # Start Docker containers for development
 	@echo "Starting dev containers..."
-	docker-compose -f docker-compose.dev.yml up --build -d --force-recreate
+	docker-compose $(DOCKER_COMPOSE_DEV_FLAGS) up $(DOCKER_BUILD_FLAGS)
 
 stop-dev:  # Stop and remove development Docker containers
 	@echo "Stopping dev containers..."
-	docker-compose -f docker-compose.dev.yml down
+	docker-compose $(DOCKER_COMPOSE_DEV_FLAGS) down
 
 prod-docker:  # Start Docker containers for production
 	@echo "Starting prod containers..."
-	docker-compose -f docker-compose.yml up --build -d --force-recreate
+	docker-compose $(DOCKER_COMPOSE_FLAGS) up $(DOCKER_BUILD_FLAGS)
 
 stop-prod:  # Stop and remove production Docker containers
 	@echo "Stopping prod containers..."
-	docker-compose -f docker-compose.yml down
+	docker-compose $(DOCKER_COMPOSE_FLAGS) down
 
 clean-docker:  # Clean up unused Docker images and volumes to free space
 	@echo "Cleaning unused images..."
@@ -109,11 +118,11 @@ clean-docker:  # Clean up unused Docker images and volumes to free space
 
 dev-logs:  # View real-time logs from development Docker containers
 	@echo "Viewing dev logs..."
-	docker-compose -f docker-compose.dev.yml logs -f
+	docker-compose $(DOCKER_COMPOSE_DEV_FLAGS) logs -f
 
 prod-logs:  # View real-time logs from production Docker containers
 	@echo "Viewing prod logs..."
-	docker-compose -f docker-compose.yml logs -f
+	docker-compose $(DOCKER_COMPOSE_FLAGS) logs -f
 
 gen-jwt:  # Generate a new JWT key for authentication
 	@echo "Generating JWT key..."
@@ -137,7 +146,7 @@ build-docker:  # Build the Docker image for the application
 
 run-docker: build-docker  # Run the Docker container based on the built image
 	@echo "Running Docker container..."
-	docker run --rm -p $(HOST_PORT):$(CONTAINER_PORT) $(IMAGE_NAME)
+	docker run $(DOCKER_RUN_FLAGS) $(IMAGE_NAME)
 
 up-docker: build-docker run-docker  # Build and run the Docker container
 	@echo "Docker is running."

@@ -311,18 +311,42 @@ To ensure all features are functional, the bot system includes unit and integrat
 
 By following **Domain-Driven Design** and utilizing **FastAPI**, this bot system is highly modular and easily extendable. With clear boundaries between different concerns (such as authentication, notifications, and conversations), it’s easy for new developers to contribute and expand the system. The detailed documentation and organized file structure will guide you through the system, making it simple to understand and interact with the project.
 
-## Useful Resources
+## 📚 Useful Resources for Domain-Driven Design (DDD)
 
-For further reading and strengthening DDD skills:
+### 🏗️ Core Concepts and Architectures
 
-- [ ] [Domain-Driven Design](https://herbertograca.com/2017/09/07/domain-driven-design/)
-- [ ] [Onion Architecture](https://medium.com/expedia-group-tech/onion-architecture-deed8a554423)
-- [ ] [implementing-dddomain-models](https://medium.com/vx-company/implementing-dddomain-models-ports-adapters-and-cqrs-with-c-2b81403f09f7)
-- [ ] [implementing-ports-CQRS](https://abstarreveld.medium.com/dddomain-models-ports-adapters-and-cqrs-reference-architecture-c-504817df65ec)
-- [ ] [clean-lessonsUse cases](https://medium.com/unil-ci-software-engineering/clean-ddd-lessons-use-cases-e9d11f64a0e9)
-- [ ] [Clean Domain-Driven Design](https://medium.com/unil-ci-software-engineering/clean-domain-driven-design-2236f5430a05)
-- [ ] [Always-Valid Domain Model](https://vkhorikov.medium.com/always-valid-domain-model-706e5f3d24b0)
-- [ ] [DDD Value Objects: Mastering Data Validation in Python](https://scresh.hashnode.dev/ddd-value-objects-mastering-data-validation-in-python)
-- [ ] [Domain-Driven Design (DDD) and Hexagonal Architecture in Java](https://vaadin.com/blog/ddd-part-3-domain-driven-design-and-the-hexagonal-architecture)
-- [ ] [DTO pattern (Data Transfer Object)](https://www.baeldung.com/java-dto-pattern)
-- [ ] [Domain model with SQLAlchemy](https://blog.szymonmiks.pl/p/domain-model-with-sqlalchemy/)
+- **Herberto Graca Blog**: [Domain-Driven Design](https://herbertograca.com/2017/09/07/domain-driven-design/)  
+- **Medium**: [Onion Architecture](https://medium.com/expedia-group-tech/onion-architecture-deed8a554423)  
+- **GitHub**: [Modular Monolith with DDD](https://github.com/kgrzybek/modular-monolith-with-ddd)  
+- **Medium**: [Clean Domain-Driven Design](https://medium.com/unil-ci-software-engineering/clean-domain-driven-design-2236f5430a05)  
+- **Medium**: [Always-Valid Domain Model](https://vkhorikov.medium.com/always-valid-domain-model-706e5f3d24b0)  
+- **GitHub**: [Clean Architecture by Examples](https://github.com/amantinband/clean-architecture?tab=readme-ov-file#application-layer-unit-tests)  
+- **GitHub**: [Python DDD Implementation](https://github.com/qu3vipon/python-ddd)  
+- **Dev.to**: [Unit of Work and Repository Design Patterns with SQLModel](https://dev.to/manukanne/a-python-implementation-of-the-unit-of-work-and-repository-design-pattern-using-sqlmodel-3mb5)  
+- **Pluralsight (*tutorial*)**: [DDD in Practice](https://www.pluralsight.com/courses/domain-driven-design-in-practice?clickid=USgRhURpGxyKRiq3y1yteWwfUkCT%3A-WWzXLjWY0&irgwc=1&mpid=1970485&aid=7010a000001xAKZAA2&utm_medium=digital_affiliate&utm_campaign=1970485&utm_source=impactradius)  
+- **Medium**: [Backend Logging in Python with FastAPI](https://medium.com/@v0220225/backend-logging-in-python-and-applied-to-fastapi-7b47118d1d92)  
+- **Code Maze**: [Clean Architecture with .NET](https://code-maze.com/dotnet-clean-architecture/)  
+
+---
+
+### ⚙️ Implementation Patterns
+
+- **Medium**: [Implementing DDD Domain Models](https://medium.com/vx-company/implementing-dddomain-models-ports-adapters-and-cqrs-with-c-2b81403f09f7)  
+- **Medium**: [Implementing Ports & CQRS](https://abstarreveld.medium.com/dddomain-models-ports-adapters-and-cqrs-reference-architecture-c-504817df65ec)  
+- **Baeldung**: [DTO Pattern (Data Transfer Object)](https://www.baeldung.com/java-dto-pattern)  
+- **Medium**: [Clean Lessons: Use Cases](https://medium.com/unil-ci-software-engineering/clean-ddd-lessons-use-cases-e9d11f64a0e9)  
+
+---
+
+### 🛠️ Tools and Frameworks
+
+- **Blog**: [Domain Model with SQLAlchemy](https://blog.szymonmiks.pl/p/domain-model-with-sqlalchemy/)  
+- **Hashnode**: [DDD Value Objects: Mastering Data Validation in Python](https://scresh.hashnode.dev/ddd-value-objects-mastering-data-validation-in-python)  
+- **GitHub**: [FastAPI Best Practices: Project Structure](https://github.com/zhanymkanov/fastapi-best-practices#1-project-structure-consistent--predictable)  
+- **ComputingForGeeks**: [GitHub Container Registry as Your Docker Registry](https://computingforgeeks.com/configure-github-container-registry-as-your-docker-registry/?utm_content=cmp-true#google_vignette)  
+
+---
+
+### 🌐 Advanced Topics
+
+- **Vaadin Blog**: [Domain-Driven Design (DDD) and Hexagonal Architecture in Java](https://vaadin.com/blog/ddd-part-3-domain-driven-design-and-the-hexagonal-architecture)  

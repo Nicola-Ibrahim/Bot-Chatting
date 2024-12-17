@@ -1,156 +1,64 @@
-[tool.poetry]
-name = "fast-api"
+[project]
+name = "bot-chating"
 version = "0.1.0"
-description = "FastAPI application"
-authors = ["Nicola Ibrahim <nicolaibrahim969@gmail.com>"]
-license = "MIT"
+description = "Add your description here"
 readme = "README.md"
-packages = [{ include = "src" }]
-package-mode = false
+license = "MIT"
+requires-python = ">=3.12"
+dependencies = [
+    "dependency-injector>=4.44.0",
+    "fastapi>=0.115.6",
+    "fastapi-cli>=0.0.6",
+    "pydantic>=2.10.3",
+    "python-dotenv>=1.0.1",
+    "returns>=0.24.0",
+    "sqlalchemy>=2.0.36",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-python-dotenv = "^0.21.1"
-fastapi = { extras = ["all"], version = "^0.115.0" }
-uvicorn = { extras = ["standard"], version = "^0.29.0" }
-httpx = "^0.24.0"
-pydantic = "^2.1.0"
-fastapi-cli = "^0.0.5"
-websockets = "^13.1"
+[dependency-groups]
+lint = ["ruff>=0.8.3"]
+dev = ["colorlog>=6.9.0", "pre-commit>=4.0.1"]
+test = [
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.25.0",
+    "pytest-cov>=6.0.0",
+    "pytest-xdist>=3.6.1",
+]
 
-# Create a new group for testing dependencies
-sqlalchemy = "^2.0.35"
-dependency-injector = "^4.43.0"
-returns = "^0.24.0"
-[tool.poetry.group.test.dependencies]
-pytest = "^7.4.0"
-pytest-asyncio = "^0.20.3"
-pytest-cov = "^4.1.0"
 
-[tool.poetry.group.dev.dependencies]
-flake8 = "^6.0.0"
-isort = "^5.12.0"
-mypy = "^1.5.1"
-pylint = "^2.15.0"
-colorlog = "^6.7.0"
-pre-commit = "^3.0.4"
-pytest-xdist = "^3.6.1"
-
-# ==== black ====
-[tool.black]
+[tool.ruff]
 line-length = 119
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-    | migrations/
-)/
-'''
-
-# ==== isort ====
-[tool.isort]
-profile = "black"
-line_length = 119
-multi_line_output = 5
-skip = [".venv/", "venv/"]
-skip_glob = ["**/migrations/*.py"]
-
-# ==== pylint ====
-[tool.pylint.MASTER]
-load-plugins = [""]
-
-[tool.pylint.FORMAT]
-max-line-length = 119
-
-[tool.pylint."MESSAGES CONTROL"]
-disable = [
-    "missing-docstring", # Disable docstring warning for brevity
-    "invalid-name",      # Disable naming convention warnings
+extend-ignore = [
+    "W191",   # tab-indentation
+    "E111",   # indentation-with-invalid-multiple
+    "E114",   # indentation-with-invalid-multiple-comment
+    "E117",   # over-indented
+    "D206",   # indent-with-spaces
+    "D300",   # triple-single-quotes
+    "Q000",   # bad-quotes-inline-string
+    "Q001",   # bad-quotes-multiline-string
+    "Q002",   # bad-quotes-docstring
+    "Q003",   # avoidable-escaped-quote
+    "COM812", # missing-trailing-comma
+    "COM819", # prohibited-trailing-comma
+    "ISC001", # single-line-implicit-string-concatenation
+    "ISC002", # multi-line-implicit-string-concatenation
 ]
 
-[tool.pylint.DESIGN]
-max-parents = 13
 
-[tool.pylint.TYPECHECK]
-generated-members = [
-    "REQUEST",
-    "acl_users",
-    "aq_parent",
-    "[a-zA-Z]+_set{1,2}",
-    "save",
-    "delete",
-]
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "tab"
+docstring-code-format = true
+docstring-code-line-length = 20
 
-# ==== mypy ====
-[tool.mypy]
-python_version = "3.12"
-files = [
-    "src/",
-    "tests/",
-] # Specify the source and test directories for type checking
-ignore_missing_imports = true
-strict = true # Enables strict type checking
-
-# ==== flake8 ====
-[tool.flake8]
-ignore = [
-    "C101",
-    "D403",
-    "F403",
-    "F401",
-    "F405",
-    "I100",
-    "I201",
-    "W503",
-    "W504",
-    "F821",
-    "Q000",
-    "E501",
-    "A001",
-    "A003",
-    "T201",
-    "I101",
-    "A002",
-]
-exclude = [
-    ".git",
-    "__pycache__",
-    ".venv",
-    ".tox",
-    "*/migrations/*",
-    "*/static/CACHE/*",
-    "docs",
-    "node_modules",
-    "venv",
-    ".script-venv",
-]
-filename = "*.py"
-accept-encodings = "utf-8"
-inline-quotes = "single"
-max-complexity = 12
-max-linenumber = 500
-max-line-length = 119
-multiline-quotes = "double"
 
 # ==== pytest ====
 [tool.pytest.ini_options]
-addopts = "-v --tb=short"
+# addopts = "-v --tb=short"
 testpaths = ["src"]
 pythonpath = ["src"]
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
 filterwarnings = "ignore::DeprecationWarning:^(?!node\\.).*:"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
