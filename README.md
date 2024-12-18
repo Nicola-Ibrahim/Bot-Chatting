@@ -69,10 +69,6 @@ The system uses **JWT** for secure user authentication. Upon successful login, a
     }
     ```
 
-#### **Schema**
-
-- **auth_schema.py**: Defines validation schemas for authentication, including fields for username, password, and JWT tokens.
-
 ---
 
 ## 💬 **Bot Conversations**
@@ -116,72 +112,6 @@ The **Conversation** entity manages the bot interactions with users, maintaining
       "status": "sent"
     }
     ```
-
-#### **Schema**
-
-- **conversation_schema.py**: Defines the structure of a conversation, including messages and sender information.
-
----
-
-## 📣 **Notifications**
-
-The system can send notifications to users about new messages, order statuses, or other relevant events.
-
-#### **Endpoints**
-
-- **POST /notifications/email**: Send an email notification to a user.
-
-  - **Request Body:**
-
-    ```json
-    {
-      "to": "user@example.com",
-      "subject": "Order Status",
-      "body": "Your order has been shipped."
-    }
-    ```
-
-- **POST /notifications/sms**: Send an SMS notification to a user.
-
-  - **Request Body:**
-
-    ```json
-    {
-      "to": "+1234567890",
-      "message": "Your order has been shipped."
-    }
-    ```
-
-#### **Schema**
-
-- **notification_schema.py**: Defines the structure for notification details (e.g., email, SMS).
-
----
-
-## 🛡️ **Configuration and Security**
-
-The system’s configuration is stored in environment variables, such as the database URL and the JWT secret. Security mechanisms include **password hashing** and **JWT** token generation and validation.
-
-#### **Key Files**
-
-- **config.py**: Configuration settings (e.g., JWT secret, database URL).
-- **security.py**: Contains utilities for securing passwords and handling JWT tokens.
-
----
-
-## 🧪 **Testing**
-
-To ensure all features are functional, the bot system includes unit and integration tests.
-
-#### **Test Endpoints**
-
-- **POST /test/authentication**: Test user authentication.
-- **POST /test/orders**: Test order creation functionality.
-
-#### **Test Files**
-
-- **test_auth.py**: Unit tests for authentication logic.
-- **test_orders.py**: Unit tests for order-related functionality.
 
 ---
 
