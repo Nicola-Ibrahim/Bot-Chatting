@@ -2,24 +2,41 @@
 
 ## 🚀 **Overview**
 
-This repository contains a bot system built using **FastAPI** and applying **Domain-Driven Design (DDD)** principles. The system is designed to integrate core features like **authentication**, **user management**, and **bot conversations**, while maintaining modularity, scalability, and maintainability. Each feature is encapsulated in its own bounded context, following DDD best practices for separation of concerns.
+This repository contains a **Bot Chat System** built with **FastAPI** and adhering to **Domain-Driven Design (DDD)** principles. The system is modular, scalable, and maintainable, integrating essential features such as **authentication**, **user management**, and **bot conversations**.
+
+The architecture is designed using **Clean Architecture** and **Modularization of a Monolithic Application**, ensuring that each feature operates within its own **bounded context**. This separation of concerns helps in managing complexity and promoting long-term maintainability.
 
 ### 🌟 **Key Features**
 
-- **FastAPI**: A high-performance web framework used to build the API, providing asynchronous support and automatic API documentation via Swagger.
-- **Domain-Driven Design (DDD)**: The architecture follows DDD principles, ensuring that business logic and components like user management and authentication are isolated and clearly defined.
-- **Authentication & Authorization**: The system supports secure login via JWT tokens, enforcing role-based access control for users.
-- **Bot Conversations**: The bot engages in interactive conversations, handling user inputs, generating responses, and maintaining conversation states.
-- **Notifications**: The system sends notifications about key events, such as message updates or system alerts, keeping users informed in real-time.
+- **FastAPI**: High-performance web framework for building APIs, offering asynchronous support and automatic API documentation via Swagger.
+- **Domain-Driven Design (DDD)**: The system follows DDD principles to maintain clear boundaries and isolate business logic in dedicated modules.
+- **Authentication & Authorization**: Secure login using JWT tokens with role-based access control (RBAC).
+- **Bot Conversations**: The bot interacts with users, processes input, and manages conversation states.
+- **Notifications**: Real-time notifications are sent about key events, such as message updates or system alerts, ensuring users stay informed.
 
-# Bot System Documentation
+## 🔍 **System Overview**
 
-🚀 **Bot System** powered by **FastAPI** and **DDD**  
-The bot system follows Domain-Driven Design (DDD) principles, facilitating a clean and manageable architecture. It integrates key features like **authentication**, **conversations**, **notifications**, and more, using FastAPI for building high-performance APIs.
+This bot system is designed with modularity in mind, following best practices to ensure the system is both scalable and maintainable. The implementation leverages **Clean Architecture** principles and **Modularization of the Monolith** to provide a clear separation of concerns between different modules.
+
+Key components include:
+
+- **Core Layer**: Houses the main domain logic, including business rules, entities, and value objects.
+- **Application Layer**: Contains use cases that orchestrate interactions between domain services and external interfaces like APIs.
+- **Infrastructure Layer**: Manages communication with external resources, such as databases, message queues, and external APIs.
+- **Presentation Layer**: Exposes the FastAPI API for external consumers, providing endpoints for interaction with the system.
+
+Each feature (e.g., **auth**, **chat**, **notifications**) is encapsulated within its own bounded context, making the system easy to extend and maintain.
 
 ## 🛠️ **Core Layer: Domain Logic**
 
-The **Core Layer** handles the main business logic, domain models, and services. Each **bounded context** in the system, such as **chat**, and **auth** has its own domain-driven services and entities.
+The **Core Layer** is the heart of the system, responsible for the main business logic and domain models. In this layer, we define:
+
+- **Entities**: Business objects that have a distinct identity (e.g., `User`, `Participants`).
+- **Value Objects**: Immutable objects that represent concepts in the domain (e.g., `Content`, `Feedback`).
+- **Aggregates**: Collections of entities and value objects treated as a unit (e.g., `Conversation`. `Message`).
+- **Domain Services**: Provide business logic that doesn't naturally belong to an entity (e.g., `UserService`, `MessageService`).
+
+This layered architecture ensures clear boundaries between business logic, infrastructure concerns, and application-specific code.
 
 ## 📄 **Running the Application**
 
