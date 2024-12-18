@@ -17,13 +17,13 @@ This repository contains a bot system built using **FastAPI** and applying **Dom
 🚀 **Bot System** powered by **FastAPI** and **DDD**  
 The bot system follows Domain-Driven Design (DDD) principles, facilitating a clean and manageable architecture. It integrates key features like **authentication**, **conversations**, **notifications**, and more, using FastAPI for building high-performance APIs.
 
----
-
 ## 🛠️ **Core Layer: Domain Logic**
 
 The **Core Layer** handles the main business logic, domain models, and services. Each **bounded context** in the system, such as **chat**, and **auth** has its own domain-driven services and entities.
 
----
+## 📄 **Running the Application**
+
+For more details on setting up and running the application, please refer to the [Running the Application guide](./BUILDING.md).
 
 ### 🧑‍💻 **Authentication & Authorization**
 
@@ -69,8 +69,6 @@ The system uses **JWT** for secure user authentication. Upon successful login, a
     }
     ```
 
----
-
 ## 💬 **Bot Conversations**
 
 The **Conversation** entity manages the bot interactions with users, maintaining the conversation flow and ensuring state consistency.
@@ -113,29 +111,6 @@ The **Conversation** entity manages the bot interactions with users, maintaining
     }
     ```
 
----
-
-## 📄 **Running the Application**
-
-1. **Set Up Environment:**  
-   Create a `.env` file with the necessary environment variables, including `DATABASE_URL`, `JWT_SECRET_KEY`, etc.
-
-2. **Install Dependencies:**  
-   Run `pip install -r requirements.txt` to install all dependencies.
-
-3. **Start the Server:**  
-   Run the FastAPI server with:
-
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-
-4. **Access API Docs:**  
-
-    Once the server is running, you can access the interactive API documentation through Swagger UI at:  
-    [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)  
-    This provides a user-friendly interface to explore and test all available API endpoints directly.
-
 ## 🔧 **Conclusion**  
 
 By following **Domain-Driven Design** and utilizing **FastAPI**, this bot system is highly modular and easily extendable. With clear boundaries between different concerns (such as authentication, notifications, and conversations), it’s easy for new developers to contribute and expand the system. The detailed documentation and organized file structure will guide you through the system, making it simple to understand and interact with the project.
@@ -174,8 +149,6 @@ By following **Domain-Driven Design** and utilizing **FastAPI**, this bot system
 10. **Vaadin Blog**: [Domain-Driven Design (DDD) and Hexagonal Architecture in Java](https://vaadin.com/blog/ddd-part-3-domain-driven-design-and-the-hexagonal-architecture)  
     Exploring the integration of DDD with Hexagonal Architecture in Java applications.
 
----
-
 ## ⚙️ Implementation Patterns
 
 1. **Medium**: [Implementing DDD Domain Models](https://medium.com/vx-company/implementing-dddomain-models-ports-adapters-and-cqrs-with-c-2b81403f09f7)  
@@ -189,8 +162,6 @@ By following **Domain-Driven Design** and utilizing **FastAPI**, this bot system
 
 4. **Medium**: [Clean Lessons: Use Cases](https://medium.com/unil-ci-software-engineering/clean-ddd-lessons-use-cases-e9d11f64a0e9)  
    Insights into designing use cases within clean architecture frameworks.
-
----
 
 ## 🛠️ Tools and Frameworks
 
