@@ -10,7 +10,7 @@ Please refer to the detailed instructions in the [Setup and Run Guide](docs/SETU
 
 ## **Installing the Environment**
 
-1. **Install `uv` Package Manager**  
+1. **Install `uv` Package Manager**
    The application uses the `uv` package manager for dependency management. Follow the steps below to install `uv`:
 
    - **Linux/MacOS:**
@@ -22,11 +22,11 @@ Please refer to the detailed instructions in the [Setup and Run Guide](docs/SETU
      curl -LsSf https://astral.sh/uv/install.sh | sh
      ```
 
-   - **Windows:**  
+   - **Windows:**
      Download the installer from [uv.sh](https://docs.astral.sh/uv/getting-started/installation/) and follow the installation instructions.
 
-1. **Install Project Dependencies:**  
-   After installing `uv`, run the following command in the root directory of the project to install all dependencies:  
+1. **Install Project Dependencies:**
+   After installing `uv`, run the following command in the root directory of the project to install all dependencies:
 
     ```bash
     uv install
@@ -34,19 +34,19 @@ Please refer to the detailed instructions in the [Setup and Run Guide](docs/SETU
 
 ## **Setting Up the Environment**
 
-1. **Create a `.env` File:**  
+1. **Create a `.env` File:**
    Use the template `.env.example` provided in the repository to create a `.env` file. Ensure you fill in the necessary environment variables such as:
    - `DATABASE_URL`
    - `JWT_SECRET_KEY`
    - Other configuration values.
 
-2. **Verify the Environment Variables:**  
+2. **Verify the Environment Variables:**
    Double-check that all required variables are set correctly before proceeding.
 
 ## **Running the Application**
 
-1. **Start the FastAPI Server:**  
-   Use the following command to start the server:  
+1. **Start the FastAPI Server:**
+   Use the following command to start the server:
 
    ```bash
    fastapi run src/shared/presentation/web/fastapi/main.py --reload

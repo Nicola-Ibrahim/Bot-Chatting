@@ -2,9 +2,18 @@
 # See https://pre-commit.com/hooks.html for more hooks
 
 exclude: "^docs/|/migrations/"
-default_stages: [commit]
+default_stages: [pre-commit]
 
 repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.8.3
+    hooks:
+      # Run the linter.
+      - id: ruff
+      # Run the formatter.
+      - id: ruff-format
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
@@ -20,38 +29,6 @@ repos:
       - id: check-case-conflict
       - id: check-docstring-first
       - id: detect-private-key
-
-  - repo: https://github.com/psf/black
-    rev: 23.1.0  # Updated to match pyproject.toml
-    hooks:
-      - id: black
-        additional_dependencies: [toml]
-
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
-    hooks:
-      - id: pyupgrade
-        args: [--py310-plus]
-
-
-  - repo: https://github.com/PyCQA/flake8
-    rev: 6.0.0
-    hooks:
-      - id: flake8
-        additional_dependencies:
-          - flake8-bugbear
-          - flake8-builtins
-          - flake8-coding
-          - flake8-import-order
-          - flake8-quotes
-          - flake8-print
-
-  # Uncomment if you want to use isort
-  # - repo: https://github.com/pycqa/isort
-  #   rev: 5.12.0
-  #   hooks:
-  #     - id: isort
-  #       additional_dependencies: [toml]
 
 ci:
   autoupdate_schedule: weekly

@@ -1,5 +1,5 @@
 [project]
-name = "bot-chating"
+name = "bot-chatting"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -17,7 +17,10 @@ dependencies = [
 
 [dependency-groups]
 lint = ["ruff>=0.8.3"]
-dev = ["colorlog>=6.9.0", "pre-commit>=4.0.1"]
+dev = [
+    "colorlog>=6.9.0",
+    "pre-commit>=4.0.1",
+]
 test = [
     "pytest>=8.3.4",
     "pytest-asyncio>=0.25.0",
@@ -27,7 +30,37 @@ test = [
 
 
 [tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
 line-length = 119
+
+[tool.ruff.lint]
 extend-ignore = [
     "W191",   # tab-indentation
     "E111",   # indentation-with-invalid-multiple
@@ -45,12 +78,32 @@ extend-ignore = [
     "ISC002", # multi-line-implicit-string-concatenation
 ]
 
+# Select which error types to lint
+select = ["E4", "E7", "E9", "F"]
+# List of ignored lint errors
+ignore = ["E501"]
+# Fixable lint errors
+fixable = ["ALL"]
+# Unfixable lint errors
+unfixable = ["B"]
+# Dummy variable pattern (variable names that can be ignored)
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+"**/{tests,docs,tools}/*" = ["E402"]
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
 
 [tool.ruff.format]
-quote-style = "single"
-indent-style = "tab"
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
 docstring-code-format = true
 docstring-code-line-length = 20
+line-ending = "auto"
 
 
 # ==== pytest ====

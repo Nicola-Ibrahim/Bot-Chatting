@@ -59,11 +59,11 @@ migrate:  # Create and apply database migrations for schema changes
 
 start:  # Start the FastAPI server with auto-reload in development
 	@echo "Starting server..."
-	fastapi run src/shared/presentation/web/fastapi/main.py --reload
+	$(UV) fastapi run src/shared/presentation/web/fastapi/main.py --reload
 
-install:  # Install project dependencies using Poetry
+install:  # Install project dependencies using uv
 	@echo "Installing dependencies..."
-	poetry install
+	uv install
 
 install-hooks:  # Install pre-commit hooks to automate code checks
 	@echo "Installing hooks..."
