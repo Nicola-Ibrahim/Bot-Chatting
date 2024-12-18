@@ -12,107 +12,6 @@ This repository contains a bot system built using **FastAPI** and applying **Dom
 - **Bot Conversations**: The bot engages in interactive conversations, handling user inputs, generating responses, and maintaining conversation states.
 - **Notifications**: The system sends notifications about key events, such as message updates or system alerts, keeping users informed in real-time.
 
-```bash
-Bot-Chat/
-├── src/
-│   ├── chat/                                  # Bounded Context: Chat - Handles user interactions, messages, and chat-based logic
-│   │   ├── application/
-│   │   │   ├── interfaces/                     # Interfaces for chat services
-│   │   │   └── services/                       # Chat-related services (e.g., response handling)
-│   │   ├── domain/
-│   │   │   ├── entities/                       # Chat entities (e.g., message, conversation)
-│   │   │   ├── value_objects/                  # Value objects related to chat (e.g., message status)
-│   │   │   └── exceptions/                     # Exceptions related to chat processes
-│   │   ├── presentation/
-│   │   │   ├── contract/                       # Interfaces for chat API contracts
-│   │   │   └── web/                            # Web layer for chat (e.g., API routes)
-│   │   ├── infra/
-│   │   │   ├── repository/                     # Chat repository for storing data (e.g., messages, conversations)
-│   │   │   └── utils/                          # Utility functions for chat (e.g., message formatting)
-│
-│   ├── ai/                                    # Bounded Context: AI - Handles AI-related logic, like models for responses
-│   │   ├── application/
-│   │   │   ├── interfaces/                     # AI service interfaces
-│   │   │   └── services/                       # AI-related services (e.g., model inference)
-│   │   ├── domain/
-│   │   │   ├── entities/                       # AI-related entities
-│   │   │   ├── value_objects/                  # Value objects for AI, like model configuration
-│   │   │   └── exceptions/                     # AI-specific exceptions
-│   │   ├── presentation/
-│   │   │   ├── contract/                       # AI service contracts (e.g., input/output format)
-│   │   │   └── web/                            # AI web layer for API interaction
-│   │   ├── infra/
-│   │   │   ├── repository/                     # AI-related repository for storing models or configurations
-│   │   │   └── utils/                          # Utility functions for AI tasks (e.g., data preprocessing)
-│
-│   ├── accounts/                              # Bounded Context: Accounts - Handles user registration, authentication, and profiles
-│   │   ├── application/
-│   │   │   ├── interfaces/                     # Interfaces for user-related services
-│   │   │   └── services/                       # User-related services (e.g., authentication, user management)
-│   │   ├── domain/
-│   │   │   ├── entities/                       # User entities (e.g., user, role)
-│   │   │   ├── value_objects/                  # Value objects for user (e.g., email, password)
-│   │   │   └── exceptions/                     # Exceptions related to user operations
-│   │   ├── presentation/
-│   │   │   ├── contract/                       # Contracts for user services (e.g., user creation API)
-│   │   │   └── web/                            # User API routes (e.g., login, registration)
-│   │   ├── infra/
-│   │   │   ├── repository/                     # User repository for DB interactions
-│   │   │   └── utils/                          # User-related utilities (e.g., password hashing)
-│
-│   ├── notification/                          # Bounded Context: Notifications - Handles system notifications to users
-│   │   ├── application/
-│   │   │   ├── interfaces/                     # Notification service interfaces
-│   │   │   └── services/                       # Notification services (e.g., email, SMS)
-│   │   ├── domain/
-│   │   │   ├── entities/                       # Notification-related entities
-│   │   │   ├── value_objects/                  # Value objects for notifications (e.g., notification types)
-│   │   │   └── exceptions/                     # Notification-specific exceptions
-│   │   ├── presentation/
-│   │   │   ├── contract/                       # Contracts for notification services
-│   │   │   └── web/                            # Notification API routes (e.g., send email, SMS)
-│   │   ├── infra/
-│   │   │   ├── repository/                     # Repository for storing notification records
-│   │   │   └── utils/                          # Notification utilities (e.g., template rendering)
-│
-│   ├── access_control/                       # Bounded Context: Access Control - Handles authentication and authorization
-│   │   ├── application/
-│   │   │   ├── interfaces/                     # Access control service interfaces (e.g., permissions)
-│   │   │   └── services/                       # Access control services (e.g., user role management)
-│   │   ├── domain/
-│   │   │   ├── entities/                       # Entities related to roles and permissions
-│   │   │   ├── value_objects/                  # Value objects related to access control (e.g., role name)
-│   │   │   └── exceptions/                     # Access control-related exceptions
-│   │   ├── presentation/
-│   │   │   ├── contract/                       # Contracts for access control (e.g., role management API)
-│   │   │   └── web/                            # Access control API routes (e.g., login, permissions)
-│   │   ├── infra/
-│   │   │   ├── repository/                     # Repository for access control data (e.g., roles, permissions)
-│   │   │   └── utils/                          # Access control utilities (e.g., JWT token generation)
-│
-│   ├── shared/                                # Shared Modules - Common services, schemas, and utilities across contexts
-│   │   ├── services/                           # Shared business logic and common services
-│   │   ├── schemas/                            # Pydantic schemas for validation across contexts
-│   │   └── utils/                              # Utility functions used across multiple contexts
-│   │   ├── presentation/
-│   │   │   ├── api/                          # FastAPI app resides here for API layer across all contexts
-│   │   │   └── cli/                          # CLI app resides here for command-line interface across contexts
-│
-│   ├── infrastructure/                        # Infrastructure Layer - Common infrastructure services
-│   │   ├── config/                            # Configuration setup for all services (e.g., DB URL, API keys)
-│   │   ├── security/                          # Security utilities (e.g., JWT handling, encryption)
-│   │   ├── logging_config/                    # Centralized logging setup for all services
-│   │   ├── repository/                        # Generic repository for interactions with data models
-│   │   └── utils/                             # Generic utilities used across infrastructure
-│
-├── .env                                       # Environment variables (e.g., database URLs, secrets)
-├── pyproject.toml                             # Dependency management for the project
-├── Dockerfile                                 # Docker configuration for containerization
-├── pre_commit_config.yaml                     # Pre-commit hooks configuration for code quality
-├── README.md                                  # Documentation for the microservice
-└── .gitignore                                 # Git ignore settings for unnecessary files
-```
-
 # Bot System Documentation
 
 🚀 **Bot System** powered by **FastAPI** and **DDD**  
@@ -311,42 +210,74 @@ To ensure all features are functional, the bot system includes unit and integrat
 
 By following **Domain-Driven Design** and utilizing **FastAPI**, this bot system is highly modular and easily extendable. With clear boundaries between different concerns (such as authentication, notifications, and conversations), it’s easy for new developers to contribute and expand the system. The detailed documentation and organized file structure will guide you through the system, making it simple to understand and interact with the project.
 
-## 📚 Useful Resources for Domain-Driven Design (DDD)
+# 📚 Useful Resources for Domain-Driven Design (DDD)
 
-### 🏗️ Core Concepts and Architectures
+## 🏗️ Core Concepts and Architectures
 
-- **Herberto Graca Blog**: [Domain-Driven Design](https://herbertograca.com/2017/09/07/domain-driven-design/)  
-- **Medium**: [Onion Architecture](https://medium.com/expedia-group-tech/onion-architecture-deed8a554423)  
-- **GitHub**: [Modular Monolith with DDD](https://github.com/kgrzybek/modular-monolith-with-ddd)  
-- **Medium**: [Clean Domain-Driven Design](https://medium.com/unil-ci-software-engineering/clean-domain-driven-design-2236f5430a05)  
-- **Medium**: [Always-Valid Domain Model](https://vkhorikov.medium.com/always-valid-domain-model-706e5f3d24b0)  
-- **GitHub**: [Clean Architecture by Examples](https://github.com/amantinband/clean-architecture?tab=readme-ov-file#application-layer-unit-tests)  
-- **GitHub**: [Python DDD Implementation](https://github.com/qu3vipon/python-ddd)  
-- **Dev.to**: [Unit of Work and Repository Design Patterns with SQLModel](https://dev.to/manukanne/a-python-implementation-of-the-unit-of-work-and-repository-design-pattern-using-sqlmodel-3mb5)  
-- **Pluralsight (*tutorial*)**: [DDD in Practice](https://www.pluralsight.com/courses/domain-driven-design-in-practice?clickid=USgRhURpGxyKRiq3y1yteWwfUkCT%3A-WWzXLjWY0&irgwc=1&mpid=1970485&aid=7010a000001xAKZAA2&utm_medium=digital_affiliate&utm_campaign=1970485&utm_source=impactradius)  
-- **Medium**: [Backend Logging in Python with FastAPI](https://medium.com/@v0220225/backend-logging-in-python-and-applied-to-fastapi-7b47118d1d92)  
-- **Code Maze**: [Clean Architecture with .NET](https://code-maze.com/dotnet-clean-architecture/)  
+1. **Herberto Graca Blog**: [Domain-Driven Design](https://herbertograca.com/2017/09/07/domain-driven-design/)  
+   An in-depth exploration of DDD principles and their practical applications.
+
+2. **Medium**: [Onion Architecture](https://medium.com/expedia-group-tech/onion-architecture-deed8a554423)  
+   An article discussing the Onion Architecture and its relation to DDD.
+
+3. **GitHub**: [Modular Monolith with DDD](https://github.com/kgrzybek/modular-monolith-with-ddd)  
+   A repository demonstrating how to build a modular monolith using DDD principles.
+
+4. **Medium**: [Clean Domain-Driven Design](https://medium.com/unil-ci-software-engineering/clean-domain-driven-design-2236f5430a05)  
+   Insights into maintaining clean architecture while implementing DDD.
+
+5. **Medium**: [Always-Valid Domain Model](https://vkhorikov.medium.com/always-valid-domain-model-706e5f3d24b0)  
+   Emphasizing the importance of maintaining validity within domain models.
+
+6. **GitHub**: [Clean Architecture by Examples](https://github.com/amantinband/clean-architecture)  
+   A collection of examples illustrating clean architecture practices.
+
+7. **GitHub**: [Python DDD Implementation](https://github.com/qu3vipon/python-ddd)  
+   A repository showcasing Domain-Driven Design implemented in Python.
+
+8. **Pluralsight (*tutorial*)**: [Domain-Driven Design in Practice](https://www.pluralsight.com/courses/domain-driven-design-in-practice)  
+   A comprehensive course offering practical insights into DDD.
+
+9. **Code Maze**: [Clean Architecture with .NET](https://code-maze.com/dotnet-clean-architecture/)  
+   A guide to implementing clean architecture principles in .NET applications.
+
+10. **Vaadin Blog**: [Domain-Driven Design (DDD) and Hexagonal Architecture in Java](https://vaadin.com/blog/ddd-part-3-domain-driven-design-and-the-hexagonal-architecture)  
+    Exploring the integration of DDD with Hexagonal Architecture in Java applications.
 
 ---
 
-### ⚙️ Implementation Patterns
+## ⚙️ Implementation Patterns
 
-- **Medium**: [Implementing DDD Domain Models](https://medium.com/vx-company/implementing-dddomain-models-ports-adapters-and-cqrs-with-c-2b81403f09f7)  
-- **Medium**: [Implementing Ports & CQRS](https://abstarreveld.medium.com/dddomain-models-ports-adapters-and-cqrs-reference-architecture-c-504817df65ec)  
-- **Baeldung**: [DTO Pattern (Data Transfer Object)](https://www.baeldung.com/java-dto-pattern)  
-- **Medium**: [Clean Lessons: Use Cases](https://medium.com/unil-ci-software-engineering/clean-ddd-lessons-use-cases-e9d11f64a0e9)  
+1. **Medium**: [Implementing DDD Domain Models](https://medium.com/vx-company/implementing-dddomain-models-ports-adapters-and-cqrs-with-c-2b81403f09f7)  
+   A discussion on implementing domain models using Ports, Adapters, and CQRS.
 
----
+2. **Medium**: [Implementing Ports & CQRS](https://abstarreveld.medium.com/dddomain-models-ports-adapters-and-cqrs-reference-architecture-c-504817df65ec)  
+   A reference architecture for DDD models, ports, adapters, and CQRS.
 
-### 🛠️ Tools and Frameworks
+3. **Baeldung**: [DTO Pattern (Data Transfer Object)](https://www.baeldung.com/java-dto-pattern)  
+   An explanation of the DTO pattern and its usage in Java applications.
 
-- **Blog**: [Domain Model with SQLAlchemy](https://blog.szymonmiks.pl/p/domain-model-with-sqlalchemy/)  
-- **Hashnode**: [DDD Value Objects: Mastering Data Validation in Python](https://scresh.hashnode.dev/ddd-value-objects-mastering-data-validation-in-python)  
-- **GitHub**: [FastAPI Best Practices: Project Structure](https://github.com/zhanymkanov/fastapi-best-practices#1-project-structure-consistent--predictable)  
-- **ComputingForGeeks**: [GitHub Container Registry as Your Docker Registry](https://computingforgeeks.com/configure-github-container-registry-as-your-docker-registry/?utm_content=cmp-true#google_vignette)  
+4. **Medium**: [Clean Lessons: Use Cases](https://medium.com/unil-ci-software-engineering/clean-ddd-lessons-use-cases-e9d11f64a0e9)  
+   Insights into designing use cases within clean architecture frameworks.
 
 ---
 
-### 🌐 Advanced Topics
+## 🛠️ Tools and Frameworks
 
-- **Vaadin Blog**: [Domain-Driven Design (DDD) and Hexagonal Architecture in Java](https://vaadin.com/blog/ddd-part-3-domain-driven-design-and-the-hexagonal-architecture)  
+1. **Blog**: [Domain Model with SQLAlchemy](https://blog.szymonmiks.pl/p/domain-model-with-sqlalchemy/)  
+   A guide on implementing domain models using SQLAlchemy in Python.
+
+2. **Hashnode**: [DDD Value Objects: Mastering Data Validation in Python](https://scresh.hashnode.dev/ddd-value-objects-mastering-data-validation-in-python)  
+   Focusing on data validation within DDD value objects in Python.
+
+3. **GitHub**: [FastAPI Best Practices: Project Structure](https://github.com/zhanymkanov/fastapi-best-practices#1-project-structure-consistent--predictable)  
+   Best practices for structuring FastAPI projects, relevant to DDD implementations.
+
+4. **Dev.to**: [Unit of Work and Repository Design Patterns with SQLModel](https://dev.to/manukanne/a-python-implementation-of-the-unit-of-work-and-repository-design-pattern-using-sqlmodel-3mb5)  
+   A Python implementation of the Unit of Work and Repository design patterns using SQLModel.
+
+5. **Medium**: [Backend Logging in Python with FastAPI](https://medium.com/@v0220225/backend-logging-in-python-and-applied-to-fastapi-7b47118d1d92)  
+   A guide on implementing backend logging in Python applications using FastAPI.
+
+6. **ComputingForGeeks**: [Configure GitHub Container Registry as Your Docker Registry](https://computingforgeeks.com/configure-github-container-registry-as-your-docker-registry/)  
+   Instructions on setting up GitHub Container Registry for Docker images.
