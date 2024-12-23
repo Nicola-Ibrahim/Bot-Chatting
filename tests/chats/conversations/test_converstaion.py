@@ -4,8 +4,8 @@ from datetime import datetime
 import pytest
 
 from ..domain.conversations.conversation import Conversation
-from ..domain.messages.rating import RatingType
 from ..domain.exceptions.operation import InValidOperationException
+from ..domain.messages.rating import RatingType
 from ..domain.value_objects.content import Content
 from ..domain.value_objects.feedback import Feedback
 

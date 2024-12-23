@@ -17,10 +17,7 @@ dependencies = [
 
 [dependency-groups]
 lint = ["ruff>=0.8.3"]
-dev = [
-    "colorlog>=6.9.0",
-    "pre-commit>=4.0.1",
-]
+dev = ["colorlog>=6.9.0", "pre-commit>=4.0.1"]
 test = [
     "pytest>=8.3.4",
     "pytest-asyncio>=0.25.0",
@@ -109,7 +106,7 @@ line-ending = "auto"
 # ==== pytest ====
 [tool.pytest.ini_options]
 # addopts = "-v --tb=short"
-testpaths = ["src"]
+testpaths = ["tests"]
 pythonpath = ["src"]
 python_files = "test_*.py"
 python_classes = "Test*"
