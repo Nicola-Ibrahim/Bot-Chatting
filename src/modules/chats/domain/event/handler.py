@@ -1,4 +1,4 @@
-from ..messages.events.message import MessageAddedEvent
+from ..messages.events.message_pinned import MessageAddedEvent
 
 
 class MessageAddedEventHandler:

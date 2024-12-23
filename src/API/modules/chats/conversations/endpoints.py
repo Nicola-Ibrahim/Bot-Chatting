@@ -1,10 +1,9 @@
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, HTTPException, status
-
 from shared.infra.utils.result import Result
 
-from ......application.services.conversation_service import ConversationApplicationService
-from ......infra.common.di import ChatAppDIContainer
+from .....modules.chats.application.services.conversation_service import ConversationApplicationService
+from .....modules.chats.infra.common.di import ChatAppDIContainer
 from ..contract.conversation import ConversationResponseSchema, CreateConversationRequestSchema, MessageResponseSchema
 
 router = APIRouter(
@@ -12,6 +11,34 @@ router = APIRouter(
     tags=["conversation"],
     responses={404: {"description": "Not found"}},
 )
+
+
+@router.post("/conversations")
+def create_conversation():
+    command = CreateConversationCommand()
+    return create_conversation_handler.execute(command)
+
+
+@router.post("/conversations/{conversation_id}/messages")
+def add_message(conversation_id: uuid.UUID, text: str):
+    command = AddMessageCommand(conversation_id=conversation_id, text=text)
+    return add_message_handler.execute(command)
+
+
+@router.post("/conversations/{conversation_id}/messages/{message_id}/feedback")
+def add_feedback(
+    conversation_id: uuid.UUID, message_id: uuid.UUID, content_pos: int, rating: RatingType, comment: str
+):
+    command = AddFeedbackCommand(
+        conversation_id=conversation_id, message_id=message_id, content_pos=content_pos, rating=rating, comment=comment
+    )
+    return add_feedback_handler.execute(command)
+
+
+@router.get("/conversations/{conversation_id}")
+def get_conversation(conversation_id: uuid.UUID):
+    query = GetConversationByIdQuery(conversation_id=conversation_id)
+    return get_conversation_handler.execute(query)
 
 
 @router.get("", response_model=ConversationResponseSchema)

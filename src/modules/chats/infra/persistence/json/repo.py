@@ -1,7 +1,7 @@
 from ....application.interfaces.conversation_repository import (
     AbstractConversationRepository,
 )
-from ....domain.conversations.conversation import Conversation
+from ....domain.conversations.root import Conversation
 from .file_handler import JsonFileHandler
 from .mapper import JsonConversationMapper
 

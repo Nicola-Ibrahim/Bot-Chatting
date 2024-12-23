@@ -4,20 +4,20 @@ from enum import Enum
 class ErrorType(Enum):
     """Enumeration of error types."""
 
-    FAILURE = "Failure"
-    NOT_FOUND = "NotFound"
-    VALIDATION = "Validation"
-    CONFLICT = "Conflict"
-    UNAUTHORIZED = "AccessUnauthorized"
-    FORBIDDEN = "AccessForbidden"
+    BUSINESS_RULE_VIOLATION = "BusinessRuleViolation"
+    ENTITY_NOT_FOUND = "EntityNotFound"
+    VALIDATION_ERROR = "ValidationError"
+    CONFLICT_ERROR = "ConflictError"
+    UNAUTHORIZED_ACCESS = "UnauthorizedAccess"
+    FORBIDDEN_ACCESS = "ForbiddenAccess"
 
 
 class ErrorCode(Enum):
     """Enumeration of error codes."""
 
-    FAILURE = "Failure"
+    BUSINESS_RULE_VIOLATION = "BusinessRuleViolation"
     INVALID_INPUT = "InvalidInput"
-    NOT_FOUND = "NotFound"
-    UNAUTHORIZED = "Unauthorized"
-    FORBIDDEN = "Forbidden"
-    CONFLICT = "Conflict"
+    ENTITY_NOT_FOUND = "EntityNotFound"
+    UNAUTHORIZED_ACCESS = "UnauthorizedAccess"
+    FORBIDDEN_ACCESS = "ForbiddenAccess"
+    CONFLICT_ERROR = "ConflictError"

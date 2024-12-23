@@ -1,19 +1,31 @@
-def delete(self, conversation_id: uuid.UUID) -> Result:
-    """
-    Deletes a conversation session from the repository.
+import uuid
 
-    Args:
-        conversation_id (uuid.UUID): The unique ID of the conversation to delete.
+from pydantic import BaseModel
 
-    Returns:
-        Result: A Result indicating the outcome of the delete operation.
-    """
-    try:
-        conversation = self._repository.get_by_id(conversation_id)
-        if not conversation:
-            return Result.fail(RepositoryException.entity_not_found("Conversation not found."))
+from src.building_blocks.application.base_command_handler import BaseCommandHandler
+from src.building_blocks.domain.exception import BusinessRuleValidationException, RepositoryException
+from src.building_blocks.domain.result import Result, resultify
 
-        self._repository.delete(conversation_id)
-        return Result.ok(None)
-    except BusinessRuleValidationException as e:
-        return Result.fail(e)
+from ....domain.interfaces.conversation_repository import AbstractConversationRepository
+
+
+class DeleteConversationCommand(BaseModel):
+    conversation_id: uuid.UUID
+
+    class Config:
+        schema_extra = {"example": {"conversation_id": "123e4567-e89b-12d3-a456-426614174000"}}
+
+
+class DeleteConversationCommandHandler(BaseCommandHandler):
+    def __init__(self, repository: AbstractConversationRepository):
+        self._repository = repository
+
+    @resultify
+    def handle(self, command: DeleteConversationCommand) -> Result[None, str]:
+        try:
+            conversation = self._repository.get_by_id(command.conversation_id)
+
+            self._repository.delete(command.conversation_id)
+            return None
+        except (BusinessRuleValidationException, RepositoryException) as e:
+            return e

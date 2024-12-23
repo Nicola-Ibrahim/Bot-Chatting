@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from dataclasses import dataclass
 from typing import Any
 
@@ -8,26 +8,25 @@ from .rule import BaseBusinessRule
 
 @dataclass(frozen=True)
 class ValueObject(ABC):
-    """Base class for Value Objects in DDD, providing equality, hashing, and string representation."""
+    """Abstract base class for value objects."""
 
-    @abstractmethod
     def __eq__(self, other: Any) -> bool:
-        """Override equality comparison to compare values of the object."""
+        """Check equality based on the value object properties."""
         if not isinstance(other, ValueObject):
             return False
         return self.__dict__ == other.__dict__
 
-    @abstractmethod
     def __hash__(self) -> int:
-        """Override hash function for ValueObjects to ensure consistent behavior."""
+        """Return the hash of the value object."""
         return hash(tuple(sorted(self.__dict__.items())))
 
-    def __repr__(self) -> str:
-        """Provide a meaningful string representation for debugging."""
-        return f"{self.__class__.__name__}({', '.join(f'{k}={v!r}' for k, v in self.__dict__.items())})"
+    def __str__(self) -> str:
+        """Return the string representation of the value object."""
+        return str(self.__dict__)
 
     def check_rule(self, rule: BaseBusinessRule) -> None:
-        if not rule.is_valid():
+        """Check a business rule."""
+        if not rule.is_satisfied():
             raise BusinessRuleValidationException(rule)
 
     @classmethod

@@ -2,7 +2,7 @@ import uuid
 
 from ....domain.primitive.exception import BusinessRuleValidationException
 from ....domain.primitive.result import Result
-from ...domain.conversations.conversation import Conversation
+from ...domain.conversations.root import Conversation
 from ...domain.messages.rating import RatingType
 from ...domain.value_objects.content import Content
 from ...domain.value_objects.feedback import Feedback

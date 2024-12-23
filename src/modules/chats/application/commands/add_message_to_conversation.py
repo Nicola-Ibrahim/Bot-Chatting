@@ -2,12 +2,12 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from ....domain import AbstractConversationRepository
-from ..domain.entities.conversation import Conversation
-from ..domain.exceptions import RepositoryException
-from ..domain.value_objects.content import Content
-from ..dto import ConversationDTO
-from .result import Result
+from src.building_blocks.application.base_command_handler import BaseCommandHandler
+from src.building_blocks.domain.exception import BusinessRuleValidationException, RepositoryException
+from src.building_blocks.domain.result import Result, resultify
+from src.modules.chats.domain.conversations.root import Conversation
+from src.modules.chats.domain.messages.root import Message
+from src.modules.chats.domain.value_objects import Content
 
 
 class AddMessageToConversationCommand(BaseModel):
@@ -25,22 +25,20 @@ class AddMessageToConversationCommandHandler(BaseCommandHandler):
         self._repository = repository
         self._response_generator = response_generator
 
-    def handle(self, command: AddMessageCommand) -> Result:
+    @resultify
+    def handle(self, command: AddMessageCommand) -> Result[ConversationDTO, str]:
         try:
-            conversation = self._repository.get_by_id(command.conversation_id)
-            if not conversation:
-                return Result.fail("Conversation not found.")
-
             response = self._response_generator.generate_answer(command.text)
-            if not response:
-                return Result.fail("Failed to generate a response.")
 
             content = Content.create(text=command.text, response=response)
             conversation.add_message(content=content)
+            Message.create(content=content)
             self._repository.save(conversation)
-            return Result.ok(ConversationDTO.from_domain(conversation))
-        except Exception as e:
-            return Result.fail(str(e))
+
+            return ConversationDTO.from_domain(conversation)
+
+        except (BusinessRuleValidationException, RepositoryException) as e:
+            return e
 
     def _publish_event(self, event):
         # Event dispatcher logic to handle domain events (to be implemented)

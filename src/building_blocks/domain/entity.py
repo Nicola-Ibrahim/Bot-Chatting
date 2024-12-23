@@ -20,7 +20,7 @@ class Entity:
     _id: Identifier
     _instance_count: int = field(default_factory=lambda: next(count()))
     _events: list[DomainEvent] = field(default_factory=list)
-    _created_at: datetime = field(default_factory=datetime.datetime.now(datetime.timezone.utc))
+    _created_at: datetime.datetime = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
 
     @property
     def id(self) -> Identifier:
@@ -33,64 +33,36 @@ class Entity:
         return self._instance_count
 
     @property
-    def created_at(self):
+    def created_at(self) -> datetime.datetime:
+        """Get the creation timestamp of the entity."""
         return self._created_at
 
     def __eq__(self, other: Any) -> bool:
-        """
-        Equality check based on ID. Ensures entities of the same type with the same ID are equal.
-        """
-        if isinstance(other, self.__class__):
-            return self._id == other.id
-        return False
+        """Check equality based on the entity ID."""
+        if not isinstance(other, Entity):
+            return False
+        return self.id == other.id
 
-    def __hash__(self) -> int:
-        """
-        Hashing based on the entity's ID.
-        """
-        return hash(self._id)
-
-    def __repr__(self) -> str:
-        """
-        String representation including entity's ID and instance ID.
-        """
-        return f"<{self.__class__.__name__}(id={self._id}, instance_count={self._instance_count})>"
-
-    def copy(self, **changes) -> "Entity":
-        """
-        Create a copy of the entity, allowing specific attributes to be modified.
-        This can be useful for creating a new version of the entity with updates.
-        """
-        updated_data = asdict(self)
-        updated_data.update(changes)
-        return self.__class__(**updated_data)
-
-    def to_dict(self) -> dict[str, Any]:
-        """
-        Convert the entity to a dictionary representation for easy serialization.
-        This will recursively serialize any nested `Entity` objects as well.
-        """
-        return {key: (value.to_dict() if isinstance(value, Entity) else value) for key, value in asdict(self).items()}
-
-    @classmethod
-    def create(cls, **kwargs) -> "Entity":
-        """
-        Factory method for creating a new instance of an entity.
-        Subclasses should override this to apply business logic or constraints.
-        """
-        return cls(**kwargs)
-
-    def _record_event(self, event: DomainEvent):
+    def add_event(self, event: DomainEvent) -> None:
+        """Add a domain event to the entity."""
         self._events.append(event)
 
-    def collect_events(self) -> list[DomainEvent]:
-        events = self._events[:]
-        self._events = []
-        return events
+    def clear_events(self) -> None:
+        """Clear all domain events."""
+        self._events.clear()
 
-    def check_rule(self, rule: BaseBusinessRule):
-        if not rule.is_valid():
+    def get_events(self) -> list[DomainEvent]:
+        """Get all domain events."""
+        return self._events
+
+    def check_rule(self, rule: BaseBusinessRule) -> None:
+        """Validate a business rule."""
+        if not rule.is_satisfied():
             raise BusinessRuleValidationException(rule)
+
+    def to_dict(self) -> dict:
+        """Serialize the entity to a dictionary."""
+        return asdict(self)
 
 
 @dataclass

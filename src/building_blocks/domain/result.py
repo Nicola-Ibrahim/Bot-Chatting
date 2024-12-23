@@ -151,3 +151,23 @@ class Result(Generic[T, E]):
             Result[T, E]: An error result.
         """
         return cls(_error=error)
+
+
+def resultify(fn: Callable[..., T]) -> Callable[..., Result[T, E]]:
+    """
+    Decorator to convert a function that returns a value into a function that returns a Result.
+
+    Args:
+        fn (Callable): The function to decorate.
+
+    Returns:
+        Callable: The decorated function.
+    """
+
+    def inner(*args, **kwargs) -> Result[T, E]:
+        try:
+            return Result.ok(fn(*args, **kwargs))
+        except BusinessRuleValidationException as e:
+            return Result.fail(e)
+
+    return inner
