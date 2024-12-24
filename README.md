@@ -10,9 +10,12 @@ The architecture is designed using **Clean Architecture** and **Modularization o
 
 - **FastAPI**: High-performance web framework for building APIs, offering asynchronous support and automatic API documentation via Swagger.
 - **Domain-Driven Design (DDD)**: The system follows DDD principles to maintain clear boundaries and isolate business logic in dedicated modules.
+- **Command Query Separation (CQS)**: Implements CQS to separate read and write operations, enhancing maintainability and scalability.
 - **Authentication & Authorization**: Secure login using JWT tokens with role-based access control (RBAC).
 - **Bot Conversations**: The bot interacts with users, processes input, and manages conversation states.
 - **Notifications**: Real-time notifications are sent about key events, such as message updates or system alerts, ensuring users stay informed.
+- **Event-Driven Architecture**: Utilizes domain events to handle business logic changes and ensure consistency across the system.
+- **Dependency Injection**: Uses dependency injection to manage dependencies and promote loose coupling between components.
 
 ## 🔍 **System Overview**
 
