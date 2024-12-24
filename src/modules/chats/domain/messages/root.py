@@ -27,7 +27,7 @@ class Message(AggregateRoot):
         return self._contents
 
     @classmethod
-    def create(cls, conversation_id: uuid.UUID, content: Content):
+    def create(cls, conversation_id: uuid.UUID, content: Content) -> "Message":
         """
         Factory method to create a new message instance.
         """
@@ -35,19 +35,23 @@ class Message(AggregateRoot):
         instance.check_rule(InitialContentMustBeProvidedRule(content))
         return instance
 
-    def add_content(self, content: Content, conversation_id: uuid.UUID):
+    def add_content(self, content: Content, conversation_id: uuid.UUID) -> Content:
         """
         Adds a new content version to the message and raises an event.
         """
         self.check_rule(ContentMustBelongToConversationRule(content, conversation_id))
         self._contents.append(content)
 
+        # Raise the domain event
         event = MessageUpdatedEvent(
             conversation_id=conversation_id,
             message_id=self._id,
             content_id=content.id,
         )
         self.add_event(event)
+
+        return content
+
 
     def update_message(self, content: Content):
         """

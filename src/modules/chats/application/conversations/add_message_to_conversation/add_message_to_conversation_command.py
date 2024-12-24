@@ -1,18 +1,13 @@
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
-from src.building_blocks.application.base_command_handler import BaseCommandHandler
-from src.building_blocks.domain.exception import BusinessRuleValidationException, RepositoryException
-from src.building_blocks.domain.result import Result, resultify
-from src.modules.chats.domain.conversations.root import Conversation
 from src.modules.chats.domain.messages.root import Message
-from src.modules.chats.domain.value_objects import Content
 
-from ..contracts.command_base import CommandBase
+from ...contracts.base_command import BaseCommand
 
 
-class AddMessageToConversationCommand(CommandBase[Result[ConversationDTO, str]]):
+class AddMessageToConversationCommand(BaseCommand):
     conversation_id: UUID
     text: str = Field(..., min_length=1, max_length=5000)
 

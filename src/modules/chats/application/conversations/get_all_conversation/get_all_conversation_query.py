@@ -1,5 +1,5 @@
-from src.building_blocks.application.base_query import BaseQuery
+from ...contracts.base_query import BaseQuery
 
 
 class GetAllConversationsQuery(BaseQuery):
-    pass    pass
+    pass
