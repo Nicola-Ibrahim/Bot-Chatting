@@ -2,11 +2,9 @@ import uuid
 from dataclasses import dataclass
 from typing import Optional
 
-from .dto import BaseDTO
-
 
 @dataclass
-class MessageDTO(BaseDTO):
+class GetSubOfMessagesDTO:
     id: uuid.UUID
     text: str
     response: Optional[str] = None
