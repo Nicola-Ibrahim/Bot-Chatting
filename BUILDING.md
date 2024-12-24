@@ -1,11 +1,3 @@
-## 📄 **Running the Application**
-
-Please refer to the detailed instructions in the [Setup and Run Guide](docs/SETUP_AND_RUN.md) for full steps on building and running the application.
-
----
-
-### **Content of `docs/SETUP_AND_RUN.md`**
-
 # 🚀 **Setup and Run Guide**
 
 ## **Installing the Environment**
@@ -25,7 +17,7 @@ Please refer to the detailed instructions in the [Setup and Run Guide](docs/SETU
    - **Windows:**
      Download the installer from [uv.sh](https://docs.astral.sh/uv/getting-started/installation/) and follow the installation instructions.
 
-1. **Install Project Dependencies:**
+2. **Install Project Dependencies:**
    After installing `uv`, run the following command in the root directory of the project to install all dependencies:
 
     ```bash
@@ -43,6 +35,16 @@ Please refer to the detailed instructions in the [Setup and Run Guide](docs/SETU
 2. **Verify the Environment Variables:**
    Double-check that all required variables are set correctly before proceeding.
 
+3. **Install Dependencies:**
+   Ensure you have Python and `uv` installed. Then, installing the decencies will be automatically by `uv` when running the application
+
+4. **Apply Database Migrations:**
+   Run the following command to apply database migrations:
+
+   ```bash
+   alembic upgrade head
+   ```
+
 ## **Running the Application**
 
 1. **Start the FastAPI Server:**
@@ -59,3 +61,18 @@ Please refer to the detailed instructions in the [Setup and Run Guide](docs/SETU
 3. Optional - Check the Redoc API Docs:
     You can also access the alternative documentation at:
     <http://127.0.0.1:8000/redoc>
+
+4. **Run Tests:**
+   To ensure everything is set up correctly, run the tests using:
+
+   ```bash
+   pytest
+   ```
+
+5. **Run the Application with Docker (Optional):**
+   If you prefer to use Docker, you can build and run the application using the provided `Dockerfile`:
+
+   ```bash
+   docker build -t bot-chat-system .
+   docker run -p 8000:8000 --env-file .env bot-chat-system
+   ```
