@@ -5,6 +5,6 @@ from src.building_blocks.domain.events import DomainEvent
 
 
 @dataclass
-class MessagePinnedEvent(DomainEvent):
+class ParticipantRoleAssignedViewerEvent(DomainEvent):
+    participant_id: uuid.UUID
     conversation_id: uuid.UUID
-    message_id: uuid.UUID

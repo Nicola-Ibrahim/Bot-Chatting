@@ -1,51 +1,195 @@
 import uuid
-from collections import OrderedDict
 from dataclasses import dataclass, field
-from datetime import datetime
 
 from src.building_blocks.domain.entity import AggregateRoot
 
-from ..messages.root import Message
-from .content import Content
-from .events.participant_added import ParticipantAddedEvent
-from .owner import Owner
-from .participant import Participant
-from .participant_role import Role
+from .events import (
+    ConversationArchivedEvent,
+    ConversationDeletedEvent,
+    ConversationRenamedEvent,
+    ConversationSharedEvent,
+    ConversationTitleUpdatedEvent,
+    MessageAddedEvent,
+    ParticipantAddedEvent,
+    ParticipantRoleChangedEvent,
+)
+from .models.owner import Owner
+from .models.participant import Participant
+from .models.participant_role import Role
+from .rules import (
+    ConversationCannotBeDeletedIfArchivedRule,
+    ConversationCannotBeModifiedIfArchivedRule,
+    ConversationCannotBeRenamedIfArchivedRule,
+    ConversationCannotBeSharedIfArchivedRule,
+    MessageCannotBeAddedIfArchivedRule,
+    OwnerCannotBeRemovedRule,
+    ParticipantCannotBeAddedIfAlreadyExistsRule,
+    ParticipantCannotBeRemovedIfNotExistsRule,
+    TitleCannotBeEmptyRule,
+)
 
 
 @dataclass
 class Conversation(AggregateRoot):
-    _message_ids: list[uuid.UUID] = field(default_factory=list)
+    _title: str = ""
     _owner: Owner
     _participants: list[Participant] = field(default_factory=list)
-    _title: str = ""
+    _message_ids: list[uuid.UUID] = field(default_factory=list)
+    _is_archived: bool = False
 
-    def add_participant(self, user_id: str, role: Role):
+    @property
+    def title(self) -> str:
         """
-        Adds a participant to the conversation with a specific permission.
+        Retrieves the title of the conversation.
+
+        Returns:
+            str: The title of the conversation.
         """
+        return self._title
 
-        self.check_rule(MeetingCannotBeChangedAfterStartRule(_term))
-        self.check_rule(AttendeeCanBeAddedOnlyInRsvpTermRule(_rsvpTerm))
+    @property
+    def owner(self) -> Owner:
+        """
+        Retrieves the owner of the conversation.
 
-        self._participants.append(Participant.create(user_id=user_id, conversation_id=self._id, role=role))
+        Returns:
+            Owner: The owner of the conversation.
+        """
+        return self._owner
+
+    @property
+    def is_archived(self) -> bool:
+        """
+        Retrieves the archived status of the conversation.
+
+        Returns:
+            bool: True if the conversation is archived, False otherwise.
+        """
+        return self._is_archived
+
+    @classmethod
+    def create(cls, owner: Owner, title: str = "") -> "Conversation":
+        """
+        Factory method to create a new conversation instance.
+
+        Args:
+            owner (Owner): The owner of the conversation.
+            title (str, optional): The title of the conversation. Defaults to "".
+
+        Returns:
+            Conversation: A new instance of the Conversation class.
+        """
+        instance = cls(_owner=owner, _title=title)
+        return instance
+
+    def add_participant(self, participant_id: str, role: Role):
+        """
+        Adds a participant to the conversation with a specific role.
+
+        Args:
+            participant_id (str): The ID of the user to be added as a participant.
+            role (Role): The role assigned to the participant.
+
+        Raises:
+            ValueError: If the conversation is archived or the participant already exists.
+        """
+        self.check_rule(ConversationCannotBeModifiedIfArchivedRule(is_archived=self._is_archived))
+        self.check_rule(
+            ParticipantCannotBeAddedIfAlreadyExistsRule(participants=self._participants, participant_id=participant_id)
+        )
+
+        self._participants.append(
+            Participant.create(participant_id=participant_id, conversation_id=self._id, role=role)
+        )
 
         # Raise the domain event
         event = ParticipantAddedEvent(
             conversation_id=self._id,
-            participant_id=user_id,
+            participant_id=participant_id,
         )
-        self._record_event(event)
+        self.add_event(event)
 
-    def remove_participant(self, user_id: str):
-        if user_id not in self._participants:
-            raise ValueError(f"User {user_id} is not a participant.")
-        del self._participants[user_id]
+    def remove_participant(self, participant_id: str):
+        """
+        Removes a participant from the conversation.
+
+        Args:
+            participant_id (str): The ID of the user to be removed.
+
+        Raises:
+            ValueError: If the conversation is archived, the participant does not exist, or the participant is the owner.
+        """
+        self.check_rule(ConversationCannotBeModifiedIfArchivedRule(is_archived=self._is_archived))
+        self.check_rule(
+            ParticipantCannotBeRemovedIfNotExistsRule(participants=self._participants, participant_id=participant_id)
+        )
+        self.check_rule(OwnerCannotBeRemovedRule(owner_id=self._owner.id, participant_id=participant_id))
+
+        participant = next((p for p in self._participants if p.id == participant_id), None)
+        self._participants.remove(participant)
+        participant.remove()
+
+    def change_participant_role(self, participant_id: str, new_role: Role):
+        """
+        Changes the role of a participant in the conversation.
+
+        Args:
+            participant_id (str): The ID of the user whose role is to be changed.
+            new_role (Role): The new role to be assigned to the participant.
+
+        Raises:
+            ValueError: If the conversation is archived or the participant does not exist.
+        """
+        self.check_rule(ConversationCannotBeModifiedIfArchivedRule(is_archived=self._is_archived))
+
+        participant = next((p for p in self._participants if p._user_id == participant_id), None)
+        if participant:
+            participant.change_role(new_role)
+            # Raise the domain event
+            event = ParticipantRoleChangedEvent(
+                conversation_id=self._id,
+                participant_id=participant_id,
+                new_role=new_role,
+            )
+            self.add_event(event)
+        else:
+            raise ValueError(f"User {participant_id} is not a participant.")
+
+    def get_participant(self, participant_id: str) -> Participant:
+        """
+        Retrieves a participant from the conversation by user ID.
+
+        Args:
+            participant_id (str): The ID of the user to be retrieved.
+
+        Returns:
+            Participant: The participant with the specified user ID, or None if not found.
+        """
+        return next((p for p in self._participants if p._user_id == participant_id), None)
+
+    def get_participants_by_role(self, role: Role) -> list[Participant]:
+        """
+        Retrieves participants from the conversation by role.
+
+        Args:
+            role (Role): The role to filter participants by.
+
+        Returns:
+            list[Participant]: A list of participants with the specified role.
+        """
 
     def add_message(self, message_id: uuid.UUID):
         """
         Adds a message ID to the conversation's list of messages.
+
+        Args:
+            message_id (uuid.UUID): The ID of the message to be added.
+
+        Raises:
+            ValueError: If the conversation is archived.
         """
+        self.check_rule(MessageCannotBeAddedIfArchivedRule(is_archived=self._is_archived))
+
         self._message_ids.append(message_id)
 
         # Raise the domain event
@@ -53,56 +197,168 @@ class Conversation(AggregateRoot):
             conversation_id=self._id,
             message_id=message_id,
         )
-        self._record_event(event)
+        self.add_event(event)
 
     def remove_message(self, message_id: uuid.UUID):
         """
-        Removes a message from the conversation.
+        Removes a message ID from the conversation's list of messages.
+
+        Args:
+            message_id (uuid.UUID): The ID of the message to be removed.
+
+        Raises:
+            ValueError: If the conversation is archived or the message does not exist.
         """
+        self.check_rule(ConversationCannotBeModifiedIfArchivedRule(is_archived=self._is_archived))
+
+        if message_id not in self._message_ids:
+            raise ValueError(f"Message {message_id} is not in the conversation.")
         self._message_ids.remove(message_id)
 
-        # Raise the domain event
-        event = MessageRemovedEvent(
-            conversation_id=self._id,
-            message_id=message_id,
-            timestamp=str(datetime.now()),
-        )
-        self._record_event(event)
+    def get_message(self, message_id: uuid.UUID) -> uuid.UUID:
+        """
+        Retrieves a message ID from the conversation by message ID.
 
-    def get_message_ids(self):
+        Args:
+            message_id (uuid.UUID): The ID of the message to be retrieved.
+
+        Returns:
+            uuid.UUID: The message ID, or None if not found.
+        """
+        return next((m for m in self._message_ids if m == message_id), None)
+
+    def get_message_ids(self) -> list[uuid.UUID]:
+        """
+        Retrieves all message IDs from the conversation.
+
+        Returns:
+            list[uuid.UUID]: A list of all message IDs in the conversation.
+        """
         return self._message_ids
 
-    def get_last_n_messages(self, n: int):
+    def get_last_n_messages(self, n: int) -> list[uuid.UUID]:
         """
-        Retrieves the last `n` messages in the conversation.
+        Retrieves the last N message IDs from the conversation.
+
+        Args:
+            n (int): The number of message IDs to retrieve.
+
+        Returns:
+            list[uuid.UUID]: A list of the last N message IDs in the conversation.
         """
-        if n <= 0:
-            raise ValueError("Number of messages must be positive.")
-        return list(self._messages.values())[-n:]
+        return self._message_ids[-n:]
 
     def read_chat_partially(self, tokenizer, max_recent: int = 5, token_limit: int = 500):
         """
-        Retrieves recent messages from the conversation within a token limit.
+        Reads the chat partially based on the tokenizer, max recent messages, and token limit.
+
+        Args:
+            tokenizer: The tokenizer to use for reading the chat.
+            max_recent (int, optional): The maximum number of recent messages to read. Defaults to 5.
+            token_limit (int, optional): The token limit for reading the chat. Defaults to 500.
         """
-        last_messages = self.get_last_n_messages(max_recent)
-        selected_messages = []
-        total_tokens = 0
+        # Implementation of partial chat reading
+        pass
 
-        for message in reversed(last_messages):
-            tokens = message.tokenize_message(tokenizer)
-            if total_tokens + tokens > token_limit:
-                break
+    def update_title(self, new_title: str):
+        """
+        Updates the title of the conversation.
 
-            selected_messages.insert(0, message)
-            total_tokens += tokens
+        Args:
+            new_title (str): The new title of the conversation.
+
+        Raises:
+            ValueError: If the conversation is archived or the title is empty.
+        """
+        self.check_rule(ConversationCannotBeModifiedIfArchivedRule(is_archived=self._is_archived))
+        self.check_rule(TitleCannotBeEmptyRule(title=new_title))
+
+        self._title = new_title
 
         # Raise the domain event
-        event = MessagesRetrievedEvent(
+        event = ConversationTitleUpdatedEvent(
             conversation_id=self._id,
-            retrieved_message_ids=[msg.id for msg in selected_messages],
-            token_count=total_tokens,
-            timestamp=str(datetime.now()),
+            new_title=new_title,
         )
-        self._record_event(event)
+        self.add_event(event)
 
-        return selected_messages
+    def get_viewers(self):
+        """
+        Retrieves the viewers of the conversation.
+
+        Returns:
+            list[Participant]: A list of viewers in the conversation.
+        """
+        return [p for p in self._participants if p.is_viewer]
+
+    def get_editors(self):
+        """
+        Retrieves the editors of the conversation.
+
+        Returns:
+            list[Participant]: A list of editors in the conversation.
+        """
+        return [p for p in self._participants if p.is_editor]
+
+    def archive(self):
+        """
+        Archives the conversation.
+
+        Raises:
+            ValueError: If the conversation is already archived.
+        """
+        if self._is_archived:
+            raise ValueError("Conversation is already archived.")
+        self._is_archived = True
+
+        # Raise the domain event
+        event = ConversationArchivedEvent(conversation_id=self._id)
+        self.add_event(event)
+
+    def delete(self):
+        """
+        Deletes the conversation.
+
+        Raises:
+            ValueError: If the conversation is archived.
+        """
+        self.check_rule(ConversationCannotBeDeletedIfArchivedRule(is_archived=self._is_archived))
+
+        # Raise the domain event
+        event = ConversationDeletedEvent(conversation_id=self._id)
+        self.add_event(event)
+
+    def share(self, user_id: str):
+        """
+        Shares the conversation with another user.
+
+        Args:
+            user_id (str): The ID of the user to share the conversation with.
+
+        Raises:
+            ValueError: If the conversation is archived.
+        """
+        self.check_rule(ConversationCannotBeSharedIfArchivedRule(is_archived=self._is_archived))
+
+        # Raise the domain event
+        event = ConversationSharedEvent(conversation_id=self._id, user_id=user_id)
+        self.add_event(event)
+
+    def rename(self, new_name: str):
+        """
+        Renames the conversation.
+
+        Args:
+            new_name (str): The new name of the conversation.
+
+        Raises:
+            ValueError: If the conversation is archived or the new name is empty.
+        """
+        self.check_rule(ConversationCannotBeRenamedIfArchivedRule(is_archived=self._is_archived))
+        self.check_rule(TitleCannotBeEmptyRule(title=new_name))
+
+        self._title = new_name
+
+        # Raise the domain event
+        event = ConversationRenamedEvent(conversation_id=self._id, new_name=new_name)
+        self.add_event(event)

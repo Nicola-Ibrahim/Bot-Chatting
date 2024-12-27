@@ -4,13 +4,12 @@ from src.building_blocks.domain.enums import ErrorCode, ErrorType
 from src.building_blocks.domain.rule import BaseBusinessRule
 
 
-@dataclass
-class ContentIndexMustBeValidRule(BaseBusinessRule):
-    content_index: int
-    contents_length: int
+@dataclass(frozen=True)
+class ContentTextMustBeValidRule(BaseBusinessRule):
+    text: str
     code: ErrorCode = ErrorCode.INVALID_INPUT
-    message: str = "Content index must be valid."
+    message: str = "Content must be valid."
     error_type: ErrorType = ErrorType.VALIDATION_ERROR
 
     def is_satisfied(self) -> bool:
-        return 0 <= self.content_index < self.contents_length
+        return bool(self.text and len(self.text) > 0)

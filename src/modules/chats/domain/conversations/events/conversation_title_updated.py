@@ -5,6 +5,6 @@ from building_blocks.domain.events import DomainEvent
 
 
 @dataclass
-class ParticipantAddedEvent(DomainEvent):
+class ConversationTitleUpdatedEvent(DomainEvent):
     conversation_id: uuid.UUID
-    participant_id: str
+    new_title: str

@@ -2,7 +2,8 @@ from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, HTTPException, status
 from shared.infra.utils.result import Result
 
-from .....modules.chats.application.services.conversation_service import ConversationApplicationService
+from src.modules.chats.application.conversations.create_conversation import create_conversation_command
+
 from .....modules.chats.infra.common.di import ChatAppDIContainer
 from ..contract.conversation import ConversationResponseSchema, CreateConversationRequestSchema, MessageResponseSchema
 
@@ -15,7 +16,7 @@ router = APIRouter(
 
 @router.post("/conversations")
 def create_conversation():
-    command = CreateConversationCommand()
+    command = create_conversation_command(user_id=1)
     return create_conversation_handler.execute(command)
 
 
@@ -287,4 +288,5 @@ async def create(
 
 #     except Exception as e:
 #         print(f"Error exporting memory: {str(e)}")
+#         return jsonify({"error": "Failed to export memory"}), 500
 #         return jsonify({"error": "Failed to export memory"}), 500

@@ -2,13 +2,13 @@ from src.building_blocks.domain.exception import BusinessRuleValidationException
 from src.building_blocks.domain.result import Result, resultify
 
 from ....application.configuration.command.base_command_handler import BaseCommandHandler
-from ....domain.conversations.root import
 from ....domain.interfaces.conversation_repository import AbstractConversationRepository
 from ....domain.messages.models.content import Content
 from ....domain.messages.root import Message
 from ....domain.value_objects import Content
 from ....infra.services.response_generator import ResponseGenerator
 from .add_message_to_conversation_command import AddMessageToConversationCommand
+
 
 class AddMessageToConversationCommandHandler(BaseCommandHandler[AddMessageToConversationCommand]):
     def __init__(self, repository: AbstractConversationRepository, response_generator: ResponseGenerator):
@@ -27,4 +27,5 @@ class AddMessageToConversationCommandHandler(BaseCommandHandler[AddMessageToConv
             self._repository.save(conversation)
 
         except (BusinessRuleValidationException, RepositoryException) as e:
+            return e
             return e

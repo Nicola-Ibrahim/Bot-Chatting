@@ -1,16 +1,14 @@
 from dataclasses import dataclass
-
 from src.building_blocks.domain.enums import ErrorCode, ErrorType
 from src.building_blocks.domain.rule import BaseBusinessRule
 
 
 @dataclass
-class ContentIndexMustBeValidRule(BaseBusinessRule):
-    content_index: int
-    contents_length: int
+class NonEmptyMessageRule(BaseBusinessRule):
+    message: str
     code: ErrorCode = ErrorCode.INVALID_INPUT
-    message: str = "Content index must be valid."
+    message: str = "Message cannot be empty."
     error_type: ErrorType = ErrorType.VALIDATION_ERROR
 
     def is_satisfied(self) -> bool:
-        return 0 <= self.content_index < self.contents_length
+        return bool(self.message and self.message.strip())

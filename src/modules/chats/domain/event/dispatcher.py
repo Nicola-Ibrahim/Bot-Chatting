@@ -1,4 +1,4 @@
-from .....building_blocks.domain.domain_event import DomainEvent
+from .....building_blocks.domain.events import DomainEvent
 
 
 class EventDispatcher:

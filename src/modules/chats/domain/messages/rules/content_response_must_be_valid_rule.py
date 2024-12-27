@@ -5,12 +5,11 @@ from src.building_blocks.domain.rule import BaseBusinessRule
 
 
 @dataclass
-class ContentIndexMustBeValidRule(BaseBusinessRule):
-    content_index: int
-    contents_length: int
+class ContentResponseMustBeValidRule(BaseBusinessRule):
+    response: str
     code: ErrorCode = ErrorCode.INVALID_INPUT
-    message: str = "Content index must be valid."
+    message: str = "Response must be valid."
     error_type: ErrorType = ErrorType.VALIDATION_ERROR
 
     def is_satisfied(self) -> bool:
-        return 0 <= self.content_index < self.contents_length
+        return not self.response or len(self.response) < 5

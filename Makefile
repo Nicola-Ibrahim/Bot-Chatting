@@ -24,6 +24,7 @@ HOST_PORT := 8000
 CONTAINER_PORT := 8000
 
 UV := uv run
+UVX := uvx
 
 .PHONY: $(COMMANDS)  # Declare all commands as PHONY
 
@@ -46,6 +47,11 @@ create-user:  # Create a superuser with administrative privileges
 gen-sample-users:  # Generate a predefined set of sample users for testing
 	@echo "Generating sample users..."
 	$(UV) python src/scripts/generate_users.py
+
+
+format:  # Format code using Black and isort for consistency
+	@echo "Formatting code..."
+	$(UVX) ruff format src
 
 lint:  # Run linters to ensure code quality and style consistency
 	@echo "Running linters..."

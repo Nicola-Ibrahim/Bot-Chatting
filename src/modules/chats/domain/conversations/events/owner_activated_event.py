@@ -5,6 +5,5 @@ from src.building_blocks.domain.events import DomainEvent
 
 
 @dataclass
-class MessagePinnedEvent(DomainEvent):
-    conversation_id: uuid.UUID
-    message_id: uuid.UUID
+class OwnerActivatedEvent(DomainEvent):
+    owner_id: uuid.UUID

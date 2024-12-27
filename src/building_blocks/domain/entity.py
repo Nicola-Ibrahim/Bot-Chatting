@@ -3,7 +3,7 @@ from dataclasses import asdict, dataclass, field
 from itertools import count
 from typing import Any
 
-from .domain_event import DomainEvent
+from .events import DomainEvent
 from .exception import BusinessRuleValidationException
 from .identifier import Identifier
 from .rule import BaseBusinessRule

@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
 
@@ -33,4 +33,4 @@ class ValueObject(ABC):
     @abstractmethod
     def create(cls, *args, **kwargs) -> "ValueObject":
         """Abstract method for creating the value object, enforcing rule validation."""
-        # Default implementation returns True. Subclasses may override this method to enforce specific validation rules.
+        raise NotImplementedError
