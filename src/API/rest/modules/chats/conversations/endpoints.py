@@ -1,11 +1,26 @@
+import uuid
+
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, HTTPException, status
 from shared.infra.utils.result import Result
 
-from src.modules.chats.application.conversations.create_conversation import create_conversation_command
+from src.modules.chats.application.contracts.chats_mediator import IChatsMediator
+from src.modules.chats.application.conversations.add_feedback_to_message.add_feedback_to_message_command import (
+    AddFeedbackToMessageCommand,
+)
+from src.modules.chats.application.conversations.add_message_to_conversation.add_message_to_conversation_command import (
+    AddMessageToConversationCommand,
+)
+from src.modules.chats.application.conversations.create_conversation.create_conversation_command import (
+    CreateConversationCommand,
+)
+from src.modules.chats.application.conversations.get_all_conversation.get_all_conversation_query import (
+    GetAllConversationsQuery,
+)
 
-from .....modules.chats.infra.common.di import ChatAppDIContainer
-from ..contract.conversation import ConversationResponseSchema, CreateConversationRequestSchema, MessageResponseSchema
+from .add_feedback_request import AddFeedbackRequest
+from .add_message_request import AddMessageRequest
+from .create_conversation_request import CreateConversationRequest
 
 router = APIRouter(
     prefix="/v1/conversation",
@@ -14,54 +29,70 @@ router = APIRouter(
 )
 
 
-@router.post("/conversations")
-def create_conversation():
-    command = create_conversation_command(user_id=1)
-    return create_conversation_handler.execute(command)
-
-
-@router.post("/conversations/{conversation_id}/messages")
-def add_message(conversation_id: uuid.UUID, text: str):
-    command = AddMessageCommand(conversation_id=conversation_id, text=text)
-    return add_message_handler.execute(command)
-
-
-@router.post("/conversations/{conversation_id}/messages/{message_id}/feedback")
-def add_feedback(
-    conversation_id: uuid.UUID, message_id: uuid.UUID, content_pos: int, rating: RatingType, comment: str
-):
-    command = AddFeedbackCommand(
-        conversation_id=conversation_id, message_id=message_id, content_pos=content_pos, rating=rating, comment=comment
-    )
-    return add_feedback_handler.execute(command)
-
-
 @router.get("/conversations/{conversation_id}")
-def get_conversation(conversation_id: uuid.UUID):
+def retrieve_conversation(
+    conversation_id: uuid.UUID,
+    chats_mediator: IChatsMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
+):
     query = GetConversationByIdQuery(conversation_id=conversation_id)
-    return get_conversation_handler.execute(query)
+    result: Result = chats_mediator.execute_query(query)
 
-
-@router.get("", response_model=ConversationResponseSchema)
-async def get(conversation_id: str):
-    return
+    return result.match(
+        on_success=lambda conversation: conversation,
+        on_failure=lambda error: HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)),
+    )
 
 
 @router.post("", response_model=ConversationResponseSchema)
-async def create(
-    request: CreateConversationRequestSchema,
-    conversation_service: ConversationApplicationService = Depends(Provide[ChatAppDIContainer.conversation_service]),
+async def create_conversation_with_details(
+    request: CreateConversationRequest,
+    chats_mediator: IChatsMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
 ):
-    conversation = request.map_to_conversation()
-
-    result: Result = conversation_service.create(conversation=conversation)
+    command = CreateConversationCommand(user_id=request.user_id)
+    result: Result = chats_mediator.execute_command(command)
 
     return result.match(
-        # TODO: Apply on success {conversation.map_to_response()} or {conversation.as_dict()} for better serialization
         on_success=lambda conversation: ConversationResponseSchema(
             id=str(conversation.id),
             messages=[MessageResponseSchema(id=str(msg.id)) for msg in conversation.all_messages],
         ),
+        on_failure=lambda error: HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)),
+    )
+
+
+@router.post("/conversations/{conversation_id}/messages")
+def add_message_to_conversation(
+    conversation_id: uuid.UUID,
+    request: AddMessageRequest,
+    chats_mediator: IChatsMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
+):
+    command = AddMessageToConversationCommand(conversation_id=conversation_id, text=request.text)
+    result: Result = chats_mediator.execute_command(command)
+
+    return result.match(
+        on_success=lambda message: message,
+        on_failure=lambda error: HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)),
+    )
+
+
+@router.post("/conversations/{conversation_id}/messages/{message_id}/feedback")
+def add_feedback_to_message(
+    conversation_id: uuid.UUID,
+    message_id: uuid.UUID,
+    request: AddFeedbackRequest,
+    chats_mediator: IChatsMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
+):
+    command = AddFeedbackToMessageCommand(
+        conversation_id=conversation_id,
+        message_id=message_id,
+        content_pos=request.content_pos,
+        rating=request.rating,
+        comment=request.comment,
+    )
+    result: Result = chats_mediator.execute_command(command)
+
+    return result.match(
+        on_success=lambda feedback: feedback,
         on_failure=lambda error: HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)),
     )
 
