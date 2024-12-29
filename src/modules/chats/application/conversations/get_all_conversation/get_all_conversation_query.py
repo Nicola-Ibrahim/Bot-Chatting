@@ -1,4 +1,4 @@
-from ...contracts.base_query import BaseQuery
+from ...contracts.query import BaseQuery
 
 
 class GetAllConversationsQuery(BaseQuery):

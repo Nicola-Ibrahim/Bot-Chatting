@@ -68,19 +68,21 @@ class Conversation(AggregateRoot):
         return self._is_archived
 
     @classmethod
-    def create(cls, owner: Owner, title: str = "") -> "Conversation":
+    def create(cls, user_id: uuid.UUID, user_name: str, title: str) -> "Conversation":
         """
-        Factory method to create a new conversation instance.
+        Creates a new conversation.
 
         Args:
-            owner (Owner): The owner of the conversation.
-            title (str, optional): The title of the conversation. Defaults to "".
+            user_id (uuid.UUID): The ID of the user creating the conversation.
+            user_name (str): The name of the user creating the conversation.
+            title (str): The title of the conversation.
 
         Returns:
-            Conversation: A new instance of the Conversation class.
+            Conversation: The newly created conversation.
         """
-        instance = cls(_owner=owner, _title=title)
-        return instance
+        owner = Owner.create(user_id=user_id, name=user_name)
+        conversation = cls(_id=uuid.uuid4(), _title=title, _owner=owner)
+        return conversation
 
     def add_participant(self, participant_id: str, role: Role):
         """

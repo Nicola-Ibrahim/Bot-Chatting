@@ -4,7 +4,7 @@ from pydantic import Field
 
 from src.modules.chats.domain.messages.root import Message
 
-from ...contracts.base_command import BaseCommand
+from ...contracts.command import BaseCommand
 
 
 class AddMessageToConversationCommand(BaseCommand):

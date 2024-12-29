@@ -13,6 +13,7 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "returns>=0.24.0",
     "sqlalchemy>=2.0.36",
+    "sqlmodel>=0.0.22",
 ]
 
 [dependency-groups]

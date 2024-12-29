@@ -1,16 +1,18 @@
-from src.building_blocks.domain.result import resultify
-from src.modules.chats.application.interfaces.conversation_repository import AbstractConversationRepository
+from src.building_blocks.domain.result import Result, TError, resultify
 
-from ...configuration.query.base_query_handler import BaseQueryHandler
+from ....domain.conversations.interfaces.repository import AbstractConversationRepository
+from ...configuration.query_handler import AbstractQueryHandler
 from .get_all_conversation_query import GetAllConversationsQuery
 
 
-class GetAllConversationsQueryHandler(BaseQueryHandler[GetAllConversationsQuery, list[GetAllConversationsQuery]]):
+class GetAllConversationsQueryHandler(
+    AbstractQueryHandler[GetAllConversationsQuery, Result[list[GetAllConversationsQuery], TError]]
+):
     def __init__(self, repository: AbstractConversationRepository):
         self._repository = repository
 
     @resultify
-    def handle(self, query: GetAllConversationsQuery) -> list[GetAllConversationsQuery]:
+    def handle(self, query: GetAllConversationsQuery) -> Result[list[GetAllConversationsQuery], TError]:
         try:
             conversations = self._repository.get_all()
             return [GetAllConversationsQuery.from_domain(conversation) for conversation in conversations]

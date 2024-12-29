@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from ...contracts.base_query import BaseQuery
+from ...contracts.query import BaseQuery
 
 
 class GetSubOfMessagesQuery(BaseQuery):

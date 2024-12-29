@@ -9,11 +9,11 @@ from .query import BaseQuery
 TResult = TypeVar("TResult")
 
 
-class AbstractChatsMediator(ABC):
+class AbstractMediator(ABC):
     @abstractmethod
-    async def execute_command(self, command: BaseCommand[TResult]) -> TResult:
+    def execute_command(self, command: BaseCommand[TResult]) -> Result:
         pass
 
     @abstractmethod
-    async def execute_query(self, query: BaseQuery[TResult]) -> TResult:
+    def execute_query(self, query: BaseQuery[TResult]) -> Result:
         pass

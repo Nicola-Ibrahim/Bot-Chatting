@@ -1,14 +1,14 @@
 from src.building_blocks.domain.exception import BusinessRuleValidationException
-from src.building_blocks.domain.result import Result, resultify
-from src.modules.chats.application.interfaces.conversation_repository import AbstractConversationRepository
-from src.modules.chats.application.interfaces.downloader import AbstractConversationDownloader
-from src.modules.chats.infra.persistence.exceptions import RepositoryException
+from src.building_blocks.domain.result import Result, TError, resultify
+from src.modules.chats.infra.domain.exceptions import RepositoryException
 
-from ...configuration.command.base_command_handler import BaseCommandHandler
+from ....domain.conversations.interfaces.downloader import AbstractConversationDownloader
+from ....domain.conversations.interfaces.repository import AbstractConversationRepository
+from ...configuration.command_handler import AbstractCommandHandler
 from .download_conversation_command import DownloadConversationCommand
 
 
-class DownloadConversationCommandHandler(BaseCommandHandler[DownloadConversationCommand]):
+class DownloadConversationCommandHandler(AbstractCommandHandler[DownloadConversationCommand, Result[None, TError]]):
     def __init__(
         self, conversation_downloader: AbstractConversationDownloader, repository: AbstractConversationRepository
     ):
@@ -16,7 +16,7 @@ class DownloadConversationCommandHandler(BaseCommandHandler[DownloadConversation
         self._repository = repository
 
     @resultify
-    def handle(self, command: DownloadConversationCommand) -> Result:
+    def handle(self, command: DownloadConversationCommand) -> Result[None, TError]:
         try:
             conversation = self._repository.get_by_id(command.conversation_id)
 

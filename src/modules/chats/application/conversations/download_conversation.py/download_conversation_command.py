@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from ...contracts.base_command import BaseCommand
+from ...contracts.command import BaseCommand
 
 
 class DownloadConversationCommand(BaseCommand):

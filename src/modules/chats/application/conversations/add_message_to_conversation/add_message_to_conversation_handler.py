@@ -1,22 +1,25 @@
 from src.building_blocks.domain.exception import BusinessRuleValidationException, RepositoryException
-from src.building_blocks.domain.result import Result, resultify
+from src.building_blocks.domain.result import Result, TError, resultify
+from src.modules.chats.domain.messages.root import Message
 
-from ....application.configuration.command.base_command_handler import BaseCommandHandler
 from ....domain.interfaces.conversation_repository import AbstractConversationRepository
 from ....domain.messages.models.content import Content
 from ....domain.messages.root import Message
 from ....domain.value_objects import Content
 from ....infra.services.response_generator import ResponseGenerator
+from ...configuration.command_handler import AbstractCommandHandler
 from .add_message_to_conversation_command import AddMessageToConversationCommand
 
 
-class AddMessageToConversationCommandHandler(BaseCommandHandler[AddMessageToConversationCommand]):
+class AddMessageToConversationCommandHandler(
+    AbstractCommandHandler[AddMessageToConversationCommand, Result[Message, TError]]
+):
     def __init__(self, repository: AbstractConversationRepository, response_generator: ResponseGenerator):
         self._repository = repository
         self._response_generator = response_generator
 
     @resultify
-    def handle(self, command: AddMessageToConversationCommand) -> Result[Message, Exception]:
+    def handle(self, command: AddMessageToConversationCommand) -> Result[Message, TError]:
         try:
             conversation = self._repository.get_by_id(command.conversation_id)
             response = self._response_generator.generate_answer(command.text)
@@ -27,5 +30,4 @@ class AddMessageToConversationCommandHandler(BaseCommandHandler[AddMessageToConv
             self._repository.save(conversation)
 
         except (BusinessRuleValidationException, RepositoryException) as e:
-            return e
             return e

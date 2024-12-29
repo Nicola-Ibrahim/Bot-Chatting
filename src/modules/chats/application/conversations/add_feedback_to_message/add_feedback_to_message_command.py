@@ -2,7 +2,7 @@ from uuid import UUID
 
 from src.modules.chats.domain.messages.models.rating import RatingType
 
-from ...contracts.base_command import BaseCommand
+from ...contracts.command import BaseCommand
 
 
 class AddFeedbackToMessageCommand(BaseCommand):

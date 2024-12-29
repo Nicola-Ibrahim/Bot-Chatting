@@ -11,35 +11,22 @@ from src.modules.chats.domain.conversations.events import (
 
 @dataclass
 class Owner(Entity):
-    user_id: uuid.UUID
-    chat_id: uuid.UUID
-    name: str
-    is_active: bool = True
+    _name: str
+    _is_active: bool = True
 
     @classmethod
-    def create(cls, user_id: uuid.UUID, chat_id: uuid.UUID, name: str) -> "Owner":
+    def create(cls, user_id: uuid.UUID, name: str) -> "Owner":
         """
         Creates a new instance of the Owner class.
 
         Args:
             user_id (uuid.UUID): The ID of the user.
-            chat_id (uuid.UUID): The ID of the chat.
             name (str): The name of the owner.
 
         Returns:
             Owner: A new instance of the Owner class.
         """
-        return cls(user_id=user_id, chat_id=chat_id, name=name)
-
-    @property
-    def id(self) -> uuid.UUID:
-        """
-        Retrieves the ID of the owner.
-
-        Returns:
-            uuid.UUID: The ID of the owner.
-        """
-        return self._id
+        return cls(_id=user_id, _name=name)
 
     def change_name(self, new_name: str) -> None:
         """
@@ -73,5 +60,4 @@ class Owner(Entity):
         Returns:
             bool: True if the owner is active, False otherwise.
         """
-        return self.is_active
         return self.is_active

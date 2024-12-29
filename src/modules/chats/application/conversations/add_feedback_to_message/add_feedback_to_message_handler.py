@@ -1,19 +1,20 @@
 from src.building_blocks.domain.exception import BusinessRuleValidationException, RepositoryException
-from src.building_blocks.domain.result import Result, resultify
+from src.building_blocks.domain.result import Result, TError, resultify
 from src.modules.chats.domain.messages.models.feedback import Feedback
 
-from ....application.configuration.command.base_command_handler import BaseCommandHandler
 from ....domain.interfaces.message_repository import AbstractMessageRepository
 from ....domain.messages.root import Message
+from ...configuration.command_handler import AbstractCommandHandler
 from .add_feedback_to_message_command import AddFeedbackToMessageCommand
 
 
-class AddFeedbackToMessageCommandHandler(BaseCommandHandler[AddFeedbackToMessageCommand]):
+class AddFeedbackToMessageCommandHandler(AbstractCommandHandler[AddFeedbackToMessageCommand, Result[Message, TError]]):
     def __init__(self, repository: AbstractMessageRepository):
         self._repository = repository
 
     @resultify
-    def handle(self, command: AddFeedbackToMessageCommand) -> Result[Message, Exception]:
+    def handle(self, command: AddFeedbackToMessageCommand) -> Result[Message, TError]:
+        # The Result type encapsulates either a successful result (Message) or an error of type TError
         try:
             message = self._repository.get_by_id(command.message_id)
 
@@ -26,6 +27,4 @@ class AddFeedbackToMessageCommandHandler(BaseCommandHandler[AddFeedbackToMessage
             return message
 
         except (BusinessRuleValidationException, RepositoryException, ValueError) as e:
-            return e
-            return e
             return e

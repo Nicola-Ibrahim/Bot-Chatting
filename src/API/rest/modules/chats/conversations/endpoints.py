@@ -4,7 +4,7 @@ from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, HTTPException, status
 from shared.infra.utils.result import Result
 
-from src.modules.chats.application.contracts.chats_mediator import IChatsMediator
+from src.modules.chats.application.contracts.mediator import AbstractMediator
 from src.modules.chats.application.conversations.add_feedback_to_message.add_feedback_to_message_command import (
     AddFeedbackToMessageCommand,
 )
@@ -32,7 +32,7 @@ router = APIRouter(
 @router.get("/conversations/{conversation_id}")
 def retrieve_conversation(
     conversation_id: uuid.UUID,
-    chats_mediator: IChatsMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
+    chats_mediator: AbstractMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
 ):
     query = GetConversationByIdQuery(conversation_id=conversation_id)
     result: Result = chats_mediator.execute_query(query)
@@ -46,7 +46,7 @@ def retrieve_conversation(
 @router.post("", response_model=ConversationResponseSchema)
 async def create_conversation_with_details(
     request: CreateConversationRequest,
-    chats_mediator: IChatsMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
+    chats_mediator: AbstractMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
 ):
     command = CreateConversationCommand(user_id=request.user_id)
     result: Result = chats_mediator.execute_command(command)
@@ -64,7 +64,7 @@ async def create_conversation_with_details(
 def add_message_to_conversation(
     conversation_id: uuid.UUID,
     request: AddMessageRequest,
-    chats_mediator: IChatsMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
+    chats_mediator: AbstractMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
 ):
     command = AddMessageToConversationCommand(conversation_id=conversation_id, text=request.text)
     result: Result = chats_mediator.execute_command(command)
@@ -80,7 +80,7 @@ def add_feedback_to_message(
     conversation_id: uuid.UUID,
     message_id: uuid.UUID,
     request: AddFeedbackRequest,
-    chats_mediator: IChatsMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
+    chats_mediator: AbstractMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
 ):
     command = AddFeedbackToMessageCommand(
         conversation_id=conversation_id,
