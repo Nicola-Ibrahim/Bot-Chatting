@@ -1,12 +1,10 @@
 import uuid
 
-from src.building_blocks.domain.result import Result
-from src.modules.chats.domain.conversations.root import Conversation
-
+from ....domain.conversations.root import Conversation
 from ...contracts.command import BaseCommand
 
 
-class CreateConversationCommand(BaseCommand[Result[Conversation]]):
+class CreateConversationCommand(BaseCommand[Conversation]):
     user_id: uuid.UUID
     user_name: str
     conversation_title: str = None

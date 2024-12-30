@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from src.building_blocks.domain.entity import AggregateRoot
 
+from ..members.models.member_id import MemberId
 from .events import (
     ConversationArchivedEvent,
     ConversationDeletedEvent,
@@ -13,6 +14,7 @@ from .events import (
     ParticipantAddedEvent,
     ParticipantRoleChangedEvent,
 )
+from .models.conversation_id import ConversationId
 from .models.owner import Owner
 from .models.participant import Participant
 from .models.participant_role import Role
@@ -31,6 +33,7 @@ from .rules import (
 
 @dataclass
 class Conversation(AggregateRoot):
+    _id: ConversationId
     _title: str = ""
     _owner: Owner
     _participants: list[Participant] = field(default_factory=list)
@@ -68,28 +71,28 @@ class Conversation(AggregateRoot):
         return self._is_archived
 
     @classmethod
-    def create(cls, user_id: uuid.UUID, user_name: str, title: str) -> "Conversation":
+    def create(cls, member_id: uuid.UUID, user_name: str, title: str) -> "Conversation":
         """
         Creates a new conversation.
 
         Args:
-            user_id (uuid.UUID): The ID of the user creating the conversation.
+            member_id (uuid.UUID): The ID of the user creating the conversation.
             user_name (str): The name of the user creating the conversation.
             title (str): The title of the conversation.
 
         Returns:
             Conversation: The newly created conversation.
         """
-        owner = Owner.create(user_id=user_id, name=user_name)
-        conversation = cls(_id=uuid.uuid4(), _title=title, _owner=owner)
+        owner = Owner.create(member_id=member_id, name=user_name)
+        conversation = cls(_id=ConversationId.create(id=uuid.uuid4()), _title=title, _owner=owner)
         return conversation
 
-    def add_participant(self, participant_id: str, role: Role):
+    def add_participant(self, participant_id: MemberId, role: Role):
         """
         Adds a participant to the conversation with a specific role.
 
         Args:
-            participant_id (str): The ID of the user to be added as a participant.
+            participant_id (MemberId): The ID of the user to be added as a participant.
             role (Role): The role assigned to the participant.
 
         Raises:
@@ -111,12 +114,12 @@ class Conversation(AggregateRoot):
         )
         self.add_event(event)
 
-    def remove_participant(self, participant_id: str):
+    def remove_participant(self, participant_id: MemberId):
         """
         Removes a participant from the conversation.
 
         Args:
-            participant_id (str): The ID of the user to be removed.
+            participant_id (MemberId): The ID of the user to be removed.
 
         Raises:
             ValueError: If the conversation is archived, the participant does not exist, or the participant is the owner.
@@ -131,12 +134,12 @@ class Conversation(AggregateRoot):
         self._participants.remove(participant)
         participant.remove()
 
-    def change_participant_role(self, participant_id: str, new_role: Role):
+    def change_participant_role(self, participant_id: MemberId, new_role: Role):
         """
         Changes the role of a participant in the conversation.
 
         Args:
-            participant_id (str): The ID of the user whose role is to be changed.
+            participant_id (MemberId): The ID of the user whose role is to be changed.
             new_role (Role): The new role to be assigned to the participant.
 
         Raises:
@@ -157,12 +160,12 @@ class Conversation(AggregateRoot):
         else:
             raise ValueError(f"User {participant_id} is not a participant.")
 
-    def get_participant(self, participant_id: str) -> Participant:
+    def get_participant(self, participant_id: MemberId) -> Participant:
         """
         Retrieves a participant from the conversation by user ID.
 
         Args:
-            participant_id (str): The ID of the user to be retrieved.
+            participant_id (MemberId): The ID of the user to be retrieved.
 
         Returns:
             Participant: The participant with the specified user ID, or None if not found.
@@ -330,12 +333,12 @@ class Conversation(AggregateRoot):
         event = ConversationDeletedEvent(conversation_id=self._id)
         self.add_event(event)
 
-    def share(self, user_id: str):
+    def share(self, member_id: str):
         """
         Shares the conversation with another user.
 
         Args:
-            user_id (str): The ID of the user to share the conversation with.
+            member_id (str): The ID of the user to share the conversation with.
 
         Raises:
             ValueError: If the conversation is archived.
@@ -343,7 +346,7 @@ class Conversation(AggregateRoot):
         self.check_rule(ConversationCannotBeSharedIfArchivedRule(is_archived=self._is_archived))
 
         # Raise the domain event
-        event = ConversationSharedEvent(conversation_id=self._id, user_id=user_id)
+        event = ConversationSharedEvent(conversation_id=self._id, member_id=member_id)
         self.add_event(event)
 
     def rename(self, new_name: str):

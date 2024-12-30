@@ -1,6 +1,6 @@
 from src.building_blocks.domain.exception import BusinessRuleValidationException
-from src.building_blocks.domain.result import Result, TError, resultify
-from src.modules.chats.infra.domain.exceptions import RepositoryException
+from src.building_blocks.domain.result import Result, TError
+from src.modules.chats.infrastructure.domain.exceptions import RepositoryException
 
 from ....domain.conversations.interfaces.downloader import AbstractConversationDownloader
 from ....domain.conversations.interfaces.repository import AbstractConversationRepository
@@ -8,15 +8,14 @@ from ...configuration.command_handler import AbstractCommandHandler
 from .download_conversation_command import DownloadConversationCommand
 
 
-class DownloadConversationCommandHandler(AbstractCommandHandler[DownloadConversationCommand, Result[None, TError]]):
+class DownloadConversationCommandHandler(AbstractCommandHandler[DownloadConversationCommand, None]):
     def __init__(
         self, conversation_downloader: AbstractConversationDownloader, repository: AbstractConversationRepository
     ):
         self._conversation_downloader = conversation_downloader
         self._repository = repository
 
-    @resultify
-    def handle(self, command: DownloadConversationCommand) -> Result[None, TError]:
+    def handle(self, command: DownloadConversationCommand) -> None:
         try:
             conversation = self._repository.get_by_id(command.conversation_id)
 
@@ -25,4 +24,4 @@ class DownloadConversationCommandHandler(AbstractCommandHandler[DownloadConversa
             return downloaded_data
 
         except (BusinessRuleValidationException, RepositoryException) as e:
-            return e
+            raise e

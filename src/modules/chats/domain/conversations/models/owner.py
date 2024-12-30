@@ -1,4 +1,3 @@
-import uuid
 from dataclasses import dataclass
 
 from src.building_blocks.domain.entity import Entity
@@ -8,6 +7,8 @@ from src.modules.chats.domain.conversations.events import (
     OwnerNameChangedEvent,
 )
 
+from ...members.models.member_id import MemberId
+
 
 @dataclass
 class Owner(Entity):
@@ -15,18 +16,18 @@ class Owner(Entity):
     _is_active: bool = True
 
     @classmethod
-    def create(cls, user_id: uuid.UUID, name: str) -> "Owner":
+    def create(cls, member_id: MemberId, name: str) -> "Owner":
         """
         Creates a new instance of the Owner class.
 
         Args:
-            user_id (uuid.UUID): The ID of the user.
+            member_id (MemberId): The ID of the user.
             name (str): The name of the owner.
 
         Returns:
             Owner: A new instance of the Owner class.
         """
-        return cls(_id=user_id, _name=name)
+        return cls(_id=member_id, _name=name)
 
     def change_name(self, new_name: str) -> None:
         """

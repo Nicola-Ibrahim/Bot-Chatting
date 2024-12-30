@@ -4,6 +4,7 @@ from datetime import datetime
 
 from src.building_blocks.domain.entity import Entity
 
+from ...members.models.member_id import MemberId
 from ..events import ParticipantRoleAssignedEditorEvent, ParticipantRoleAssignedViewerEvent
 from ..rules import MeetingAttendeeRemovedDomainEvent
 from .participant_role import Role
@@ -19,19 +20,19 @@ class Participant(Entity):
     _removing_member_id: uuid.UUID = field(default=None)
 
     @classmethod
-    def create(cls, participant_id: uuid.UUID, conversation_id: uuid.UUID, role: Role) -> "Participant":
+    def create(cls, member_id: MemberId, conversation_id: uuid.UUID, role: Role) -> "Participant":
         """
         Creates a new participant.
 
         Args:
-            participant_id (uuid.UUID): The ID of the participant.
+            member_id (uuid.UUID): The ID of the participant.
             conversation_id (uuid.UUID): The ID of the conversation.
             role (Role): The role of the participant.
 
         Returns:
             Participant: A new participant instance.
         """
-        return cls(_id=participant_id, _conversation_id=conversation_id, _role=role)
+        return cls(_id=member_id, _conversation_id=conversation_id, _role=role)
 
     @property
     def is_removed(self) -> bool:

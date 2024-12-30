@@ -177,10 +177,13 @@ By following **Domain-Driven Design** and utilizing **FastAPI**, this bot system
 2. **Medium**: [Implementing Ports & CQRS](https://abstarreveld.medium.com/dddomain-models-ports-adapters-and-cqrs-reference-architecture-c-504817df65ec)
    A reference architecture for DDD models, ports, adapters, and CQRS.
 
-3. **Baeldung**: [DTO Pattern (Data Transfer Object)](https://www.baeldung.com/java-dto-pattern)
+3. **Medium**: [DDD Beyond the Basics: Mastering Aggregate Design](https://medium.com/ssense-tech/ddd-beyond-the-basics-mastering-aggregate-design-26591e218c8c)
+   An article discussing advanced concepts in aggregate design within DDD.
+
+4. **Baeldung**: [DTO Pattern (Data Transfer Object)](https://www.baeldung.com/java-dto-pattern)
    An explanation of the DTO pattern and its usage in Java applications.
 
-4. **Medium**: [Clean Lessons: Use Cases](https://medium.com/unil-ci-software-engineering/clean-ddd-lessons-use-cases-e9d11f64a0e9)
+5. **Medium**: [Clean Lessons: Use Cases](https://medium.com/unil-ci-software-engineering/clean-ddd-lessons-use-cases-e9d11f64a0e9)
    Insights into designing use cases within clean architecture frameworks.
 
 ## 🛠️ Tools and Frameworks
