@@ -1,4 +1,4 @@
-from ...application.interfaces.downloader import AbstractConversationDownloader
+from ....application import AbstractConversationDownloader
 
 
 class ConversationDownloader(AbstractConversationDownloader):

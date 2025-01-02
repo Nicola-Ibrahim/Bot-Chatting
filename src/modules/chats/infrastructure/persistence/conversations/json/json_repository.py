@@ -1,7 +1,64 @@
+from .....application import AbstractConversationRepository
+from .....domain.conversations.root import Conversation
+from ....processing.json.manager import JsonFileManager
+from .mapper import JsonConversationMapper
+
+
+class JsonConversationRepository(AbstractConversationRepository):
+    """
+    Repository for managing conversation data stored in JSON files.
+    """
+
+    def __init__(self):
+        self.json_file_manager = JsonFileManager(directory="conversation_data")
+
+    def get_by_id(self, conversation_id: str) -> Conversation:
+        """
+        Fetches a conversation aggregate by ID.
+
+        Args:
+            conversation_id (str): Unique identifier for the conversation.
+
+        Returns:
+            Conversation: The Conversation domain model.
+        """
+        data = self.json_file_manager.read(conversation_id)
+        return JsonConversationMapper.conversation_from_json(data)
+
+    def save(self, conversation: Conversation) -> None:
+        """
+        Saves or updates a conversation aggregate.
+
+        Args:
+            conversation (Conversation): The Conversation domain model to save.
+        """
+        data = JsonConversationMapper.conversation_to_json(conversation)
+        self.json_file_manager.write(conversation.id, data)
+
+    def delete(self, conversation_id: str) -> None:
+        """
+        Deletes a conversation by ID.
+
+        Args:
+            conversation_id (str): Unique identifier for the conversation.
+        """
+        self.json_file_manager.delete(conversation_id)
+
+    def list_all_conversations(self) -> list[str]:
+        """
+        Lists all existing conversation IDs.
+
+        Returns:
+            list[str]: List of conversation IDs.
+        """
+        return self.json_file_manager.list_files()
+
+
 import json
 import os
 
 from chat.application.interface.feedback_repository import AbstractFeedbackRepository
+
 from common.infra.config import FEEDBACK_DIR
 
 

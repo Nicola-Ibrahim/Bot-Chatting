@@ -2,7 +2,7 @@ import json
 import os
 
 
-class JsonFileHandler:
+class JsonFileManager:
     """
     Handles low-level JSON file operations.
     """
@@ -11,7 +11,7 @@ class JsonFileHandler:
 
     def __init__(self, directory: str, prefix: str = None):
         """
-        Initializes the JsonFileHandler.
+        Initializes the JsonFileManager.
 
         Args:
             directory (str): The base directory for storing JSON files.

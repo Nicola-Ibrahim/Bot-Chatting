@@ -1,7 +1,7 @@
 from typing import Any
 
-from ....domain.conversations.root import Conversation
-from ....domain.messages.root import Content
+from .....domain.conversations.root import Conversation
+from .....domain.messages.root import Content
 
 
 class JsonConversationMapper:

@@ -1,11 +1,10 @@
 from dependency_injector import containers, providers
 
-from ...application.services.conversation_service import ConversationApplicationService
-from .. import ConversationDownloader
-from .. import JsonFileConversationRepository
+from ....application import ConversationApplicationService
+from ... import ConversationDownloader, JsonFileConversationRepository
 
 
-class ChatAppDIContainer(containers.DeclarativeContainer):
+class ConversationDIContainer(containers.DeclarativeContainer):
     conversation_download_service = providers.Singleton(ConversationDownloader)
 
     repository = providers.Singleton(JsonFileConversationRepository)
