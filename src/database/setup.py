@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
-from typing import Dict, Generic, Optional, Type, TypeVar
+from typing import Dict, Generic, Optional, TypeVar
 
 from sqlalchemy.engine import Engine
-from sqlmodel import Session, SQLModel
+from sqlmodel import SQLModel
 
 from .connection import DatabaseConnectionManager
 
@@ -10,9 +10,7 @@ ModelType = TypeVar("ModelType", bound=SQLModel)
 
 
 @dataclass
-class DBContext(Generic[ModelType]):
-    """Manages repositories and session lifecycle for database operations."""
-
+class DBSetup(Generic[ModelType]):
     engine: Engine = field(init=False)
     connection_string: Optional[str] = None
     config: Optional[Dict[str, str]] = None

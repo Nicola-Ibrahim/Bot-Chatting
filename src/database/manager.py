@@ -1,4 +1,4 @@
-from typing import Generic, Type, TypeVar
+from typing import Generic, TypeVar, Type
 
 from sqlmodel import Session, SQLModel, select
 
@@ -6,7 +6,8 @@ ModelType = TypeVar("ModelType", bound=SQLModel)
 
 
 class Manager(Generic[ModelType]):
-    def __init__(self, engine):
+    def __init__(self, model: Type[ModelType], engine):
+        self.model = model
         self.engine = engine
 
     def add(self, entity: ModelType) -> None:
@@ -15,6 +16,22 @@ class Manager(Generic[ModelType]):
             session.add(entity)
             session.commit()
             session.refresh(entity)
+
+    def delete(self, entity_id: int) -> None:
+        """Delete an entity from the session and commit."""
+        with Session(self.engine) as session:
+            entity = session.get(self.model, entity_id)
+            session.delete(entity)
+            session.commit()
+
+    def delete_all(self) -> None:
+        """Delete all entities from the session and commit."""
+        with Session(self.engine) as session:
+            statement = select(self.model)
+            entities = session.exec(statement).all()
+            for entity in entities:
+                session.delete(entity)
+            session.commit()
 
     def add_all(self, entities: list[ModelType]) -> None:
         """Add multiple entities to the session and commit."""
@@ -70,3 +87,15 @@ class Manager(Generic[ModelType]):
             session.add(entity)
             session.commit()
             session.refresh(entity)
+
+    def exists(self, entity_id: int) -> bool:
+        """Check if an entity exists by its ID."""
+        with Session(self.engine) as session:
+            entity = session.get(self.model, entity_id)
+            return entity is not None
+
+    def count(self) -> int:
+        """Count the number of entities."""
+        with Session(self.engine) as session:
+            statement = select(self.model)
+            return session.exec(statement).count()

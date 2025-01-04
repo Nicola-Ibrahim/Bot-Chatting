@@ -10,8 +10,9 @@ class Model(SQLModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    manager: Manager = Field(default=None, init=False)
+
+    def __post_init__(self):
         self.updated_at = datetime.now(timezone.utc)
 
     @classmethod
