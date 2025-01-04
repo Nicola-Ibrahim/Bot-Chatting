@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from src.building_blocks.domain.entity import AggregateRoot
 
-from ..members.models.member_id import MemberId
+from ..members.components.member_id import MemberId
 from .events import (
     ConversationArchivedEvent,
     ConversationDeletedEvent,
@@ -14,10 +14,10 @@ from .events import (
     ParticipantAddedEvent,
     ParticipantRoleChangedEvent,
 )
-from .models.conversation_id import ConversationId
-from .models.owner import Owner
-from .models.participant import Participant
-from .models.participant_role import Role
+from .components.conversation_id import ConversationId
+from .components.owner import Owner
+from .components.participant import Participant
+from .components.participant_role import Role
 from .rules import (
     ConversationCannotBeDeletedIfArchivedRule,
     ConversationCannotBeModifiedIfArchivedRule,

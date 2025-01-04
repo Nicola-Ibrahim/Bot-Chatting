@@ -9,7 +9,7 @@ class ConversationId(ValueObject):
     _value: uuid.UUID
 
     @classmethod
-    def create(cls, id: uuid.UUID = None) -> "ConversationId":
+    def create(cls, id: uuid.UUID) -> "ConversationId":
         return cls(_value=id)
 
     @property

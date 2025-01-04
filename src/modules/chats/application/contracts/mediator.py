@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar
 
-from shared.infra.utils.result import Result
+from src.building_blocks.domain.result import Result
 
 from .command import BaseCommand
 from .query import BaseQuery

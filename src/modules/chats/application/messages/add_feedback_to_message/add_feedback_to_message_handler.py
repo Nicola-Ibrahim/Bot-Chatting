@@ -1,5 +1,5 @@
 from src.building_blocks.domain.exception import BusinessRuleValidationException, RepositoryException
-from src.modules.chats.domain.messages.models.feedback import Feedback
+from src.modules.chats.domain.messages.components.feedback import Feedback
 
 from ....domain.messages.interfaces.repository import AbstractMessageRepository
 from ....domain.messages.root import Message

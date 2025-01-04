@@ -2,8 +2,8 @@ import uuid
 
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, HTTPException, status
-from shared.infra.utils.result import Result
 
+from src.building_blocks.domain.result import Result
 from src.modules.chats.application.contracts.mediator import AbstractMediator
 from src.modules.chats.application.conversations.add_feedback_to_message.add_feedback_to_message_command import (
     AddFeedbackToMessageCommand,

@@ -2,6 +2,7 @@ from sqlmodel import Session, select
 
 from .....domain.conversations.interfaces.repository import AbstractConversationRepository
 from .....domain.conversations.root import Conversation
+from ...db_context import DBContext
 
 
 class SQLConversationRepository(AbstractConversationRepository):

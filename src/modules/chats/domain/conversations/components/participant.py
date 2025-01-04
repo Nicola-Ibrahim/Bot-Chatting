@@ -4,7 +4,7 @@ from datetime import datetime
 
 from src.building_blocks.domain.entity import Entity
 
-from ...members.models.member_id import MemberId
+from ...members.components.member_id import MemberId
 from ..events import ParticipantRoleAssignedEditorEvent, ParticipantRoleAssignedViewerEvent
 from ..rules import MeetingAttendeeRemovedDomainEvent
 from .participant_role import Role

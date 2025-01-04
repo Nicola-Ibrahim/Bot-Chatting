@@ -7,7 +7,7 @@ from src.modules.chats.domain.conversations.events import (
     OwnerNameChangedEvent,
 )
 
-from ...members.models.member_id import MemberId
+from ...members.components.member_id import MemberId
 
 
 @dataclass

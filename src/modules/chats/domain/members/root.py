@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from src.building_blocks.domain.entity import AggregateRoot
 
 from .events import MemberCreatedEvent
-from .models.member_id import MemberId
+from .components.member_id import MemberId
 
 
 @dataclass

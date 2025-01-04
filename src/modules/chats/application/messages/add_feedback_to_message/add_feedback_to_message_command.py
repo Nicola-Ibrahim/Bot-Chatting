@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.modules.chats.domain.messages.models.rating import RatingType
+from src.modules.chats.domain.messages.components.rating import RatingType
 
 from ....domain.messages.root import Message
 from ...contracts.command import BaseCommand

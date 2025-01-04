@@ -13,7 +13,7 @@ class GetSubOfMessagesQueryHandler(
         self._repository = repository
 
     @resultify
-    def handle(self, query: GetSubOfMessagesQuery) -> Result[list[GetSubOfMessagesDTO], TError]:
+    def handle(self, query: GetSubOfMessagesQuery) -> list[GetSubOfMessagesDTO]:
         try:
             conversation = self._repository.get_by_id(query.conversation_id)
             messages = conversation.get_messages(query.start, query.count)

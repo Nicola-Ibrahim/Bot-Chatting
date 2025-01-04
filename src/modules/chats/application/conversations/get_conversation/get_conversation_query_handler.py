@@ -1,4 +1,4 @@
-from src.building_blocks.domain.result import Result, TError, resultify
+from src.building_blocks.domain.result import Result, TError
 
 from ....domain.conversations.interfaces.repository import AbstractConversationRepository
 from ...configuration.query_handler import AbstractQueryHandler
@@ -10,8 +10,7 @@ class GetConversationQueryHandler(AbstractQueryHandler[GetConversationQuery, Res
     def __init__(self, repository: AbstractConversationRepository):
         self._repository = repository
 
-    @resultify
-    def handle(self, query: GetConversationQuery) -> Result[GetConversationDTO, TError]:
+    def handle(self, query: GetConversationQuery) -> GetConversationDTO:
         try:
             conversation = self._repository.get_by_id(query.conversation_id)
             return GetConversationDTO.from_domain(conversation)

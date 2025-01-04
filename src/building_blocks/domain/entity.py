@@ -1,11 +1,9 @@
 import datetime
 from dataclasses import asdict, dataclass, field
-from itertools import count
 from typing import Any
 
 from .events import DomainEvent
 from .exception import BusinessRuleValidationException
-from .identifier import Identifier
 from .rule import BaseBusinessRule
 
 
@@ -17,20 +15,19 @@ class Entity:
     Supports flexible ID types.
     """
 
-    _id: Identifier
-    _instance_count: int = field(default_factory=lambda: next(count()))
+    _id: str
     _events: list[DomainEvent] = field(default_factory=list)
     _created_at: datetime.datetime = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
 
     @property
-    def id(self) -> Identifier:
-        """Get the ID of the entity."""
-        return self._id
+    def id(self) -> str:
+        """
+        Retrieves the ID of the conversation.
 
-    @property
-    def instance_count(self) -> int:
-        """Get the instance-specific ID."""
-        return self._instance_count
+        Returns:
+            ConversationId: The ID of the conversation.
+        """
+        return self._id
 
     @property
     def created_at(self) -> datetime.datetime:
@@ -41,7 +38,7 @@ class Entity:
         """Check equality based on the entity ID."""
         if not isinstance(other, Entity):
             return False
-        return self.id == other.id
+        return self._id == other._id
 
     def add_event(self, event: DomainEvent) -> None:
         """Add a domain event to the entity."""

@@ -6,8 +6,8 @@ from src.building_blocks.domain.entity import AggregateRoot
 from src.building_blocks.domain.exception import BusinessRuleValidationException
 
 from .events import MessageAddedEvent, MessageEditedEvent, MessagePinnedEvent, MessageUpdatedEvent
-from .models.content import Content
-from .models.feedback import Feedback
+from .components.content import Content
+from .components.feedback import Feedback
 from .rules import (
     ContentResponseMustBeValidRule,
     ContentTextMustBeValidRule,

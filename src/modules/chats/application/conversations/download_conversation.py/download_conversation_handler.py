@@ -1,5 +1,4 @@
 from src.building_blocks.domain.exception import BusinessRuleValidationException
-from src.building_blocks.domain.result import Result, TError
 from src.modules.chats.infrastructure.domain.exceptions import RepositoryException
 
 from ....domain.conversations.interfaces.downloader import AbstractConversationDownloader
