@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from building_blocks.domain.enums import ErrorCode, ErrorType
 from building_blocks.domain.rule import BaseBusinessRule
 
-from ..components.participant import Participant
+from ..value_objects.participant import Participant
 
 
 @dataclass

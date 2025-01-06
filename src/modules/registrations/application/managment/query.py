@@ -1,7 +1,7 @@
 from typing import Callable
 
 from ...domain.model.root_entity import User
-from ...domain.model.exceptions import UserNotFoundError
+from ....user_access.domain.users.exceptions import UserNotFoundError
 
 
 class UserQueryUseCase:

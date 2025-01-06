@@ -5,7 +5,7 @@ from sqlmodel import Field, Relationship
 from src.database.model import Model
 
 
-class Conversation(Model, table=True):
+class Conversation(Model):
     __tablename__ = "conversations"
 
     title: str

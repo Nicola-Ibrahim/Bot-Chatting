@@ -3,7 +3,7 @@ from typing import Callable
 from ...domain.model.root_entity import User
 from ..interfaces.notification_service import INotificationService
 from ..interfaces.repository import IUserRepository
-from ...domain.model.exceptions import UserNotCreatedException
+from ....user_access.domain.users.exceptions import UserNotCreatedException
 
 
 class UserCommandUseCase:

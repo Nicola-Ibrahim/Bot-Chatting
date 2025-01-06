@@ -5,9 +5,9 @@ from datetime import datetime, timezone
 from src.building_blocks.domain.entity import AggregateRoot
 from src.building_blocks.domain.exception import BusinessRuleValidationException
 
+from ..conversations.value_objects.conversation_id import ConversationId
+from ..members.value_objects.member_id import MemberId
 from .events import MessageAddedEvent, MessageEditedEvent, MessagePinnedEvent, MessageUpdatedEvent
-from .components.content import Content
-from .components.feedback import Feedback
 from .rules import (
     ContentResponseMustBeValidRule,
     ContentTextMustBeValidRule,
@@ -15,6 +15,9 @@ from .rules import (
     FeedbackMustBeValidRule,
     NonEmptyMessageRule,
 )
+from .value_objects.content import Content
+from .value_objects.feedback import Feedback
+from .value_objects.message_id import MessageId
 
 
 @dataclass
@@ -23,8 +26,9 @@ class Message(AggregateRoot):
     Represents a message containing multiple contents and feedback.
     """
 
-    _conversation_id: uuid.UUID
-    _sender_id: uuid.UUID
+    _id: MessageId
+    _conversation_id: ConversationId
+    _sender_id: MemberId
     _contents: list[Content] = field(default_factory=list)
     _created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     _updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))

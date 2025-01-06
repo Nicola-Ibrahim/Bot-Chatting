@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from ..components.member_id import MemberId
+from ..value_objects.member_id import MemberId
 from ..root import Member
 
 

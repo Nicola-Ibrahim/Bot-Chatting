@@ -2,7 +2,7 @@ from src.building_blocks.domain.exception import BusinessRuleValidationException
 from src.modules.chats.domain.messages.root import Message
 
 from ....domain.conversations.interfaces.repository import AbstractConversationRepository
-from ....domain.messages.components.content import Content
+from ....domain.messages.value_objects.content import Content
 from ....domain.messages.interfaces.repository import AbstractMessageRepository
 from ....domain.messages.root import Message
 from ....infrastructure.services.response_generator import ResponseGenerator

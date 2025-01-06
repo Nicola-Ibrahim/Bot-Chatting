@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from src.building_blocks.domain.enums import ErrorCode, ErrorType
 from src.building_blocks.domain.rule import BaseBusinessRule
-from src.modules.chats.domain.messages.components.feedback import Feedback
+from src.modules.chats.domain.messages.value_objects.feedback import Feedback
 
 
 @dataclass

@@ -3,10 +3,10 @@ from .conversation_deleted_event import ConversationDeletedEvent
 from .conversation_renamed_event import ConversationRenamedEvent
 from .conversation_shared_event import ConversationSharedEvent
 from .conversation_title_updated import ConversationTitleUpdatedEvent
+from .creator_activated_event import CreatorActivatedEvent
+from .creator_deactivated_event import CreatorDeactivatedEvent
+from .creator_name_changed_event import CreatorNameChangedEvent
 from .message_added import MessageAddedEvent
-from .owner_activated_event import OwnerActivatedEvent
-from .owner_deactivated_event import OwnerDeactivatedEvent
-from .owner_name_changed_event import OwnerNameChangedEvent
 from .participant_added import ParticipantAddedEvent
 from .participant_role_assigned_editor_event import ParticipantRoleAssignedEditorEvent
 from .participant_role_assigned_viewer_event import ParticipantRoleAssignedViewerEvent
@@ -19,9 +19,9 @@ __all__ = [
     "ParticipantRoleChangedEvent",
     "ParticipantRoleAssignedViewerEvent",
     "ParticipantRoleAssignedEditorEvent",
-    "OwnerNameChangedEvent",
-    "OwnerActivatedEvent",
-    "OwnerDeactivatedEvent",
+    "CreatorNameChangedEvent",
+    "CreatorActivatedEvent",
+    "CreatorDeactivatedEvent",
     "ConversationArchivedEvent",
     "ConversationDeletedEvent",
     "ConversationRenamedEvent",
