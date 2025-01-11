@@ -1,10 +1,12 @@
+version: '3.8'
+
 services:
   app:
     build:
-      context: . # Points to the current directory where the Dockerfile is located
+      context: ./src/ # Points to the current directory where the Dockerfile is located
       dockerfile: Dockerfile # The Dockerfile used to build the application image
     volumes:
-      - .:/code # Mounts the current directory (source code) into the container for development
+      - .:/bot # Mounts the current directory (source code) into the container for development
     env_file:
       - .env
     expose:
@@ -13,15 +15,22 @@ services:
       - internal_network # Connects the app service to the internal network for secure communication with other services
     depends_on:
       - postgres_db # Ensures that the PostgreSQL database starts before the app service
+    restart: on-failure
 
   postgres_db:
-    image: postgres:17.0 # Use the latest stable version of PostgreSQL
-    env_file:
-      - .env
+    build:
+      context: ./src/ # Path to the Dockerfile for PostgreSQL
+      dockerfile: ./database/Dockerfile # PostgreSQL Dockerfile
     volumes:
       - db_data:/var/lib/postgresql/data # Mounts a persistent volume to store PostgreSQL data, ensuring data is not lost on container restart
+    env_file:
+      - .env
     networks:
       - internal_network # PostgreSQL service is on the same internal network, allowing only internal services to access it
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER} # Use environment variables from .env file for configuration
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
 
   nginx:
     image: nginx:1.27 # Use the latest stable version of NGINX
@@ -35,8 +44,9 @@ services:
       - internal_network # Connects NGINX to the internal network to communicate with the app service
 
 volumes:
-  db_data: # Defines a volume for storing PostgreSQL data persistently
+  db_data:
+    driver: local # Defines a volume for storing PostgreSQL data persistently
 
 networks:
-  internal_network: # Single internal network for all services
+  internal_network:
     driver: bridge # Creates an internal bridge network for isolated service communication

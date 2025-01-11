@@ -45,7 +45,9 @@ class DatabaseConnectionManager:
         return connector.create_engine()
 
     @staticmethod
-    def _get_connector(connection_string: Optional[str], config: Optional[dict[str, str]], **kwargs) -> DatabaseConnector:
+    def _get_connector(
+        connection_string: Optional[str], config: Optional[dict[str, str]], **kwargs
+    ) -> DatabaseConnector:
         """
         Get the appropriate connector based on the connection string or config.
 

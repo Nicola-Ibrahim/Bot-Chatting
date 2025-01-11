@@ -1,8 +1,16 @@
 from datetime import datetime, timezone
+from typing import TypeVar
 
+from sqlalchemy.ext.declarative import declarative_base
 from sqlmodel import Field, SQLModel
 
 from .manager import Manager
+
+T = TypeVar("T", bound="Model")
+
+
+Base = declarative_base()
+metadata = Base.metadata
 
 
 class TableMeta(type(SQLModel)):
@@ -41,7 +49,7 @@ class TableMeta(type(SQLModel)):
         return super().__new__(cls, name, bases, dct)
 
 
-class Model(SQLModel, metaclass=TableMeta):
+class BaseModel(SQLModel, metaclass=TableMeta):
     """
     Base model class for SQLModel with shared functionality.
 
