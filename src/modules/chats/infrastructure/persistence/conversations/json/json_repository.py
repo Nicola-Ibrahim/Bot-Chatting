@@ -1,10 +1,10 @@
-from .....application import AbstractConversationRepository
+from .....application import Conversations
 from .....domain.conversations.root import Conversation
 from ....processing.json.manager import JsonFileManager
 from .mapper import JsonConversationMapper
 
 
-class JsonConversationRepository(AbstractConversationRepository):
+class JsonConversations(Conversations):
     """
     Repository for managing conversation data stored in JSON files.
     """

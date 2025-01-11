@@ -1,31 +1,34 @@
+import uuid
 from abc import ABC, abstractmethod
 
-from ..root import Conversation
+from ..root import User
 
 
-class Conversations(ABC):
+class AbstractUserRepository(ABC):
+    pass
+
     @abstractmethod
-    def delete(self, conversation_id: str) -> None:
+    def delete(self, user_id: uuid.UUID) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def find(self, conversation_id: str) -> Conversation:
+    def find(self, user_id: uuid.UUID) -> User:
         raise NotImplementedError
 
     @abstractmethod
-    def find_all(self, user_id: str) -> list[Conversation]:
+    def find_all(self, user_id: str) -> list[User]:
         raise NotImplementedError
 
     @abstractmethod
-    def save(self, conversation: Conversation) -> None:
+    def save(self, user: User) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def update(self, conversation: Conversation) -> None:
+    def update(self, user: User) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    def exists(self, conversation_id: str) -> bool:
+    def exists(self, user_id: uuid.UUID) -> bool:
         raise NotImplementedError
 
     @abstractmethod

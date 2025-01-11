@@ -101,31 +101,25 @@ class User(AggregateRoot):
     def is_active(self) -> bool:
         return self._is_active
 
-    # Factory method for creating a user
     @classmethod
     def create_user(
         cls,
+        user_id: UserId,
         username: Username,
         email: Email,
-        raw_password: str,
+        password: str,
         name: Name,
         address: Address,
         phone_number: PhoneNumber,
-        role: Role,
-        permissions: list[Permission],
     ):
-        hashed_password = Password.hash_password(raw_password=raw_password)
-        user_id = UserId.create(value=uuid.uuid4())
         return cls(
             _id=user_id,
             _name=name,
             _username=username,
             _email=email,
-            _password=hashed_password,
+            _password=password,
             _phone_number=phone_number,
             _address=address,
-            _permissions=permissions,
-            _role=role,
         )
 
     # Role Management

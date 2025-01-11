@@ -2,15 +2,13 @@ from src.building_blocks.domain.exception import BusinessRuleValidationException
 from src.modules.chats.infrastructure.domain.exceptions import RepositoryException
 
 from ....domain.conversations.interfaces.downloader import AbstractConversationDownloader
-from ....domain.conversations.interfaces.repository import AbstractConversationRepository
+from ....domain.conversations.interfaces.repository import Conversations
 from ...configuration.command_handler import AbstractCommandHandler
 from .download_conversation_command import DownloadConversationCommand
 
 
 class DownloadConversationCommandHandler(AbstractCommandHandler[DownloadConversationCommand, None]):
-    def __init__(
-        self, conversation_downloader: AbstractConversationDownloader, repository: AbstractConversationRepository
-    ):
+    def __init__(self, conversation_downloader: AbstractConversationDownloader, repository: Conversations):
         self._conversation_downloader = conversation_downloader
         self._repository = repository
 

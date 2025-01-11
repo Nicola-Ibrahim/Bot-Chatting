@@ -1,13 +1,11 @@
-from src.building_blocks.domain.result import Result, TError
-
-from ....domain.conversations.interfaces.repository import AbstractConversationRepository
+from ....domain.conversations.interfaces.repository import Conversations
 from ...configuration.query_handler import AbstractQueryHandler
 from .get_conversation_dto import GetConversationDTO
 from .get_conversation_query import GetConversationQuery
 
 
-class GetConversationQueryHandler(AbstractQueryHandler[GetConversationQuery, Result[GetConversationDTO, TError]]):
-    def __init__(self, repository: AbstractConversationRepository):
+class GetConversationQueryHandler(AbstractQueryHandler[GetConversationQuery, GetConversationDTO]):
+    def __init__(self, repository: Conversations):
         self._repository = repository
 
     def handle(self, query: GetConversationQuery) -> GetConversationDTO:
