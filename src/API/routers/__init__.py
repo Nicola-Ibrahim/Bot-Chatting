@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 
-from ..utils.import_helpers import get_member_from_package
+from ..utils.import_helpers import extract_members_from_package
 
 PACKAGE_PATHS = [
-    "modules.chats.conversations",
+    "src.api.modules.chats.conversations",
 ]
 
 
@@ -19,6 +19,6 @@ def prepare_routers(router_type=APIRouter):
     """
     routers = []
     for package_path in PACKAGE_PATHS:
-        package_routers = get_member_from_package(package_path, member_type=router_type)
+        package_routers = extract_members_from_package(package_path, member_type=router_type)
         routers.extend(package_routers)
     return routers
