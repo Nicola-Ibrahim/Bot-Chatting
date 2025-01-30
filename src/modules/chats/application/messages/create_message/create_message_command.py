@@ -6,7 +6,7 @@ from ....domain.messages.root import Message
 from ...contracts.command import BaseCommand
 
 
-class AddMessageToConversationCommand(BaseCommand[Message]):
+class CreateMessageCommand(BaseCommand[Message]):
     conversation_id: UUID
     text: str = Field(..., min_length=1, max_length=5000)
 
