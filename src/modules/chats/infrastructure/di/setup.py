@@ -1,6 +1,6 @@
-from .conversation.di import ConversationDIContainer
-from .downloader.di import DownloaderDIContainer
-from .email.di import EmailDIContainer
+from .downloader import ConversationDIContainer
+from ..downloader.di import DownloaderDIContainer
+from .email import EmailDIContainer
 
 
 class DIStartup:
