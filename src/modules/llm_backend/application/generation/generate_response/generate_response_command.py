@@ -1,15 +1,14 @@
-import uuid
-
 from ....domain import ResponseGenerator
 from ...contracts.command import BaseCommand
 
 
 class GenerateResponseCommand(BaseCommand[ResponseGenerator]):
-    prompt: str
+    query: str
+    user_id: str
 
     class Config:
         schema_extra = {
             "example": {
-                "prompt": "What is the weather like today?",
+                "query": "What is the weather like today?",
             }
         }

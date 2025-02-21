@@ -4,7 +4,7 @@ from src.building_blocks.domain.value_object import ValueObject
 
 
 @dataclass(frozen=True)
-class ModelMetadata(ValueObject):
+class Metadata(ValueObject):
     """
     Represents metadata about a pre-trained model.
     """

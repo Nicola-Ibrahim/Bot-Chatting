@@ -1,49 +1,63 @@
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from typing import Self
+from uuid import uuid4
+
+from src.building_blocks.domain.entity import AggregateRoot
+from src.building_blocks.domain.events import ModelInteractionCreatedEvent
+
+from .value_objects.interaction_id import InteractionId
+from .value_objects.metadata import Metadata
+from .value_objects.query import Query
+from .value_objects.reponse import Response
+
+
 @dataclass
 class ModelInteraction(AggregateRoot):
-    """
-    Represents an interaction with a model by a user.
-    """
-
-    _id: UUID
-    _model_name: str  # Name of the model used
-    _user_id: UUID
-    _input_text: str
-    _response_text: str
-    _tokenization_id: Optional[UUID] = None
-    _timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    _id: InteractionId
+    _model_name: ModelName
+    _user_id: UserId
+    _query: Query
+    _response: Response
     _metadata: dict = field(default_factory=dict)
+
+    @property
+    def model_name(self) -> ModelName:
+        return self._model_name
+
+    @property
+    def user_id(self) -> UserId:
+        return self._user_id
+
+    @property
+    def query(self) -> Query:
+        return self._query
+
+    @property
+    def response(self) -> Response:
+        return self._response
+
+    @property
+    def metadata(self) -> Metadata:
+        return Metadata(self._metadata)
 
     @classmethod
     def create(
         cls,
-        model_name: str,
-        user_id: UUID,
-        input_text: str,
-        response_text: str,
-        tokenization_id: Optional[UUID] = None,
-        metadata: Optional[dict] = None,
-    ) -> "ModelInteraction":
-        """
-        Factory method to create a new model interaction.
-        """
-        # Validate business rules
-        cls.check_rules(
-            InputTextMustBeValidRule(text=input_text),
-            ResponseTextMustBeValidRule(text=response_text),
-        )
-
-        # Create the interaction
+        model_name: ModelName,
+        user_id: UserId,
+        query: Query,
+        response: Response,
+        metadata: Metadata | None = None,
+    ) -> Self:
         interaction = cls(
-            _id=uuid4(),
+            _id=InteractionId.create(id=uuid4()),
             _model_name=model_name,
             _user_id=user_id,
-            _input_text=input_text,
-            _response_text=response_text,
-            _tokenization_id=tokenization_id,
-            _metadata=metadata or {},
+            _query=query,
+            _response=response,
         )
 
-        # Emit a domain event
         interaction.add_event(
             ModelInteractionCreatedEvent(
                 interaction_id=interaction.id,
@@ -52,5 +66,4 @@ class ModelInteraction(AggregateRoot):
                 timestamp=interaction.timestamp,
             )
         )
-
         return interaction
