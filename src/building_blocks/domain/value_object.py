@@ -24,10 +24,11 @@ class ValueObject(ABC):
         """Return the string representation of the value object."""
         return str(self.__dict__)
 
-    def check_rule(self, rule: BaseBusinessRule) -> None:
+    def check_rules(self, *rule: BaseBusinessRule) -> None:
         """Check a business rule."""
-        if not rule.is_satisfied():
-            raise BusinessRuleValidationException(rule)
+        for rule in rule:
+            if not rule.is_satisfied():
+                raise BusinessRuleValidationException(rule)
 
     @classmethod
     @abstractmethod

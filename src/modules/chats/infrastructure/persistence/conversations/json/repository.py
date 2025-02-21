@@ -59,7 +59,7 @@ import os
 
 from chat.application.interface.feedback_repository import AbstractFeedbackRepository
 
-from common.infra.config import FEEDBACK_DIR
+from src.modules.llm_backend.infrastructure.configuration.paths import FEEDBACK_DIR
 
 
 class JsonFileFeedbackRepository(AbstractFeedbackRepository):

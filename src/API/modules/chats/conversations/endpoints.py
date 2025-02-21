@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 # from src.building_blocks.domain.result import Result
 # from src.modules.chats.application.contracts.mediator import AbstractMediator
 # from src.modules.chats.application.conversations.add_message_to_conversation.add_message_to_conversation_command import (
-#     AddMessageToConversationCommand,
+#     CreateMessageCommand ,
 # )
 # from src.modules.chats.application.conversations.create_conversation.create_conversation_command import (
 #     CreateConversationCommand,
@@ -63,7 +63,7 @@ router = APIRouter(
 #     request: AddMessageRequest,
 #     chats_mediator: AbstractMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
 # ):
-#     command = AddMessageToConversationCommand(conversation_id=conversation_id, text=request.text)
+#     command = CreateMessageCommand (conversation_id=conversation_id, text=request.text)
 #     result: Result = chats_mediator.execute_command(command)
 
 #     return result.match(

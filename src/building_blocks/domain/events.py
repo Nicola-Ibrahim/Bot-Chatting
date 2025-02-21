@@ -7,13 +7,13 @@ from dataclasses import dataclass, field
 class DomainEvent:
     """Base class for the domain event"""
 
-    _id: uuid.UUID = field(default_factory=uuid.uuid4)
+    _event_id: uuid.UUID = field(default_factory=uuid.uuid4)
     _occurred_on: datetime.datetime = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
 
     @property
     def id(self) -> uuid.UUID:
         """Get the ID of the domain event."""
-        return self._id
+        return self._event_id
 
     @property
     def occurred_on(self) -> datetime.datetime:

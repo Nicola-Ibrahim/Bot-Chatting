@@ -81,10 +81,12 @@ class Entity:
         """Get all domain events."""
         return self._events
 
-    def check_rule(self, rule: BaseBusinessRule) -> None:
+    def check_rules(self, *rules: list[BaseBusinessRule]) -> None:
         """Validate a business rule."""
-        if not rule.is_satisfied():
-            raise BusinessRuleValidationException(rule)
+
+        for rule in rules:
+            if not rule.is_satisfied():
+                raise BusinessRuleValidationException(rule)
 
 
 @dataclass
