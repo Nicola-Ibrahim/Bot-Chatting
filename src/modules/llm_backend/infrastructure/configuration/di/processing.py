@@ -10,4 +10,4 @@ class ProcessingDIContainer(containers.DeclarativeContainer):
     tokenizer = providers.Dependency()
 
     # Sentence splitting
-    sentence_splitter = providers.Resource(SentenceSplitter, paragraph_separator="\n\n\n", chunk_size=512)
+    sentence_splitter = providers.Factory(SentenceSplitter, paragraph_separator="\n\n\n", chunk_size=512)

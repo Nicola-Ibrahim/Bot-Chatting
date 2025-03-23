@@ -1,13 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Any
 
 from ..contracts.command import BaseCommand
 
-TResult = TypeVar("TResult")
-TCommand = TypeVar("TCommand", bound=BaseCommand)
 
-
-class AbstractCommandHandler(Generic[TCommand, TResult | None], ABC):
+class BaseCommandHandler(ABC):
     @abstractmethod
-    def handle(self, command: TCommand) -> TResult | None:
+    def handle(self, command: BaseCommand) -> Any:
         pass

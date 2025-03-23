@@ -65,6 +65,9 @@ class QwenModelInputFormatter(ModelInputFormatter):
                 "The assistant gives helpful, detailed, and polite answers to the user’s questions "
                 "based on the context. The assistant should also indicate when the answer cannot be "
                 "found in the context. In this case, the assistant answers with 'I cannot help you answering this question based on the documentation.'. It gives a full and complete answer for the question and include image paths from the context."
+                "The assistant must strictly extract and include any complete image directory paths exactly as they appear in the context, without modification. "
+                "If the context contains images, the assistant must include them in the response as HTML `<img>` tags. "
+                "For example: `<img src='/path/to/image.png' alt='Image' style='max-width: 100%; height: auto;'>`. "
                 "The assistant answers with the correct Latex Code using $...$ for short formulas and $$...$$ for longer formulas.",
             },
             {"role": "system", "content": context},

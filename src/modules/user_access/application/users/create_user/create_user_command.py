@@ -6,7 +6,7 @@ from ....domain.users.root import User
 from ...contracts.command import BaseCommand
 
 
-class CreateUserCommand(BaseCommand[User]):
+class CreateUserCommand(BaseCommand):
     user_id: UUID
     name: str = Field(..., min_length=1, max_length=100)
     username: str = Field(..., min_length=3, max_length=50)

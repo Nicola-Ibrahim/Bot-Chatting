@@ -7,7 +7,7 @@ TResult = TypeVar("TResult")
 TCommand = TypeVar("TCommand", bound=BaseCommand)
 
 
-class AbstractCommandHandler(Generic[TCommand, TResult | None], ABC):
+class BaseCommandHandler(Generic[TCommand, TResult | None], ABC):
     @abstractmethod
     def handle(self, command: TCommand) -> TResult | None:
         pass

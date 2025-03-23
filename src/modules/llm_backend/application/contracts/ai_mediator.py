@@ -11,9 +11,9 @@ TResult = TypeVar("TResult")
 
 class AbstractAIMediator(ABC):
     @abstractmethod
-    async def execute_command(self, command: BaseCommand[TResult]) -> TResult:
+    async def execute_command(self, command: BaseCommand) -> TResult:
         pass
 
     @abstractmethod
-    async def execute_query(self, query: BaseQuery[TResult]) -> TResult:
+    async def execute_query(self, query: BaseQuery) -> TResult:
         pass

@@ -3,11 +3,11 @@ from src.modules.chats.domain.messages.value_objects.feedback import Feedback
 
 from ....domain.messages.interfaces.repository import AbstractMessageRepository
 from ....domain.messages.root import Message
-from ...configuration.command_handler import AbstractCommandHandler
+from ...configuration.command_handler import BaseCommandHandler
 from .add_feedback_to_message_command import AddFeedbackToMessageCommand
 
 
-class AddFeedbackToMessageCommandHandler(AbstractCommandHandler[AddFeedbackToMessageCommand, Message]):
+class AddFeedbackToMessageCommandHandler(BaseCommandHandler):
     def __init__(self, repository: AbstractMessageRepository):
         self._repository = repository
 

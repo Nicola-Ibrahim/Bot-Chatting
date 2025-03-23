@@ -1,10 +1,9 @@
 import uuid
 
-from ....domain.conversations.root import Conversation
 from ...contracts.command import BaseCommand
 
 
-class CreateConversationCommand(BaseCommand[Conversation]):
+class CreateConversationCommand(BaseCommand):
     user_id: uuid.UUID
     user_name: str
     conversation_title: str = None

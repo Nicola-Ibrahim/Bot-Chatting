@@ -1,10 +1,10 @@
 from ....domain import ResponseGenerator, Responses
 from ....domain.model.root import ModelInteraction
-from ...configuration.command_handler import AbstractCommandHandler
+from ...configuration.command_handler import BaseCommandHandler
 from .generate_response_command import GenerateResponseCommand
 
-from ..pipelines
-class GenerateResponseCommandHandler(AbstractCommandHandler[GenerateResponseCommand, str]):
+
+class GenerateResponseCommandHandler(BaseCommandHandler[GenerateResponseCommand, str]):
     def __init__(self, repository: Responses):
         self._repository = repository
 

@@ -1,9 +1,9 @@
 from ....domain.conversations.interfaces.repository import Conversations
-from ...configuration.command_handler import AbstractCommandHandler
+from ...configuration.command_handler import BaseCommandHandler
 from .delete_conversation_command import DeleteConversationCommand
 
 
-class DeleteConversationCommandHandler(AbstractCommandHandler[DeleteConversationCommand, None]):
+class DeleteConversationCommandHandler(BaseCommandHandler):
     def __init__(self, conversation_repository: Conversations):
         self._conversation_repository = conversation_repository
 

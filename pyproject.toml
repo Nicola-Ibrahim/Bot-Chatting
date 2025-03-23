@@ -6,6 +6,7 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.12"
 dependencies = [
+    "alembic>=1.14.0",
     "azure-identity>=1.19.0",
     "azure-keyvault-secrets>=4.9.0",
     "dependency-injector>=4.44.0",

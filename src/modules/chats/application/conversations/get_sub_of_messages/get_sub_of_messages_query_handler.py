@@ -1,10 +1,10 @@
 from ....domain.conversations.interfaces.repository import Conversations
-from ...configuration.query_handler import AbstractQueryHandler
+from ...configuration.query_handler import BaseQueryHandler
 from .get_sub_of_messages_dto import GetSubOfMessagesDTO
 from .get_sub_of_messages_query import GetSubOfMessagesQuery
 
 
-class GetSubOfMessagesQueryHandler(AbstractQueryHandler[GetSubOfMessagesQuery, list[GetSubOfMessagesDTO]]):
+class GetSubOfMessagesQueryHandler(BaseQueryHandler):
     def __init__(self, repository: Conversations):
         self._repository = repository
 

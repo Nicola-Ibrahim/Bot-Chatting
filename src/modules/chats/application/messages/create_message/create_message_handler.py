@@ -7,11 +7,11 @@ from ....domain.messages.root import Message
 from ....domain.messages.value_objects.content import Content
 from ....domain.messages.value_objects.message_id import MessageId
 from ....infrastructure import ResponseGenerator
-from ...configuration.command_handler import AbstractCommandHandler
+from ...configuration.command_handler import BaseCommandHandler
 from .create_message_command import CreateMessageCommand
 
 
-class CreateMessageCommandHandler(AbstractCommandHandler[CreateMessageCommand, Message]):
+class CreateMessageCommandHandler(BaseCommandHandler):
     def __init__(
         self,
         messages_repository: AbstractMessageRepository,

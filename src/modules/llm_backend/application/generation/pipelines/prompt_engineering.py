@@ -63,7 +63,7 @@ class PromptFormatter:
 
         selected = context_docs[: self.max_docs_for_context]
         return "\n\n".join(
-            f"Document {doc_index+1} ({path}):\n{content.replace('\n\n\n', '\n\n').strip()}"
+            f"Document {doc_index + 1} ({path}):\n{content.replace('\n\n\n', '\n\n').strip()}"
             for doc_index, (path, content, _) in enumerate(selected)
         )
 

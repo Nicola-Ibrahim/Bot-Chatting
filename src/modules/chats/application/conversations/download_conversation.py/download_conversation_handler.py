@@ -3,11 +3,11 @@ from src.modules.chats.infrastructure.domain.exceptions import RepositoryExcepti
 
 from ....domain.conversations.interfaces.downloader import AbstractConversationDownloader
 from ....domain.conversations.interfaces.repository import Conversations
-from ...configuration.command_handler import AbstractCommandHandler
+from ...configuration.command_handler import BaseCommandHandler
 from .download_conversation_command import DownloadConversationCommand
 
 
-class DownloadConversationCommandHandler(AbstractCommandHandler[DownloadConversationCommand, None]):
+class DownloadConversationCommandHandler(BaseCommandHandler):
     def __init__(self, conversation_downloader: AbstractConversationDownloader, repository: Conversations):
         self._conversation_downloader = conversation_downloader
         self._repository = repository

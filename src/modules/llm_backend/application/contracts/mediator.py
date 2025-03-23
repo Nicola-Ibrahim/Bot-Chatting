@@ -9,11 +9,11 @@ from .query import BaseQuery
 TResult = TypeVar("TResult")
 
 
-class AbstractMediator(ABC):
+class IMediator(ABC):
     @abstractmethod
-    def execute_command(self, command: BaseCommand[TResult]) -> Result:
+    def execute_command(self, command: BaseCommand) -> Result:
         pass
 
     @abstractmethod
-    def execute_query(self, query: BaseQuery[TResult]) -> Result:
+    def execute_query(self, query: BaseQuery) -> Result:
         pass

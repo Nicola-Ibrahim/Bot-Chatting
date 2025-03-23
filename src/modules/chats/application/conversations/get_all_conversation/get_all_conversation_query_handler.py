@@ -1,9 +1,9 @@
 from ....domain.conversations.interfaces.repository import Conversations
-from ...configuration.query_handler import AbstractQueryHandler
+from ...configuration.query_handler import BaseQueryHandler
 from .get_all_conversation_query import GetAllConversationsQuery
 
 
-class GetAllConversationsQueryHandler(AbstractQueryHandler[GetAllConversationsQuery, list[GetAllConversationsQuery]]):
+class GetAllConversationsQueryHandler(BaseQueryHandler):
     def __init__(self, conversation_repository: Conversations):
         self._conversation_repository = conversation_repository
 

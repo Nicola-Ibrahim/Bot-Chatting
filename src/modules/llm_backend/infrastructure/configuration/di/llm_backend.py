@@ -13,7 +13,7 @@ class LLMBackendContainer(containers.DeclarativeContainer):
     # Wiring configuration
     wiring_config = containers.WiringConfiguration(
         modules=["src.web.chat.endpoints"],
-        packages=["src.llm_backend.application.prompt"],
+        packages=["src.llm_backend.application.prompt", "src.llm_backend.application.excel", "src.tests"],
     )
 
     # Sub-containers

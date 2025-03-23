@@ -7,7 +7,7 @@ TResult = TypeVar("TResult")
 TQuery = TypeVar("TQuery", bound=BaseQuery)
 
 
-class AbstractQueryHandler(Generic[TQuery, TResult], ABC):
+class BaseQueryHandler(Generic[TQuery, TResult], ABC):
     @abstractmethod
     def handle(self, query: TQuery) -> TResult:
         pass

@@ -1,10 +1,10 @@
 from ....domain.conversations.interfaces.repository import Conversations
 from ....domain.conversations.root import Conversation
-from ...configuration.command_handler import AbstractCommandHandler
+from ...configuration.command_handler import BaseCommandHandler
 from .create_conversation_command import CreateConversationCommand
 
 
-class CreateNewConversationCommandHandler(AbstractCommandHandler[CreateConversationCommand, str]):
+class CreateNewConversationCommandHandler(BaseCommandHandler):
     def __init__(self, repository: Conversations):
         self._repository = repository
 

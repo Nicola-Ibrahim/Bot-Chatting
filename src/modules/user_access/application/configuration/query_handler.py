@@ -1,13 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Any
 
 from ..contracts.query import BaseQuery
 
-TResult = TypeVar("TResult")
-TQuery = TypeVar("TQuery", bound=BaseQuery)
 
-
-class AbstractQueryHandler(Generic[TQuery, TResult], ABC):
+class BaseQueryHandler(ABC):
     @abstractmethod
-    def handle(self, query: TQuery) -> TResult:
+    def handle(self, query: BaseQuery) -> Any:
         pass

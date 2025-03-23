@@ -1,11 +1,11 @@
 from ....domain.members.interfaces.repository import AbstractMemberRepository
 from ....domain.members.root import Member
 from ....domain.members.value_objects.member_id import MemberId
-from ...configuration.command_handler import AbstractCommandHandler
+from ...configuration.command_handler import BaseCommandHandler
 from .create_member_command import CreateMemberCommand
 
 
-class CreateMemberCommandHandler(AbstractCommandHandler[CreateMemberCommand, Member]):
+class CreateMemberCommandHandler(BaseCommandHandler[CreateMemberCommand, Member]):
     def __init__(self, member_repository: AbstractMemberRepository):
         self._member_repository = member_repository
 

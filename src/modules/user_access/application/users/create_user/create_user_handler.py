@@ -9,11 +9,11 @@ from ....domain.users.value_objects.password import Password
 from ....domain.users.value_objects.phone_number import PhoneNumber
 from ....domain.users.value_objects.user_id import UserId
 from ....domain.users.value_objects.username import Username
-from ...configuration.command_handler import AbstractCommandHandler
+from ...configuration.command_handler import BaseCommandHandler
 from .create_user_command import CreateUserCommand
 
 
-class CreateUserCommandHandler(AbstractCommandHandler[CreateUserCommand, User]):
+class CreateUserCommandHandler(BaseCommandHandler):
     def __init__(self, user_repository: AbstractUserRepository):
         self._user_repository = user_repository
 

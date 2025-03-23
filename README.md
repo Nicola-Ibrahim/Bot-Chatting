@@ -135,73 +135,74 @@ The **Conversation** entity manages the bot interactions with users, maintaining
 
 By following **Domain-Driven Design** and utilizing **FastAPI**, this bot system is highly modular and easily extendable. With clear boundaries between different concerns (such as authentication, notifications, and conversations), it’s easy for new developers to contribute and expand the system. The detailed documentation and organized file structure will guide you through the system, making it simple to understand and interact with the project.
 
-# 📚 Useful Resources for Domain-Driven Design (DDD)
+# 📚 Domain-Driven Design (DDD) Resources
 
-## 🏗️ Core Concepts and Architectures
+This document provides a curated list of resources for learning and implementing Domain-Driven Design (DDD).
 
-1. **Herberto Graca Blog**: [Domain-Driven Design](https://herbertograca.com/2017/09/07/domain-driven-design/)
-   An in-depth exploration of DDD principles and their practical applications.
+## 1. Foundational Concepts
 
-2. **Medium**: [Onion Architecture](https://medium.com/expedia-group-tech/onion-architecture-deed8a554423)
-   An article discussing the Onion Architecture and its relation to DDD.
+These resources cover the core principles and underlying concepts of DDD.
 
-3. **GitHub**: [Modular Monolith with DDD](https://github.com/kgrzybek/modular-monolith-with-ddd)
-   A repository demonstrating how to build a modular monolith using DDD principles.
+1. **Eric Evans' Book (Highly Recommended):** *Domain-Driven Design: Tackling Complexity in the Heart of Software* (This should be the first entry if you intend to recommend the book)
+2. **Herberto Graca's Blog:** [Domain-Driven Design](https://herbertograca.com/2017/09/07/domain-driven-design/) - In-depth DDD principles and practical applications.
+3. **Medium:** [Always-Valid Domain Model](https://vkhorikov.medium.com/always-valid-domain-model-706e5f3d24b0) - Importance of valid domain models.
 
-4. **Medium**: [Clean Domain-Driven Design](https://medium.com/unil-ci-software-engineering/clean-domain-driven-design-2236f5430a05)
-   Insights into maintaining clean architecture while implementing DDD.
+## 2. Architectural Patterns & Best Practices
 
-5. **Medium**: [Always-Valid Domain Model](https://vkhorikov.medium.com/always-valid-domain-model-706e5f3d24b0)
-   Emphasizing the importance of maintaining validity within domain models.
+These resources explore architectural patterns and best practices relevant to DDD implementations.
 
-6. **GitHub**: [Clean Architecture by Examples](https://github.com/amantinband/clean-architecture)
-   A collection of examples illustrating clean architecture practices.
+1. **Medium:** [Onion Architecture](https://medium.com/expedia-group-tech/onion-architecture-deed8a554423) - Onion Architecture and its relation to DDD.
+2. **Medium:** [Clean Domain-Driven Design](https://medium.com/unil-ci-software-engineering/clean-domain-driven-design-2236f5430a05) - Maintaining clean architecture with DDD.
+3. **Code Maze:** [Clean Architecture with .NET](https://code-maze.com/dotnet-clean-architecture/) - Clean architecture principles (relevant to DDD).
+4. **Vaadin Blog:** [DDD & Hexagonal Architecture in Java](https://vaadin.com/blog/ddd-part-3-domain-driven-design-and-the-hexagonal-architecture) - Combining DDD and Hexagonal Architecture.
+5. **GitHub:** [Clean Architecture by Examples](https://github.com/amantinband/clean-architecture) - Clean architecture examples.
 
-7. **GitHub**: [Python DDD Implementation](https://github.com/qu3vipon/python-ddd)
-   A repository showcasing Domain-Driven Design implemented in Python.
+## 3. Implementation Patterns & Techniques
 
-8. **Pluralsight (*tutorial*)**: [Domain-Driven Design in Practice](https://www.pluralsight.com/courses/domain-driven-design-in-practice)
-   A comprehensive course offering practical insights into DDD.
+This section focuses on specific implementation patterns and techniques used in DDD.
 
-9. **Code Maze**: [Clean Architecture with .NET](https://code-maze.com/dotnet-clean-architecture/)
-   A guide to implementing clean architecture principles in .NET applications.
+1. **Medium:** [Implementing DDD Domain Models](https://medium.com/vx-company/implementing-dddomain-models-ports-adapters-and-cqrs-with-c-2b81403f09f7) - DDD domain models, Ports, Adapters, and CQRS.
+2. **Medium:** [Implementing Ports & CQRS](https://abstarreveld.medium.com/dddomain-models-ports-adapters-and-cqrs-reference-architecture-c-504817df65ec) - Reference architecture for DDD models, Ports, Adapters, and CQRS.
+3. **Medium:** [DDD Beyond the Basics: Mastering Aggregate Design](https://medium.com/ssense-tech/ddd-beyond-the-basics-mastering-aggregate-design-26591e218c8c) - Advanced aggregate design.
+4. **Medium:** [Clean Lessons: Use Cases](https://medium.com/unil-ci-software-engineering/clean-ddd-lessons-use-cases-e9d11f64a0e9) - Use cases in clean architecture.
+5. **Baeldung:** [DTO Pattern](https://www.baeldung.com/java-dto-pattern) - Data Transfer Object (DTO) pattern.
+6. **Medium:** [User Authentication Basics: Hashing and JWT](https://medium.com/@nick_92077/user-authentication-basics-hashing-and-jwt-3f9adf12272) - Basics of user authentication, hashing, and JWT in DDD.
+7. **Szymon Miks Blog:** [Domain Model with SQLAlchemy](https://blog.szymonmiks.pl/p/domain-model-with-sqlalchemy/) - Domain models with SQLAlchemy.
 
-10. **Vaadin Blog**: [Domain-Driven Design (DDD) and Hexagonal Architecture in Java](https://vaadin.com/blog/ddd-part-3-domain-driven-design-and-the-hexagonal-architecture)
-    Exploring the integration of DDD with Hexagonal Architecture in Java applications.
+## 4. Practical Examples & Tutorials
 
-## ⚙️ Implementation Patterns
+These resources provide hands-on examples and tutorials for implementing DDD.
 
-1. **Medium**: [Implementing DDD Domain Models](https://medium.com/vx-company/implementing-dddomain-models-ports-adapters-and-cqrs-with-c-2b81403f09f7)
-   A discussion on implementing domain models using Ports, Adapters, and CQRS.
+1. **Pluralsight:** [Domain-Driven Design in Practice](https://www.pluralsight.com/courses/domain-driven-design-in-practice) - Practical DDD implementation (course).
+2. **GitHub:** [Modular Monolith with DDD](https://github.com/kgrzybek/modular-monolith-with-ddd) - Modular monolith with DDD example.
+3. **GitHub:** [Python DDD Implementation](https://github.com/qu3vipon/python-ddd) - Python DDD implementation example.
 
-2. **Medium**: [Implementing Ports & CQRS](https://abstarreveld.medium.com/dddomain-models-ports-adapters-and-cqrs-reference-architecture-c-504817df65ec)
-   A reference architecture for DDD models, ports, adapters, and CQRS.
+## 5. Tools & Frameworks
 
-3. **Medium**: [DDD Beyond the Basics: Mastering Aggregate Design](https://medium.com/ssense-tech/ddd-beyond-the-basics-mastering-aggregate-design-26591e218c8c)
-   An article discussing advanced concepts in aggregate design within DDD.
+Tools and frameworks that aid in DDD implementation.
 
-4. **Baeldung**: [DTO Pattern (Data Transfer Object)](https://www.baeldung.com/java-dto-pattern)
-   An explanation of the DTO pattern and its usage in Java applications.
+1. **Medium:** [Python Dependency Injection](https://medium.com/@spraneeth4/python-dependency-injector-simplifying-dependency-injection-in-your-projects-14385af0bf78) - Dependency injection in Python.
+2. **Hashnode:** [DDD Value Objects: Mastering Data Validation in Python](https://scresh.hashnode.dev/ddd-value-objects-mastering-data-validation-in-python) - Data validation in Python DDD value objects.
+3. **GitHub:** [FastAPI Best Practices](https://github.com/zhanymkanov/fastapi-best-practices#1-project-structure-consistent--predictable) - FastAPI project structure best practices.
+4. **Dev.to:** [Unit of Work & Repository with SQLModel](https://dev.to/manukanne/a-python-implementation-of-the-unit-of-work-and-repository-design-pattern-using-sqlmodel-3mb5) - Unit of Work and Repository patterns with SQLModel.
+5. **Medium:** [Backend Logging in Python with FastAPI](https://medium.com/@v0220225/backend-logging-in-python-and-applied-to-fastapi-7b47118d1d92) - Backend logging in Python with FastAPI.
+6. **ComputingForGeeks:** [GitHub Container Registry](https://computingforgeeks.com/configure-github-container-registry-as-your-docker-registry/) - Configuring GitHub Container Registry.
+7. **Eric's Pytest Blog:** [pytest with eric](https://pytest-with-eric.com/) - pytest for Python testing (essential for robust DDD). (Moved here as it's a tool)
+8. **Szymon Miks Blog:** [Domain Model with SQLAlchemy](https://blog.szymonmiks.pl/p/domain-model-with-sqlalchemy/) - Domain models with SQLAlchemy. (Moved here as it's tool/technique specific)
 
-5. **Medium**: [Clean Lessons: Use Cases](https://medium.com/unil-ci-software-engineering/clean-ddd-lessons-use-cases-e9d11f64a0e9)
-   Insights into designing use cases within clean architecture frameworks.
-
-## 🛠️ Tools and Frameworks
-
-1. **Blog**: [Domain Model with SQLAlchemy](https://blog.szymonmiks.pl/p/domain-model-with-sqlalchemy/)
-   A guide on implementing domain models using SQLAlchemy in Python.
-
-2. **Hashnode**: [DDD Value Objects: Mastering Data Validation in Python](https://scresh.hashnode.dev/ddd-value-objects-mastering-data-validation-in-python)
-   Focusing on data validation within DDD value objects in Python.
-
-3. **GitHub**: [FastAPI Best Practices: Project Structure](https://github.com/zhanymkanov/fastapi-best-practices#1-project-structure-consistent--predictable)
-   Best practices for structuring FastAPI projects, relevant to DDD implementations.
-
-4. **Dev.to**: [Unit of Work and Repository Design Patterns with SQLModel](https://dev.to/manukanne/a-python-implementation-of-the-unit-of-work-and-repository-design-pattern-using-sqlmodel-3mb5)
-   A Python implementation of the Unit of Work and Repository design patterns using SQLModel.
-
-5. **Medium**: [Backend Logging in Python with FastAPI](https://medium.com/@v0220225/backend-logging-in-python-and-applied-to-fastapi-7b47118d1d92)
-   A guide on implementing backend logging in Python applications using FastAPI.
-
-6. **ComputingForGeeks**: [Configure GitHub Container Registry as Your Docker Registry](https://computingforgeeks.com/configure-github-container-registry-as-your-docker-registry/)
-   Instructions on setting up GitHub Container Registry for Docker images.
+```bash
+┌───────────────────┐       ┌──────────────────┐
+│ RetrievalOrchestrator │─────>│ VectorSearchEngine │
+└───────────────────┘       └──────────────────┘
+       │                           ▲
+       │                           │
+       ▼                           │
+┌───────────────────┐       ┌──────────────────┐
+│   TextProcessor   │       │    IndexBuilder  │
+└───────────────────┘       └──────────────────┘
+       │                           ▲
+       ▼                           │
+┌───────────────────┐       ┌──────────────────┐
+│  MemoryManager    │       │   EmbeddingModel │
+└───────────────────┘       └──────────────────┘
+```
