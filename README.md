@@ -30,6 +30,23 @@ Key components include:
 
 Each feature (e.g., **auth**, **chat**, **notifications**) is encapsulated within its own bounded context, making the system easy to extend and maintain.
 
+## 🏗️ **Architecture Overview**
+
+### 1. System Context
+
+![System Context](doc/images/structurizr-System_Context_Diagram-001.png)
+*The bot chat system interacts with users through web/mobile clients and integrates with external AI services and notification providers.*
+
+### 2. Container Architecture
+
+![System Context Diagram](doc/images/structurizr-Container_Diagram-001.png)
+*Key components include:*
+
+- **API Gateway**: Entry point for all requests
+- **Conversation Service**: Manages chat sessions
+- **AI Integration**: Connects to LLM providers
+- **Data Stores**: PostgreSQL (primary) and Redis (caching)
+
 ## 🛠️ **Core Layer: Domain Logic**
 
 The **Core Layer** is the heart of the system, responsible for the main business logic and domain models. In this layer, we define:
