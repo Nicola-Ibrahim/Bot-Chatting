@@ -2,7 +2,7 @@ import uuid
 
 from sqlmodel import Field, Relationship
 
-from src.database.model import BaseModel
+from src.database.models import BaseModel
 
 
 class ConversationDBModel(BaseModel):

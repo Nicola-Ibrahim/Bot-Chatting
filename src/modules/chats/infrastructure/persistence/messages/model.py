@@ -11,6 +11,9 @@ class Message(Model):
 
     content: str
     timestamp: datetime = Field(default_factory=datetime.now(timezone.utc))
-    # sender_id: uuid.UUID = Field(foreign_key="member.id")
-    # sender: "Member" = Relationship(back_populates="messages")
+    sender_id: uuid.UUID = Field(foreign_key="member.id")
+    sender: "Member" = Relationship(back_populates="messages")
     conversation_id: uuid.UUID = Field(foreign_key="conversation.id")
+    conversation: "Conversation" = Relationship(back_populates="messages")
+    feedback: str = Field(default=None)
+    feedback_timestamp: datetime = Field(default=None)

@@ -3,7 +3,7 @@ from .....domain.conversations.root import Conversation
 from .model import ConversationDBModel
 
 
-class PostgresConversations(Conversations):
+class SQLConversationRepository(Conversations):
     """
     SQL-based repository for managing Conversation entities.
     """
