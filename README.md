@@ -207,6 +207,13 @@ Tools and frameworks that aid in DDD implementation.
 7. **Eric's Pytest Blog:** [pytest with eric](https://pytest-with-eric.com/) - pytest for Python testing (essential for robust DDD). (Moved here as it's a tool)
 8. **Szymon Miks Blog:** [Domain Model with SQLAlchemy](https://blog.szymonmiks.pl/p/domain-model-with-sqlalchemy/) - Domain models with SQLAlchemy. (Moved here as it's tool/technique specific)
 
+## 5. Architecture Visualization
+
+Essential resources for designing and documenting your system architecture:
+
+1. **Official C4 Model Site**: [https://c4model.com](https://c4model.com) - The definitive guide to C4 architecture diagrams
+2. **Structurizr**: [https://structurizr.com](https://structurizr.com) - Tool for creating C4 diagrams with DSL
+
 ```bash
 ┌───────────────────┐       ┌──────────────────┐
 │ RetrievalOrchestrator │─────>│ VectorSearchEngine │
