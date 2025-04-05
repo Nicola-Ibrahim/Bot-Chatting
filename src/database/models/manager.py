@@ -1,10 +1,11 @@
 from typing import Generic, Optional, Type, TypeVar
 
-from sqlmodel import Session, select
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-from .model import Model
+from .model import BaseModel
 
-ModelType = TypeVar("ModelType", bound=Model)
+ModelType = TypeVar("ModelType", bound=BaseModel)
 
 
 class Manager(Generic[ModelType]):
