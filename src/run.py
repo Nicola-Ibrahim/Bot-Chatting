@@ -1,6 +1,6 @@
 from src.api.app import ChatbotFastAPIApp
 from src.modules.chats.infrastracture.configuration.chat_startup import ChatStartUp
-from src.modules.llm_backend.infrastructure.configuration.llm_backend_startup import LLMBackendStartup
+from src.modules.llm_backend.infrastructure.configuration.startup import LLMBackendStartup
 
 
 def initialize_application_components():
