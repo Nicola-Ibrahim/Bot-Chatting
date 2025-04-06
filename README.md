@@ -34,12 +34,12 @@ Each feature (e.g., **auth**, **chat**, **notifications**) is encapsulated withi
 
 ### 1. System Context
 
-![System Context](doc/images/structurizr-System_Context_Diagram-001.png)
+![System Context](docs/diagrams/images/c1_system_context.png)
 *The bot chat system interacts with users through web/mobile clients and integrates with external AI services and notification providers.*
 
 ### 2. Container Architecture
 
-![System Context Diagram](doc/images/structurizr-Container_Diagram-001.png)
+![Chat App](docs/diagrams/images/c2_container.png)
 *Key components include:*
 
 - **API Gateway**: Entry point for all requests

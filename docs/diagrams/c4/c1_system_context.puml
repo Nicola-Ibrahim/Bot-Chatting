@@ -1,0 +1,24 @@
+@startuml ChatBot_System_Context
+!include <C4/C4_Context>
+
+title ChatBot System Context Diagram
+
+Person(user, "User", "A client uses chatbot for LLM interaction")
+
+System(chat_system, "Chat System", "Allows users to manage conversations with LLM")
+System(llm, "LLM API", "External AI service for generating responses")
+System(notification, "Notification System", "Sends alerts to users")
+
+Rel(user, chat_system, "Uses")
+Rel(chat_system, llm, "Queries")
+Rel(chat_system, notification, "Triggers")
+Rel(notification, user, "Sends notifications")
+
+legend right
+  <<legend>> Element Colors
+  <#1E3A5F> Person
+  <#357ABD> Internal System
+  <#0099CC> External System
+  <#FF4500> Notification System
+endlegend
+@enduml
