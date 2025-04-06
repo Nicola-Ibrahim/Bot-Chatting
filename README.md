@@ -21,12 +21,7 @@ The architecture is designed using **Clean Architecture** and **Modularization o
 
 This bot system is designed with modularity in mind, following best practices to ensure the system is both scalable and maintainable. The implementation leverages **Clean Architecture** principles and **Modularization of the Monolith** to provide a clear separation of concerns between different modules.
 
-Key components include:
-
-- **Core Layer**: Houses the main domain logic, including business rules, entities, and value objects.
-- **Application Layer**: Contains use cases that orchestrate interactions between domain services and external interfaces like APIs.
-- **Infrastructure Layer**: Manages communication with external resources, such as databases, message queues, and external APIs.
-- **Presentation Layer**: Exposes the FastAPI API for external consumers, providing endpoints for interaction with the system.
+![alt text](docs/DDD_design.png)
 
 Each feature (e.g., **auth**, **chat**, **notifications**) is encapsulated within its own bounded context, making the system easy to extend and maintain.
 
