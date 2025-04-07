@@ -1,12 +1,10 @@
-from logging import Logger
-
 from dependency_injector import containers, providers
-from dependency_injector.wiring import Provide, inject
+from dependency_injector.wiring import Provide
 
-from .di.data_access import DataAccessDIContainer  # SQL database container
-from .di.downloader import DownloaderDIContainer  # SQL database container
-from .di.email import EmailDIContainer  # Email sender container
-from .di.logger import LoggerDIContainer  # Logger container
+from .di.data_access import DataAccessDIContainer
+from .di.downloader import DownloaderDIContainer
+from .di.email import EmailDIContainer
+from .di.logger import LoggerDIContainer
 
 
 class ChatDIContainer(containers.DeclarativeContainer):
@@ -22,16 +20,15 @@ class ChatDIContainer(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
         packages=[
             "src.chat.application",
-            "src.api.modeules",
         ],
     )
 
 
-class ChatStartUp:
+class ChatsStartUp:
     """Composition root for chat bounded context"""
 
-    def __init__(self, logger: Logger):
-        self.logger = logger
+    def __init__(self):
+        self._logger = None
         self._container: ChatDIContainer = None
 
     @property
@@ -40,13 +37,15 @@ class ChatStartUp:
             raise RuntimeError("Container not initialized")
         return self._container
 
-    @inject
+    @staticmethod
     def initialize(
         self, config: dict, db_connection_string: str = Provide[ChatDIContainer.config.database.url]
     ) -> None:
         """Initialize the chat module composition root"""
+
+        self._logger = LoggerDIContainer.logger()
         try:
-            self.logger.info("Initializing chat module dependencies...")
+            self._logger.info("Initializing chat module dependencies...")
 
             self._container = ChatDIContainer()
             self._container.config.from_dict(config)
@@ -55,22 +54,22 @@ class ChatStartUp:
             self._container.wire()
             self._container.init_resources()
 
-            self.logger.info("Chat module dependencies initialized successfully")
+            self._logger.info("Chat module dependencies initialized successfully")
 
         except Exception as e:
-            self.logger.error(f"Chat module initialization failed: {str(e)}")
+            self._logger.error(f"Chat module initialization failed: {str(e)}")
             raise RuntimeError("Chat module bootstrap failed") from e
 
     def stop(self) -> None:
         """Clean up resources"""
         try:
-            self.logger.info("Shutting down chat module...")
+            self._logger.info("Shutting down chat module...")
             if self._container:
                 self._container.shutdown_resources()
                 self._container.unwire()
 
         except Exception as e:
-            self.logger.error(f"Chat module shutdown error: {str(e)}")
+            self._logger.error(f"Chat module shutdown error: {str(e)}")
             raise
         finally:
             self._container = None

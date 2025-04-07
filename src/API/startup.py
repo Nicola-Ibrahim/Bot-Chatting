@@ -2,11 +2,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .core.config import settings
+from .modules.chats.di import MeetingsModuleDIContainer
 from .routers import prepare_routers
 
 
-class ChatbotFastAPIApp:
-    def start():
+class APIStartup:
+    def configureContainers(self):
+        """
+        Configure the dependency injection containers for the application.
+        """
+        MeetingsModuleDIContainer.init_resources()
+
+    def start(self):
+        self.configureContainers()
+
         _app = FastAPI(title=settings.PROJECT_NAME)
 
         _app.add_middleware(

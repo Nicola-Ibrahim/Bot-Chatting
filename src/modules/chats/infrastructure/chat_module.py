@@ -9,7 +9,7 @@ from ..application.contracts.query import BaseQuery
 from .configuration.di.chat_backend import ChatDIContainer
 
 
-class ChatModule(IChatModule):
+class ChatsModule(IChatModule):
     """Main entry point for the meetings module"""
 
     @inject

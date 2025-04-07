@@ -4,7 +4,7 @@ from ..processing.document import DocumentProcessor
 from .di.llm_backend import LLMBackendContainer
 
 
-class LLMBackendStartUp:
+class LLMsStartUp:
     """Startup class for the LLM backend module."""
 
     def __init__(self):
