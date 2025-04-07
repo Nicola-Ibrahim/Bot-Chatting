@@ -6,7 +6,7 @@ from .command import BaseCommand
 from .query import BaseQuery
 
 
-class IChatModule(ABC):
+class IChatsModule(ABC):
     @abstractmethod
     async def execute_command_async(self, command: BaseCommand) -> TResult:
         raise NotImplementedError

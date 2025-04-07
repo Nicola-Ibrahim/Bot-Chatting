@@ -1,7 +1,7 @@
-import uuid
-
 from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, HTTPException, status
+
+from src.modules.chats.infrastructure.chat_module import ChatsModule
 
 # from src.building_blocks.domain.result import Result
 # from src.modules.chats.application.contracts.mediator import IMediator
@@ -14,16 +14,52 @@ from fastapi import APIRouter, Depends, HTTPException, status
 # from src.modules.chats.application.conversations.get_all_conversation.get_all_conversation_query import (
 #     GetAllConversationsQuery,
 # )
-
-# from .add_feedback_request import AddFeedbackRequest
-# from .add_message_request import AddMessageRequest
-# from .create_conversation_request import CreateConversationRequest
+from .add_feedback_request import AddFeedbackRequest
+from .add_message_request import AddMessageRequest
+from .create_conversation_request import CreateConversationRequest
 
 router = APIRouter(
     prefix="/v1/conversation",
     tags=["conversation"],
     responses={404: {"description": "Not found"}},
 )
+
+
+@router.post(
+    "/",
+    response_model=ConversationResponseSchem,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create new conversation",
+    responses={
+        status.HTTP_201_CREATED: {
+            "description": "Conversation successfully created",
+            "content": {
+                "application/json": {
+                    "example": {"conversation_id": "conv_12345", "created_at": "2023-07-20T12:34:56Z"}
+                }
+            },
+        }
+    },
+)
+async def create_conversation(
+    request: CreateConversationRequest,
+    current_user_id: str = Depends(get_current_user),
+    chats_module=Depends(Provide[ChatsModule]),
+) -> ConversationResponseSchema:
+    """
+    Create a new conversation.
+    """
+    # Execute command
+    result = await chats_module.execute_command_async(
+        CreateConversationCommand(
+            user_id=current_user_id,
+        )
+    )
+
+    return result.match(
+        on_success=lambda conversation: ConversationResponseSchema(id=str(conversation.id)),
+        on_failure=lambda error: HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)),
+    )
 
 
 # @router.get("/conversations/{conversation_id}")
@@ -37,23 +73,6 @@ router = APIRouter(
 #     return result.match(
 #         on_success=lambda conversation: conversation,
 #         on_failure=lambda error: HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)),
-#     )
-
-
-# @router.post("", response_model=ConversationResponseSchema)
-# async def create_conversation_with_details(
-#     request: CreateConversationRequest,
-#     chats_mediator: IMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
-# ):
-#     command = CreateConversationCommand(user_id=request.user_id)
-#     result: Result = chats_mediator.execute_command(command)
-
-#     return result.match(
-#         on_success=lambda conversation: ConversationResponseSchema(
-#             id=str(conversation.id),
-#             messages=[MessageResponseSchema(id=str(msg.id)) for msg in conversation.all_messages],
-#         ),
-#         on_failure=lambda error: HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)),
 #     )
 
 

@@ -2,14 +2,14 @@ from dependency_injector.wiring import Provide, inject
 
 from src.building_blocks.domain.result import TResult
 
-from ..application.contracts.chat_module import IChatModule
+from ..application.contracts.chat_module import IChatsModule
 from ..application.contracts.command import BaseCommand
 from ..application.contracts.mediator import IMediator
 from ..application.contracts.query import BaseQuery
 from .configuration.di.chat_backend import ChatDIContainer
 
 
-class ChatsModule(IChatModule):
+class ChatsModule(IChatsModule):
     """Main entry point for the meetings module"""
 
     @inject
