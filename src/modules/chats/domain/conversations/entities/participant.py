@@ -7,7 +7,6 @@ from src.building_blocks.domain.entity import Entity
 from ...members.value_objects.member_id import MemberId
 from ..enums.participant_role import ParticipantRole
 from ..events import ParticipantRoleAssignedEditorEvent, ParticipantRoleAssignedViewerEvent
-from ..rules import MeetingAttendeeRemovedDomainEvent
 
 
 @dataclass
@@ -92,4 +91,4 @@ class Participant(Entity):
         self._removing_reason = reason
         self._removing_member_id = removing_member_id
 
-        self.add_event(MeetingAttendeeRemovedDomainEvent(self.id, self._conversation_id, reason))
+        self.add_event()

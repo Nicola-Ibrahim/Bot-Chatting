@@ -1,98 +1,127 @@
-from pydantic import AnyHttpUrl, BaseModel, PostgresDsn, field_validator
+import logging.config
+from typing import Any, ClassVar
+
+from pydantic import AnyHttpUrl, PostgresDsn, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class LogConfig(BaseModel):
-    """Logging configuration to be set for the server"""
+class LoggingConfig(BaseSettings):
+    """Centralized logging configuration with production-ready defaults"""
 
-    LOGGER_NAME: str = "chat"
-    LOG_FORMAT: str = "%(levelprefix)s | %(asctime)s | %(message)s"
-    LOG_LEVEL: str = "DEBUG"
+    LOGGER_NAME: str = "chatbot"
+    LOG_LEVEL: str = "INFO"
+    LOG_FORMAT: str = "%(levelprefix)s | %(asctime)s | %(name)s | %(message)s"
+    LOG_DATEFMT: str = "%Y-%m-%d %H:%M:%S"
 
-    # Logging config
-    version: int = 1
-    disable_existing_loggers: bool = False
-    formatters: dict = {
-        "default": {
-            "()": "uvicorn.logging.DefaultFormatter",
-            "fmt": LOG_FORMAT,
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        },
-    }
-    handlers: dict = {
-        "default": {
-            "formatter": "default",
-            "class": "logging.StreamHandler",
-            "stream": "ext://sys.stderr",
-        },
-    }
-    loggers: dict = {
-        LOGGER_NAME: {"handlers": ["default"], "level": LOG_LEVEL},
-    }
+    # Pre-configured logging dictConfig
+    @property
+    def dict_config(self) -> dict[str, Any]:
+        return {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "formatters": {
+                "default": {
+                    "()": "uvicorn.logging.DefaultFormatter",
+                    "fmt": self.LOG_FORMAT,
+                    "datefmt": self.LOG_DATEFMT,
+                    "use_colors": True,
+                },
+                "json": {
+                    "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+                    "fmt": self.LOG_FORMAT,
+                },
+            },
+            "handlers": {
+                "console": {
+                    "class": "logging.StreamHandler",
+                    "formatter": "default",
+                    "stream": "ext://sys.stdout",
+                },
+                "json_console": {
+                    "class": "logging.StreamHandler",
+                    "formatter": "json",
+                    "stream": "ext://sys.stdout",
+                },
+            },
+            "loggers": {
+                self.LOGGER_NAME: {
+                    "handlers": ["console"],
+                    "level": self.LOG_LEVEL,
+                    "propagate": False,
+                },
+                "uvicorn.error": {
+                    "handlers": ["console"],
+                    "level": "INFO",
+                    "propagate": False,
+                },
+            },
+        }
+
+    def configure_logging(self) -> None:
+        """Apply logging configuration"""
+        logging.config.dictConfig(self.dict_config)
 
 
-class Settings(BaseModel):
-    PROJECT_NAME: str = "Bot Chatting"
-    LOGGING: LogConfig = LogConfig()
+class AppSettings(BaseSettings):
+    """Main application settings with environment-aware configuration"""
 
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        env_prefix="APP_",
+        case_sensitive=True,
+        extra="ignore",
+    )
+
+    # Application Metadata
+    PROJECT_NAME: str = "Chatbot Service"
+    VERSION: str = "1.0.0"
+    DEBUG: bool = False
+    ENVIRONMENT: str = "development"
+
+    # Security
+    SECRET_KEY: str = "change-me-in-production"
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
 
-    @field_validator("BACKEND_CORS_ORIGINS", check_fields=True)
-    def assemble_cors_origins(cls, v: str | list[str]) -> list[str] | str:
-        """
-        The function `assemble_cors_origins` takes a string or a list of strings as input and returns a list of stripped
-        strings if the input is a comma-separated string, otherwise it returns the input as is.
+    # Database
+    POSTGRES_HOST: str = "localhost"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str = "postgres"
+    POSTGRES_DB: str = "chatbot"
+    DATABASE_URI: PostgresDsn | None = None
 
-        Args:
-            cls: The `cls` parameter in the `assemble_cors_origins` function represents the class to which the method
-            belongs. In this case, it seems that the method is a class method, and `cls` would refer to the class itself.
-            v (Union[str, List[str]]): The parameter `v` in the provided function `assemble_cors_origins` can be either a
-            string or a list of strings.
+    # Logging
+    LOGGING: ClassVar[LoggingConfig] = LoggingConfig()
 
-        Returns:
-            The function `assemble_cors_origins` returns a list of strings if the input `v` is a single string without square
-            brackets, it returns the input as is if it is already a list or a string with square brackets, and raises a
-            ValueError for any other input type.
-        """
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
+    def assemble_cors_origins(cls, v: str | list[str]) -> list[str]:
+        """Parse CORS origins from string or list"""
+        if isinstance(v, str):
+            if v.startswith("["):
+                import json
+
+                return json.loads(v)
+            return [origin.strip() for origin in v.split(",")]
+        return v
+
+    @field_validator("DATABASE_URI", mode="before")
+    def assemble_db_uri(cls, v: str | None, values: dict[str, Any]) -> PostgresDsn:
+        """Construct DB URI if not explicitly provided"""
+        if v:
             return v
-        raise ValueError(v)
 
-    # POSTGRES_SERVER: str
-    # POSTGRES_USER: str
-    # POSTGRES_PASSWORD: str
-    # POSTGRES_DB: str
-    # DATABASE_URI: PostgresDsn | None = None
+        return PostgresDsn.build(
+            scheme="postgresql+asyncpg",
+            username=values["POSTGRES_USER"],
+            password=values["POSTGRES_PASSWORD"],
+            host=values["POSTGRES_HOST"],
+            port=str(values["POSTGRES_PORT"]),
+            path=values["POSTGRES_DB"],
+        )
 
-    # @field_validator("DATABASE_URI", check_fields=True)
-    # def assemble_db_connection(cls, v: str | None, values: dict[str, Any]) -> Any:
-    #     """
-    #     Check the databaase uri, if it is string then return it as correct
-    #     if is not then constructs the database URI with taken values from
-    #     Setting models
-
-    #     Args:
-    #         v (Optional[str]): The current value of the field being validated (DATABASE_URI in this case).
-    #         values (Dict[str, Any]): A dictionary containing the current values of all fields in the model.
-
-    #     Returns:
-    #         Any: _description_
-
-    #     """
-    #     if isinstance(v, str):
-    #         return v
-    #     return PostgresDsn.build(
-    #         scheme="postgresql",
-    #         user=values.get("POSTGRES_USER"),
-    #         password=values.get("POSTGRES_PASSWORD"),
-    #         host=values.get("POSTGRES_SERVER"),
-    #         path=f"/{values.get('POSTGRES_DB') or ''}",
-    #     )
-
-    class Config:
-        case_sensitive = True
-        env_file = ".env"
-
-
-settings = Settings()
+    def configure(self) -> None:
+        """Apply all configurations"""
+        if self.DEBUG:
+            self.LOGGING.LOG_LEVEL = "DEBUG"
+        self.LOGGING.configure_logging()

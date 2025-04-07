@@ -10,7 +10,7 @@ from .configuration.di.chat_backend import ChatDIContainer
 
 
 class ChatsModule(IChatsModule):
-    """Main entry point for the meetings module"""
+    """Main entry point for the chats module"""
 
     @inject
     async def execute_command_async(

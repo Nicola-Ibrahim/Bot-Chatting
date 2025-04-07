@@ -1,7 +1,12 @@
 import importlib
+import os
 import pkgutil
+from functools import lru_cache
+from importlib import import_module
 from inspect import getmembers
 from typing import Any, Generator, Type, TypeVar
+
+from pydantic_settings import BaseSettings
 
 # Define a generic type variable for the member
 T = TypeVar("T")
@@ -67,3 +72,38 @@ def extract_members_from_package(
     # Then, extract the desired members from the modules
     for module in modules:
         yield from extract_members_from_module(module, member_type, member_name)
+
+
+@lru_cache
+def get_settings() -> BaseSettings:
+    """
+    Dynamically loads the appropriate settings module based on environment.
+    Caches the result for performance.
+
+    Environment Detection Priority:
+    1. Explicit ENV environment variable
+    2. APP_ENV environment variable
+    3. Defaults to 'dev'
+
+    Raises:
+        ImportError: If the settings module cannot be imported
+        AttributeError: If the settings module is invalid
+    """
+    env = os.getenv("ENV") or os.getenv("APP_ENV", "dev").lower()
+
+    try:
+        # Dynamic import based on environment
+        settings_module = import_module(f"app.core.config.{env}_settings")
+
+        # Validate the module has a Settings class
+        if not hasattr(settings_module, "Settings"):
+            raise AttributeError(f"{env}_settings.py must define a 'Settings' class")
+
+        return settings_module.Settings()
+
+    except ImportError as e:
+        raise ImportError(
+            f"Could not import settings for environment '{env}'. " f"Ensure app/core/config/{env}_settings.py exists."
+        ) from e
+    except Exception as e:
+        raise RuntimeError(f"Failed to load settings for environment '{env}': {str(e)}") from e

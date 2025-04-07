@@ -1,7 +1,7 @@
 from fastapi.responses import JSONResponse
 
 
-class ApiResponse:
+class APIResponse:
     @staticmethod
     def success(data: dict = None, message: str = "Success"):
         return JSONResponse(content={"message": message, "data": data}, status_code=200)
