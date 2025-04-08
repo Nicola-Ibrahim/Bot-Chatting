@@ -91,20 +91,6 @@ class Result(Generic[TResult, TError]):
             return fn(self.value)
         return self
 
-    def on_failure(self, fn: Callable[[TError], Any]) -> "Result[TResult, TError]":
-        """
-        Executes a function when the result is a failure (i.e., has an error).
-
-        Args:
-            fn (Callable): Function to execute on failure.
-
-        Returns:
-            Result[TResult, TError]: This result (unchanged).
-        """
-        if self.is_failure:
-            fn(self.error)
-        return self
-
     def unwrap(self) -> TResult:
         """
         Returns the success value or raises an error if the result is a failure.

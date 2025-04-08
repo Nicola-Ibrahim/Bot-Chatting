@@ -17,7 +17,7 @@ from src.modules.chats.infrastructure.chat_module import ChatsModule
 from .add_feedback_request import AddFeedbackRequest
 from .add_message_request import AddMessageRequest
 from .create_conversation_request import CreateConversationRequest
-
+from .....core.exceptions.errors import APIError
 router = APIRouter(
     prefix="/v1/conversation",
     tags=["conversation"],
@@ -58,7 +58,7 @@ async def create_conversation(
 
     return result.match(
         on_success=lambda conversation: ConversationResponseSchema(id=str(conversation.id)),
-        on_failure=lambda error: HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)),
+        on_failure=lambda error: raise APIError(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)),
     )
 
 
