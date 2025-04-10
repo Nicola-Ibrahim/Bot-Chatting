@@ -5,6 +5,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from ..modules.utils import ModuleInitializer
 from .core import logging, middleware
 from .core.exceptions.errors import APIError
 from .core.exceptions.handlers import global_exception_handler
@@ -39,6 +40,7 @@ class APIFactory:
             openapi_url=self.settings.OPENAPI_URL if self.settings.ENABLE_DOCS else None,
         )
 
+        self._init_modules()
         self._configure_middleware()
         self._register_exception_handlers()
         self._register_routers()
@@ -91,3 +93,10 @@ class APIFactory:
         for error in APIError.__subclasses__():
             self.app.add_exception_handler(error, global_exception_handler)
         self.app.add_exception_handler(Exception, global_exception_handler)
+
+    def _init_modules(self):
+        """Initialize all modules"""
+        ModuleInitializer.initialize()
+
+
+app = APIFactory().create_app()

@@ -12,13 +12,13 @@ ENV DB_PORT=5432
 RUN apt-get update && apt-get install -y --no-install-recommends netcat && apt-get clean
 
 # Copy the custom entrypoint script into the container
-COPY db_entrypoint.sh /usr/local/bin/db_entrypoint.sh
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # Make the entrypoint script executable
-RUN chmod +x /usr/local/bin/db_entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set the custom entrypoint to use the script
-ENTRYPOINT ["/usr/local/bin/db_entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # Use the default command to start PostgreSQL
 CMD ["postgres"]

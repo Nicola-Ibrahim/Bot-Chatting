@@ -1,4 +1,4 @@
-from src.api.app import APIFactory
+from src.api.main import APIFactory
 
 from .modules.utils import initialize_modules
 
