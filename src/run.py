@@ -1,12 +1,12 @@
-from src.api.startup import APIFactory
+from src.api.app import APIFactory
 
 from .modules.utils import initialize_modules
 
 
 def create_and_run_api():
     """Creates and runs the Flask application."""
-    factory = APIFactory()
-    return factory.create_app()
+    app = APIFactory().create_app()
+    return app.run()
 
 
 def main():

@@ -1,13 +1,13 @@
 from fastapi import APIRouter
 
-from ..utils.import_helpers import extract_members_from_package
+from .import_helpers import extract_members_from_package
 
 PACKAGE_PATHS = [
     "src.api.modules.chats.conversations",
 ]
 
 
-def prepare_routers(router_type=APIRouter):
+def collect_routers(router_type=APIRouter):
     """
     Prepare and return a list of APIRouter instances.
 
