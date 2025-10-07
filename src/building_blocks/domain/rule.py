@@ -11,5 +11,5 @@ class BaseBusinessRule(ABC):
     error_type: ErrorType
 
     @abstractmethod
-    def is_satisfied(self) -> bool:
+    def is_broken(self) -> bool:
         """Check if the business rule is satisfied."""

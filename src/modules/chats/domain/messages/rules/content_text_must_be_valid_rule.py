@@ -11,5 +11,5 @@ class ContentTextMustBeValidRule(BaseBusinessRule):
     message: str = "Content must be valid."
     error_type: ErrorType = ErrorType.VALIDATION_ERROR
 
-    def is_satisfied(self) -> bool:
+    def is_broken(self) -> bool:
         return bool(self.text and len(self.text) > 0)

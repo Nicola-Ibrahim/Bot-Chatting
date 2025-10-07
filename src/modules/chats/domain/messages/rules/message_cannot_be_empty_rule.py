@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from src.building_blocks.domain.enums import ErrorCode, ErrorType
 from src.building_blocks.domain.rule import BaseBusinessRule
 
@@ -10,5 +11,5 @@ class NonEmptyMessageRule(BaseBusinessRule):
     message: str = "Message cannot be empty."
     error_type: ErrorType = ErrorType.VALIDATION_ERROR
 
-    def is_satisfied(self) -> bool:
+    def is_broken(self) -> bool:
         return bool(self.message and self.message.strip())

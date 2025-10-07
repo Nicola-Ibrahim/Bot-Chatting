@@ -12,5 +12,5 @@ class ConversationCannotBeSharedIfArchivedRule(BaseBusinessRule):
     message = "Conversation cannot be shared if it is archived."
     error_type = ErrorType.BUSINESS_RULE_VIOLATION
 
-    def is_satisfied(self) -> bool:
+    def is_broken(self) -> bool:
         return not self.is_archived

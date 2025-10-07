@@ -12,7 +12,7 @@ class FeedbackMustBeValidRule(BaseBusinessRule):
     message: str = "Feedback must have a valid rating and comment must be less than 500 characters."
     error_type: ErrorType = ErrorType.VALIDATION_ERROR
 
-    def is_satisfied(self) -> bool:
+    def is_broken(self) -> bool:
         if not self.feedback.rating:
             return False
         if self.feedback.comment and len(self.feedback.comment) > 500:

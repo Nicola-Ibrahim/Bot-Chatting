@@ -15,5 +15,5 @@ class ParticipantCannotBeAddedIfAlreadyExistsRule(BaseBusinessRule):
     message = "Participant cannot be added if they already exist in the conversation."
     error_type = ErrorType.BUSINESS_RULE_VIOLATION
 
-    def is_satisfied(self) -> bool:
+    def is_broken(self) -> bool:
         return not any(p.id == self.participant_id for p in self.participants)

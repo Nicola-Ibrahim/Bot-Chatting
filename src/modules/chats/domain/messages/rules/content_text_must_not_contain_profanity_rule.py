@@ -11,6 +11,6 @@ class ContentTextMustNotContainProfanityRule(BaseBusinessRule):
     message: str = "Content must not contain profanity."
     error_type: ErrorType = ErrorType.VALIDATION_ERROR
 
-    def is_satisfied(self) -> bool:
+    def is_broken(self) -> bool:
         profanities = ["badword1", "badword2"]
         return not any(profanity in self.text for profanity in profanities)

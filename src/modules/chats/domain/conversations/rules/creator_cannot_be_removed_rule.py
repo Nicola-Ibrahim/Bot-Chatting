@@ -12,5 +12,5 @@ class CreatorCannotBeRemovedRule(BaseBusinessRule):
     message = "The creator of the conversation cannot be removed."
     error_type = ErrorType.BUSINESS_RULE_VIOLATION
 
-    def is_satisfied(self) -> bool:
+    def is_broken(self) -> bool:
         return self.creator_id != self.participant_id

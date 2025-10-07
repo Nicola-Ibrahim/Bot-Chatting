@@ -12,5 +12,5 @@ class MessageCannotBeAddedIfArchivedRule(BaseBusinessRule):
     message = "Messages cannot be added to an archived conversation."
     error_type = ErrorType.BUSINESS_RULE_VIOLATION
 
-    def is_satisfied(self) -> bool:
+    def is_broken(self) -> bool:
         return not self.is_archived

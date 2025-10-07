@@ -11,5 +11,5 @@ class ContentResponseMustBeValidRule(BaseBusinessRule):
     message: str = "Response must be valid."
     error_type: ErrorType = ErrorType.VALIDATION_ERROR
 
-    def is_satisfied(self) -> bool:
+    def is_broken(self) -> bool:
         return not self.response or len(self.response) < 5

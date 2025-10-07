@@ -12,5 +12,5 @@ class ContentIndexMustBeValidRule(BaseBusinessRule):
     message: str = "Content index must be valid."
     error_type: ErrorType = ErrorType.VALIDATION_ERROR
 
-    def is_satisfied(self) -> bool:
+    def is_broken(self) -> bool:
         return 0 <= self.content_index < self.contents_length

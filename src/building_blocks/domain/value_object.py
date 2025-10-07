@@ -27,7 +27,7 @@ class ValueObject(ABC):
     def check_rules(self, *rule: BaseBusinessRule) -> None:
         """Check a business rule."""
         for rule in rule:
-            if not rule.is_satisfied():
+            if not rule.is_broken():
                 raise BusinessRuleValidationException(rule)
 
     @classmethod

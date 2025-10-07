@@ -85,7 +85,7 @@ class Entity:
         """Validate a business rule."""
 
         for rule in rules:
-            if not rule.is_satisfied():
+            if rule.is_broken():
                 raise BusinessRuleValidationException(rule)
 
 
