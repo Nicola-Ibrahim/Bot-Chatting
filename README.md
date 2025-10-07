@@ -202,6 +202,8 @@ Tools and frameworks that aid in DDD implementation.
 7. **Eric's Pytest Blog:** [pytest with eric](https://pytest-with-eric.com/) - pytest for Python testing (essential for robust DDD). (Moved here as it's a tool)
 8. **Szymon Miks Blog:** [Domain Model with SQLAlchemy](https://blog.szymonmiks.pl/p/domain-model-with-sqlalchemy/) - Domain models with SQLAlchemy. (Moved here as it's tool/technique specific)
 
+9. ****: [Tactical domain driven desing](https://vaadin.com/blog/ddd-part-2-tactical-domain-driven-design)
+
 ## 5. Architecture Visualization
 
 Essential resources for designing and documenting your system architecture:

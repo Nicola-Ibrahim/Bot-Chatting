@@ -78,8 +78,8 @@ install-hooks:  # Install pre-commit hooks to automate code checks
 
 update-db:  # Create and apply migrations, then install hooks
 	@echo "Updating database..."
-	$(MAKE) migrate
-	$(MAKE) install-hooks
+	alembic -c alembic/alembic.ini revision --autogenerate -m "Create a baseline migrations"
+	alembic -c alembic/alembic.ini upgrade head
 
 shell:  # Open a Django shell for interactive management
 	@echo "Opening shell..."

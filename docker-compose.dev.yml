@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app:
     build:
-      context: ./src/ # Points to the current directory where the Dockerfile is located
+      context: ./src # Points to the current directory where the Dockerfile is located
       dockerfile: Dockerfile # The Dockerfile used to build the application image
     volumes:
       - .:/bot # Mounts the current directory (source code) into the container for development
@@ -19,18 +19,34 @@ services:
 
   postgres_db:
     build:
-      context: ./src/ # Path to the Dockerfile for PostgreSQL
-      dockerfile: ./database/Dockerfile # PostgreSQL Dockerfile
+      context: ./src/database # Path to the Dockerfile for PostgreSQL
+      dockerfile: Dockerfile # PostgreSQL Dockerfile
     volumes:
       - db_data:/var/lib/postgresql/data # Mounts a persistent volume to store PostgreSQL data, ensuring data is not lost on container restart
     env_file:
-      - .env
+      - .env.dev # Loads environment variables from a .env file for development
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ] # Health check command to ensure PostgreSQL is ready
+      interval: 5s # Checks the database every 5 seconds
+      timeout: 5s # Timeout for the health check
+      retries: 5 # Number of retries before considering the service unhealthy
+
     networks:
       - internal_network # PostgreSQL service is on the same internal network, allowing only internal services to access it
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER} # Use environment variables from .env file for configuration
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+    restart: always # Ensures PostgreSQL restarts automatically
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    env_file:
+      - .env.dev
+    ports:
+      - "5050:80" # Expose pgAdmin on port 5050 of the host
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    networks:
+      - internal_network
 
   nginx:
     image: nginx:1.27 # Use the latest stable version of NGINX
