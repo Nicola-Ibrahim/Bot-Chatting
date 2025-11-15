@@ -1,5 +1,11 @@
 from dataclasses import dataclass
 
+"""Business rule ensuring a message does not contain profane words.
+
+The rule is broken when any of the predefined profanities appear in the
+text. Imports remain correct as they reference ``src.building_blocks``.
+"""
+
 from src.building_blocks.domain.enums import ErrorCode, ErrorType
 from src.building_blocks.domain.rule import BaseBusinessRule
 
@@ -13,4 +19,5 @@ class ContentTextMustNotContainProfanityRule(BaseBusinessRule):
 
     def is_broken(self) -> bool:
         profanities = ["badword1", "badword2"]
-        return not any(profanity in self.text for profanity in profanities)
+        # The rule is broken if the text contains any profane word
+        return any(profanity in self.text for profanity in profanities)

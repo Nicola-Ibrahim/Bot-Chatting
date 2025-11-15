@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class ErrorType(Enum):
-    """Enumeration of error types."""
+    """Enumeration of high-level domain error categories."""
 
     BUSINESS_RULE_VIOLATION = "BusinessRuleViolation"
     ENTITY_NOT_FOUND = "EntityNotFound"
@@ -10,10 +10,12 @@ class ErrorType(Enum):
     CONFLICT_ERROR = "ConflictError"
     UNAUTHORIZED_ACCESS = "UnauthorizedAccess"
     FORBIDDEN_ACCESS = "ForbiddenAccess"
+    INFRASTRUCTURE_ERROR = "InfrastructureError"
+    INTERNAL_ERROR = "InternalError"
 
 
 class ErrorCode(Enum):
-    """Enumeration of error codes."""
+    """Enumeration of well-known domain error codes."""
 
     BUSINESS_RULE_VIOLATION = "BusinessRuleViolation"
     INVALID_INPUT = "InvalidInput"
@@ -21,3 +23,5 @@ class ErrorCode(Enum):
     UNAUTHORIZED_ACCESS = "UnauthorizedAccess"
     FORBIDDEN_ACCESS = "ForbiddenAccess"
     CONFLICT_ERROR = "ConflictError"
+    INFRASTRUCTURE_FAILURE = "InfrastructureFailure"
+    INTERNAL_ERROR = "InternalError"

@@ -1,12 +1,14 @@
+import os
 from contextlib import asynccontextmanager
 from typing import Optional
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
-from ..modules.utils import ModuleInitializer
-from .core import logging, middleware
+from ..modules.initializer import ModuleInitializer
+from .core import middleware
 from .core.exceptions.errors import APIError
 from .core.exceptions.handlers import global_exception_handler
 from .core.utils.import_helpers import get_settings
@@ -16,87 +18,99 @@ from .core.utils.routing import collect_routers
 class APIFactory:
     def __init__(self):
         self.app: Optional[FastAPI] = None
-        self.settings = get_settings()
+
+        raw_settings = get_settings()
+        settings_dict = (
+            raw_settings
+            if isinstance(raw_settings, dict)
+            else (raw_settings.model_dump() if hasattr(raw_settings, "model_dump") else raw_settings.__dict__)
+        )
+
+        # 🔹 Split once, keep dict-only
+        self.api_cfg = settings_dict.get("api", {})
+        self.platform_cfg = settings_dict.get("platform", {})
+        self.modules_cfg = settings_dict.get("modules", settings_dict)  # fallback to legacy flat shape
 
     @asynccontextmanager
     async def _lifespan(self, app: FastAPI):
-        """Async context manager for application lifespan events"""
-        # Startup logic
-        logging.configure_logging()
-        yield
-        # Shutdown logic (none needed in this simplified version)
+        # 🔹 Initialize modules with separated configs
+        handles = ModuleInitializer.initialize(self.modules_cfg, self.platform_cfg)
+
+        # Optional: expose handles for routers/tests
+        app.state.modules = handles
+
+        try:
+            yield
+        finally:
+            if handles:
+                handles.shutdown()
 
     def create_app(self) -> FastAPI:
-        """Factory method for creating and configuring the FastAPI application"""
         self.app = FastAPI(
-            title=self.settings.PROJECT_NAME,
-            version=self.settings.API_VERSION,
-            description=self.settings.API_DESCRIPTION,
-            lifespan=self._lifespan,
-            docs_url=self.settings.DOCS_URL if self.settings.ENABLE_DOCS else None,
-            redoc_url=self.settings.REDOC_URL if self.settings.ENABLE_DOCS else None,
-            contact=self.settings.CONTACT_INFO,
-            license_info=self.settings.LICENSE_INFO,
-            openapi_url=self.settings.OPENAPI_URL if self.settings.ENABLE_DOCS else None,
+            title=self.api_cfg.get("PROJECT_NAME", "API"),
+            version=self.api_cfg.get("API_VERSION", "v1"),
+            description=self.api_cfg.get("API_DESCRIPTION", ""),
+            lifespan=self._lifespan,  # 🔹 use lifespan (recommended)
+            docs_url=self.api_cfg.get("DOCS_URL") if self.api_cfg.get("ENABLE_DOCS", True) else None,
+            redoc_url=self.api_cfg.get("REDOC_URL") if self.api_cfg.get("ENABLE_DOCS", True) else None,
+            contact=self.api_cfg.get("CONTACT_INFO"),
+            license_info=self.api_cfg.get("LICENSE_INFO"),
+            openapi_url=self.api_cfg.get("OPENAPI_URL") if self.api_cfg.get("ENABLE_DOCS", True) else None,
         )
 
-        self._init_modules()
         self._configure_middleware()
         self._register_exception_handlers()
         self._register_routers()
-
+        self._mount_frontend()
         return self.app
 
     def run(self, **uvicorn_kwargs):
-        """
-        Run the FastAPI application using Uvicorn with settings integration
-
-        Args:
-            **uvicorn_kwargs: Additional arguments to pass to uvicorn.run()
-        """
         if not self.app:
             self.create_app()
-
         uvicorn.run(
             app=self.app,
-            host=self.settings.HOST,
-            port=self.settings.PORT,
-            reload=self.settings.DEBUG,
-            workers=self.settings.WORKERS if not self.settings.DEBUG else 1,
-            log_level="debug" if self.settings.DEBUG else "info",
+            host=self.api_cfg.get("HOST", "0.0.0.0"),
+            port=self.api_cfg.get("PORT", 8000),
+            reload=self.api_cfg.get("DEBUG", False),
+            workers=self.api_cfg.get("WORKERS", 1) if not self.api_cfg.get("DEBUG", False) else 1,
+            log_level="debug" if self.api_cfg.get("DEBUG", False) else "info",
             **uvicorn_kwargs,
         )
 
     def _configure_middleware(self):
-        """Configure essential middleware"""
         self.app.add_middleware(middleware.SecurityHeadersMiddleware)
-
-        if self.settings.CORS_ENABLED:
+        if self.api_cfg.get("CORS_ENABLED", True):
             self.app.add_middleware(
                 CORSMiddleware,
-                allow_origins=self.settings.CORS_ORIGINS,
-                allow_credentials=self.settings.CORS_ALLOW_CREDENTIALS,
-                allow_methods=self.settings.CORS_ALLOW_METHODS,
-                allow_headers=self.settings.CORS_ALLOW_HEADERS,
+                allow_origins=self.api_cfg.get("CORS_ORIGINS", ["*"]),
+                allow_credentials=self.api_cfg.get("CORS_ALLOW_CREDENTIALS", True),
+                allow_methods=self.api_cfg.get("CORS_ALLOW_METHODS", ["*"]),
+                allow_headers=self.api_cfg.get("CORS_ALLOW_HEADERS", ["*"]),
             )
 
     def _register_routers(self):
-        """Register all API routers"""
         routers = collect_routers()
         for router in routers:
             self.app.include_router(
-                router, prefix=f"/api/{self.settings.API_VERSION}", tags=[router.tags[0]] if router.tags else None
+                router,
+                prefix=f"/api/{self.api_cfg.get('API_VERSION', 'v1')}",
+                tags=[router.tags[0]] if router.tags else None,
             )
 
     def _register_exception_handlers(self):
-        """Register exception handlers"""
         for error in APIError.__subclasses__():
             self.app.add_exception_handler(error, global_exception_handler)
         self.app.add_exception_handler(Exception, global_exception_handler)
 
-    def _init_modules(self):
-        """Initialize all modules"""
-        ModuleInitializer.initialize()
+    def _mount_frontend(self) -> None:
+        try:
+            if self.app is None:
+                return
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            frontend_path = os.path.join(base_dir, "..", "frontend")
+            if os.path.isdir(frontend_path):
+                self.app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+        except Exception:
+            import logging as _logging
 
-
-app = APIFactory().create_app()
+            _logging.getLogger(__name__).exception("An error occurred while mounting the frontend directory")

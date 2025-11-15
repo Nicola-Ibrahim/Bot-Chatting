@@ -1,4 +1,4 @@
-from src.building_blocks.domain.exception import BusinessRuleValidationException, RepositoryException
+from src.building_blocks.domain.exceptions import BusinessRuleValidationException, RepositoryException
 
 from ....domain.conversations.value_objects.conversation_id import ConversationId
 from ....domain.members.value_objects.member_id import MemberId

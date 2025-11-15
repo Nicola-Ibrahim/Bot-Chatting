@@ -5,7 +5,7 @@ from llama_index.core import QueryBundle
 
 from src.llm_backend.infrastructure.processing.search_engines import VectorSearchEngine
 
-from ...infrastructure.configuration.di.llm_backend import LLMBackendContainer
+from ..configuration.di.containers import LLMBackendContainer
 
 
 class DocumentFetcher:

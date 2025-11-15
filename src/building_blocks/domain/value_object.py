@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
 
-from .exception import BusinessRuleValidationException
+from .exceptions import BusinessRuleValidationException
 from .rule import BaseBusinessRule
 
 
@@ -24,10 +24,10 @@ class ValueObject(ABC):
         """Return the string representation of the value object."""
         return str(self.__dict__)
 
-    def check_rules(self, *rule: BaseBusinessRule) -> None:
-        """Check a business rule."""
-        for rule in rule:
-            if not rule.is_broken():
+    def check_rules(self, *rules: BaseBusinessRule) -> None:
+        """Ensure that the supplied business rules hold true."""
+        for rule in rules:
+            if rule.is_broken():
                 raise BusinessRuleValidationException(rule)
 
     @classmethod

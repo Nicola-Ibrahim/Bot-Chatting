@@ -1,5 +1,3 @@
-from .connectors.manager import DBConnectionFactory
-from .model import BaseModel
-from .manager import DBSet
+from .base import BaseSQLModel
 
-__all__ = ["BaseModel", "DBConnectionFactory", "DBSet"]
+__all__ = ["BaseSQLModel"]

@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from uuid import UUID
 
 from src.building_blocks.domain.entity import Entity
-from src.building_blocks.domain.exception import BusinessRuleValidationException
+from src.building_blocks.domain.exceptions import BusinessRuleValidationException
 
 from ...members.value_objects.member_id import MemberId
 from ..rules import CreatorNameCannotBeEmptyRule

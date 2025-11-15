@@ -1,97 +1,94 @@
-import datetime
-from dataclasses import asdict, dataclass, field
-from typing import Any
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass, field, replace
+from datetime import datetime, timezone
+from typing import Any, Generic, TypeVar
 
 from .events import DomainEvent
-from .exception import BusinessRuleValidationException
+from .exceptions import BusinessRuleValidationException
 from .rule import BaseBusinessRule
 
+TEntityId = TypeVar("TEntityId")
 
-@dataclass
-class Entity:
-    """
-    Abstract base class for all domain entities. Provides unique ID, equality checks,
-    copy functionality, and serialization support.
-    Supports flexible ID types.
-    """
 
-    _id: str
-    _events: list[DomainEvent] = field(default_factory=list)
-    _created_at: datetime.datetime = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
+@dataclass(eq=False)
+class Entity(Generic[TEntityId]):
+    """Base class for all domain entities."""
+
+    _id: TEntityId
+    _created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    _updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    _version: int = 0
+    _events: list[DomainEvent] = field(default_factory=list, init=False, repr=False)
 
     @property
-    def id(self) -> str:
-        """
-        Retrieves the ID of the conversation.
-
-        Returns:
-            ConversationId: The ID of the conversation.
-        """
+    def id(self) -> TEntityId:
         return self._id
 
     @property
-    def created_at(self) -> datetime.datetime:
-        """Get the creation timestamp of the entity."""
+    def created_at(self) -> datetime:
         return self._created_at
 
+    @property
+    def updated_at(self) -> datetime:
+        return self._updated_at
+
+    @property
+    def version(self) -> int:
+        return self._version
+
     def __eq__(self, other: Any) -> bool:
-        """Check equality based on the entity ID."""
-        if not isinstance(other, Entity):
-            return False
-        return self._id == other._id
+        return isinstance(other, Entity) and other._id == self._id
 
     def __hash__(self) -> int:
-        """
-        Hash based on the unique ID, allowing entities to be used in hash-based collections.
-        """
         return hash(self._id)
 
     def __repr__(self) -> str:
-        """
-        Provide a readable string representation of the entity, including its ID.
-        """
-        return f"<{self.__class__.__name__}(id={self._id})>"
+        return f"{self.__class__.__name__}(id={self._id!r})"
 
-    def copy(self, **changes) -> "Entity":
-        """
-        Create a copy of the entity, allowing specific attributes to be modified.
-        This can be useful for creating a new version of the entity with updates.
-        """
-        updated_data = asdict(self)
-        updated_data.update(changes)
-        return self.__class__(**updated_data)
+    def touch(self) -> None:
+        """Update the modification timestamp."""
+        self._updated_at = datetime.now(timezone.utc)
+        self._version += 1
+
+    def copy(self, **changes: Any) -> "Entity[TEntityId]":
+        """Create a modified copy of the entity."""
+        return replace(self, **changes)
 
     def to_dict(self) -> dict[str, Any]:
-        """
-        Convert the entity to a dictionary representation for easy serialization.
-        """
-        # return asdict(self)
+        """Serialize the entity (recursively) into a dict."""
+        raw = asdict(self)
+        raw.pop("_events", None)
+        return {
+            key: value.to_dict() if isinstance(value, Entity) else value
+            for key, value in raw.items()
+        }
 
-        return {key: (value.to_dict() if isinstance(value, Entity) else value) for key, value in asdict(self).items()}
-
-    def add_event(self, event: DomainEvent) -> None:
-        """Add a domain event to the entity."""
+    # ------------------------------------------------------------------ #
+    # Domain events
+    # ------------------------------------------------------------------ #
+    def record_event(self, event: DomainEvent) -> None:
         self._events.append(event)
 
-    def clear_events(self) -> None:
-        """Clear all domain events."""
+    def pull_events(self) -> list[DomainEvent]:
+        events = list(self._events)
         self._events.clear()
+        return events
+
+    # Backwards compatible helpers ------------------------------------------------
+    def add_event(self, event: DomainEvent) -> None:
+        self.record_event(event)
 
     def get_events(self) -> list[DomainEvent]:
-        """Get all domain events."""
-        return self._events
+        return list(self._events)
 
-    def check_rules(self, *rules: list[BaseBusinessRule]) -> None:
-        """Validate a business rule."""
+    def clear_events(self) -> None:
+        self._events.clear()
 
+    # ------------------------------------------------------------------ #
+    # Business rules
+    # ------------------------------------------------------------------ #
+    def check_rules(self, *rules: BaseBusinessRule) -> None:
         for rule in rules:
             if rule.is_broken():
                 raise BusinessRuleValidationException(rule)
-
-
-@dataclass
-class AggregateRoot(Entity):
-    """
-    A special type of Entity that serves as the root of an aggregate in DDD.
-    This class does not introduce additional logic, but it can be extended in the future.
-    """

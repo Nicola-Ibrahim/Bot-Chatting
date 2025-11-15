@@ -1,4 +1,4 @@
-from src.building_blocks.domain.exception import BusinessRuleValidationException, RepositoryException
+from src.building_blocks.domain.exceptions import BusinessRuleValidationException, RepositoryException
 from src.modules.chats.domain.messages.value_objects.feedback import Feedback
 
 from ....domain.messages.interfaces.repository import AbstractMessageRepository

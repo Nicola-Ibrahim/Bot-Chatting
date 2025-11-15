@@ -3,8 +3,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Self
 
-from src.building_blocks.domain.entity import AggregateRoot
-from src.building_blocks.domain.exception import BusinessRuleValidationException
+from src.building_blocks.domain.aggregate_root import AggregateRoot
+from src.building_blocks.domain.exceptions import BusinessRuleValidationException
 
 from ..conversations.value_objects.conversation_id import ConversationId
 from ..members.value_objects.member_id import MemberId

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Self
 from uuid import uuid4
 
-from src.building_blocks.domain.entity import AggregateRoot
+from src.building_blocks.domain.aggregate_root import AggregateRoot
 from src.building_blocks.domain.events import ModelInteractionCreatedEvent
 
 from .value_objects.interaction_id import InteractionId

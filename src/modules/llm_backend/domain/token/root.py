@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from uuid import UUID, uuid4
 
-from src.building_blocks.domain.entity import AggregateRoot
+from src.building_blocks.domain.aggregate_root import AggregateRoot
 
 
 @dataclass

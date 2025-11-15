@@ -9,8 +9,21 @@ class CreateNewConversationCommandHandler(BaseCommandHandler):
         self._repository = repository
 
     def handle(self, command: CreateConversationCommand) -> str:
+        """
+        Handle the creation of a new conversation by delegating to the domain model
+        and persisting the resulting aggregate.
+
+        Args:
+            command: The command containing the necessary data to create a conversation.
+
+        Returns:
+            The identifier of the newly created conversation as a string.
+        """
         conversation = Conversation.create(
-            user_id=command.user_id, user_name=command.user_name, title=command.conversation_title
+            creator_id=command.user_id,
+            creator_name=command.user_name,
+            title=command.conversation_title,
         )
         self._repository.save(conversation)
-        return conversation.id
+        # Return string form of UUID for external consumption
+        return str(conversation.id)

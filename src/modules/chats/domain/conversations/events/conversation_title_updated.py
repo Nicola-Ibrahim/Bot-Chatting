@@ -1,7 +1,7 @@
 import uuid
 from dataclasses import dataclass
 
-from building_blocks.domain.events import DomainEvent
+from src.building_blocks.domain.events import DomainEvent
 
 
 @dataclass

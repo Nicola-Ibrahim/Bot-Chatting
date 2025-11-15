@@ -1,5 +1,7 @@
-from src.building_blocks.domain.exception import BusinessRuleValidationException
-from src.modules.chats.infrastructure.domain.exceptions import RepositoryException
+from src.building_blocks.domain.exceptions import (
+    BusinessRuleValidationException,
+    RepositoryException,
+)
 
 from ....domain.conversations.interfaces.downloader import AbstractConversationDownloader
 from ....domain.conversations.interfaces.repository import Conversations

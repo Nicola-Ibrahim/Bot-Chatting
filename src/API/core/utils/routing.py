@@ -2,8 +2,19 @@ from fastapi import APIRouter
 
 from .import_helpers import extract_members_from_package
 
+# Packages containing FastAPI routers.  ``collect_routers`` will scan
+# these packages and import any members that are instances of
+# ``APIRouter``.  Each package corresponds to a bounded context and
+# versioned API.  Adding a new package here will automatically
+# register its routes with the application.
+# Define which packages contain API routers.  When the application
+# starts it will scan these packages and collect any objects of type
+# ``APIRouter`` into a single list for registration.  The user-centric
+# routes now live exclusively under ``accounts``.
 PACKAGE_PATHS = [
-    "src.api.modules.chats.conversations",
+    "src.api.modules.chats.v1.conversations",
+    "src.api.modules.chats.v1.chat",
+    "src.api.modules.accounts.v1",
 ]
 
 

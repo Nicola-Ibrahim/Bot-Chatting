@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 
 
 @dataclass
@@ -19,3 +19,10 @@ class DomainEvent:
     def occurred_on(self) -> datetime.datetime:
         """Get the timestamp when the event occurred."""
         return self._occurred_on
+
+    def to_dict(self) -> dict:
+        """Serialize the event for logging or the outbox."""
+        raw = asdict(self)
+        raw["event_id"] = str(self._event_id)
+        raw["occurred_on"] = self._occurred_on.isoformat()
+        return raw

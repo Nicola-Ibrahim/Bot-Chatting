@@ -1,6 +1,6 @@
 from src.api.main import APIFactory
 
-from .modules.utils import initialize_modules
+from .modules.initializer import initialize_modules
 
 
 def create_and_run_api():

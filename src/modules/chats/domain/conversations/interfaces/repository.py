@@ -1,37 +1,36 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
-from ..root import Conversation
 
-
-class Conversations(ABC):
+class BaseRepository(ABC):
     @abstractmethod
-    def delete(self, conversation_id: str) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    def find(self, conversation_id: str) -> Conversation:
-        raise NotImplementedError
+    def delete(self, id: str) -> None:
+        raise NotImplementedError("Subclasses must implement this method.")
 
     @abstractmethod
-    def find_all(self, user_id: str) -> list[Conversation]:
-        raise NotImplementedError
+    def find(self, id: str) -> Any:
+        raise NotImplementedError("Subclasses must implement this method.")
 
     @abstractmethod
-    def save(self, conversation: Conversation) -> None:
-        raise NotImplementedError
+    def find_all(self, id: list[str]) -> list[Any]:
+        raise NotImplementedError("Subclasses must implement this method.")
 
     @abstractmethod
-    def update(self, conversation: Conversation) -> None:
-        raise NotImplementedError
+    def save(self, obj: Any) -> None:
+        raise NotImplementedError("Subclasses must implement this method.")
 
     @abstractmethod
-    def exists(self, conversation_id: str) -> bool:
-        raise NotImplementedError
+    def update(self, obj: Any) -> None:
+        raise NotImplementedError("Subclasses must implement this method.")
 
     @abstractmethod
-    def count(self, user_id: str) -> int:
-        raise NotImplementedError
+    def exists(self, id: str) -> bool:
+        raise NotImplementedError("Subclasses must implement this method.")
 
     @abstractmethod
-    def delete_all(self, user_id: str) -> None:
-        raise NotImplementedError
+    def count(self, id: str) -> int:
+        raise NotImplementedError("Subclasses must implement this method.")
+
+    @abstractmethod
+    def delete_all(self, id: list[str]) -> None:
+        raise NotImplementedError("Subclasses must implement this method.")

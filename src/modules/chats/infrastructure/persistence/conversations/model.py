@@ -2,10 +2,10 @@ import uuid
 
 from sqlmodel import Field, Relationship
 
-from src.database.models import BaseModel
+from ......database.models import BaseSQLModel
 
 
-class ConversationDBModel(BaseModel):
+class ConversationDBModel(BaseSQLModel):
     __tablename__ = "conversations"
 
     id: int = Field(primary_key=True)

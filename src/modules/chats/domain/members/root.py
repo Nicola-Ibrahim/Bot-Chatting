@@ -3,7 +3,7 @@ from dataclasses import KW_ONLY, dataclass, field
 from datetime import datetime, timezone
 from typing import Self
 
-from src.building_blocks.domain.entity import AggregateRoot
+from src.building_blocks.domain.aggregate_root import AggregateRoot
 
 from .events import MemberCreatedEvent
 from .value_objects.member_id import MemberId
