@@ -19,3 +19,28 @@ class ConversationDBModel(BaseSQLModel):
 
     # If you need a direct mapping between message ids and participants
     # you could use a normalized table for participants and messages
+
+
+class Message(Model):
+    __tablename__ = "messages"
+
+    content: str
+    timestamp: datetime = Field(default_factory=datetime.now(timezone.utc))
+    sender_id: uuid.UUID = Field(foreign_key="member.id")
+    sender: "Member" = Relationship(back_populates="messages")
+    conversation_id: uuid.UUID = Field(foreign_key="conversation.id")
+    conversation: "Conversation" = Relationship(back_populates="messages")
+    feedback: str = Field(default=None)
+    feedback_timestamp: datetime = Field(default=None)
+
+
+class Member(Model):
+    __tablename__ = "members"
+
+    login: str
+    first_name: str
+    last_name: str
+    is_admin: bool = False
+    is_creator: bool = False
+    conversations: list["Conversation"] = Relationship(back_populates="members")
+    messages: list["Message"] = Relationship(back_populates="sender")

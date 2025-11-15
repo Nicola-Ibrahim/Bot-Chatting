@@ -6,7 +6,7 @@ from ....domain.conversations.interfaces.repository import BaseRepository
 from ....domain.conversations.root import Conversation
 from ....domain.conversations.value_objects.conversation_id import ConversationId
 from ....domain.members.value_objects.member_id import MemberId
-from .model import ConversationDBModel
+from ..orm.model import ConversationDBModel
 
 
 def map_to_entity(row: ConversationDBModel) -> Conversation:

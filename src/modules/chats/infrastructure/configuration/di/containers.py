@@ -6,7 +6,7 @@ from src.database.configuration.manager import DatabaseConnectionManager
 
 from ....application import ConversationApplicationService
 from ... import ConversationDownloader, ConversationsDownloader, EmailSender, JsonFileConversationRepository
-from ...persistence.conversations.repository import SQLConversationRepository
+from ...persistence.repositories.sql_conversation_repo import SQLConversationRepository
 from ...persistence.members.repository import SQLMemberRepository
 from ...persistence.messages.repository import SQLMessageRepository
 
