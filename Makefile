@@ -1,162 +1,137 @@
-# Language for translation
-lang := en
-
-# Common Docker flags
-DOCKER_COMPOSE_FLAGS := -f docker-compose.yml
-DOCKER_COMPOSE_DEV_FLAGS := -f docker-compose.dev.yml
-DOCKER_BUILD_FLAGS := --build -d --force-recreate
-DOCKER_RUN_FLAGS := --rm -p $(HOST_PORT):$(CONTAINER_PORT)
-
-# Catch all targets and store them in a variable
-COMMANDS := $(shell grep -E '^[a-zA-Z0-9_-]+:' Makefile | sed 's/:.*//')
-
-# Define color codes
-RED    := \033[31m
-GREEN  := \033[32m
-YELLOW := \033[33m
-BLUE   := \033[34m
-RESET  := \033[0m
-
-# Default image name
-IMAGE_NAME := myapp
-# Default host and container ports
-HOST_PORT := 8000
-CONTAINER_PORT := 8000
-
-UV := uv run
+# ==== Config ====
+UV  := uv run
 UVX := uvx
+COMPOSE := docker compose
 
-.PHONY: $(COMMANDS)  # Declare all commands as PHONY
+# Compose files
+DEV_COMPOSE  := -f docker-compose.dev.yml
+PROD_COMPOSE := -f docker-compose.yml
 
-list:  # List all commands and their descriptions
-	@echo "$(YELLOW)===========================$(RESET)"
-	@echo "$(YELLOW)      Available Commands    $(RESET)"
-	@echo "$(YELLOW)===========================$(RESET)"
-	@printf "$(GREEN)%-30s$(RESET)  %s\n" "Command" "Description"
-	@echo "$(YELLOW)---------------------------  --------------------$(RESET)"
-	@for cmd in $(COMMANDS); do \
-		desc=$$(grep "^$$cmd:" Makefile | sed 's/.*# //'); \
-		printf "$(GREEN)%-30s$(RESET)  %s\n" "$$cmd" "$$desc"; \
-	done
-	@echo "$(YELLOW)===========================$(RESET)"
+# Service names from your compose.yml
+API_SERVICE := app
+FE_SERVICE  := frontend
 
-create-user:  # Create a superuser with administrative privileges
-	@echo "Creating superuser..."
-	$(UV) python src/scripts/create_superuser.py
+# Frontend local defaults
+FE_DIR  := frontend
+FE_PORT := 3000
+FRONTEND_BACKEND_URL ?= http://localhost:8000  # exposed to browser in local FE dev
 
-gen-sample-users:  # Generate a predefined set of sample users for testing
-	@echo "Generating sample users..."
-	$(UV) python src/scripts/generate_users.py
+# ---- Help (targets use '## desc') ----
+.PHONY: help
+help: ## Show this help
+	@awk 'BEGIN {FS=":.*## "; printf "\n\033[33m%s\033[0m\n","Available commands"} \
+	     /^[a-zA-Z0-9_.-]+:.*## /{printf "  \033[32m%-28s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-
-format:  # Format code using Black and isort for consistency
-	@echo "Formatting code..."
+# ===========================
+# Backend (local, no Docker)
+# ===========================
+.PHONY: be-install be-fmt be-lint be-test be-coverage be-dev
+be-install: ## Install backend deps (uv)
+	uv install
+be-fmt: ## Format backend code (ruff)
 	$(UVX) ruff format src
-
-lint:  # Run linters to ensure code quality and style consistency
-	@echo "Running linters..."
+be-lint: ## Run linters (pre-commit)
 	$(UV) pre-commit run --all-files
+be-test: ## Run backend tests (pytest)
+	$(UV) pytest -v -rs -s -n auto --show-capture=no
+be-coverage: ## Tests + coverage report
+	$(UV) pytest --cov && $(UV) coverage html
+be-dev: ## Run API locally (Uvicorn auto-reload)
+	$(UV) uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
 
-migrate:  # Create and apply database migrations for schema changes
-	@echo "Creating migrations..."
-	$(UV) alembic revision --autogenerate -m "Migration"
-	@echo "Applying migrations..."
+# Backend scripts (optional)
+.PHONY: be-user-create be-users-seed be-tokens-flush be-shell
+be-user-create: ## Create a superuser
+	$(UV) python src/scripts/create_superuser.py
+be-users-seed: ## Generate sample users
+	$(UV) python src/scripts/generate_users.py
+be-tokens-flush: ## Remove expired tokens
+	$(UV) python src/scripts/flush_expired_tokens.py
+be-shell: ## Open a Python REPL with project env
+	$(UV) python -i
+
+# ===========================
+# Frontend (local, no Docker)
+# ===========================
+.PHONY: fe-install fe-dev fe-build fe-start
+fe-install: ## Install frontend deps
+	cd $(FE_DIR) && npm install
+fe-dev: ## Run Next.js dev (http://localhost:$(FE_PORT))
+	cd $(FE_DIR) && NEXT_PUBLIC_BACKEND_URL=$(FRONTEND_BACKEND_URL) npm run dev
+fe-build: ## Build Next.js
+	cd $(FE_DIR) && npm run build
+fe-start: ## Start Next.js in prod mode
+	cd $(FE_DIR) && npm run start -p $(FE_PORT)
+
+# ===========================
+# Database (local CLI)
+# ===========================
+.PHONY: db-revision db-upgrade
+db-revision: ## Create migration (autogenerate)
+	$(UV) alembic revision --autogenerate -m "migration"
+db-upgrade: ## Apply migrations to head
 	$(UV) alembic upgrade head
 
-start:  # Start the FastAPI server with auto-reload in development
-	@echo "Starting server..."
-	$(UV) fastapi run src/shared/presentation/web/fastapi/main.py --reload
-
-install:  # Install project dependencies using uv
-	@echo "Installing dependencies..."
-	uv install
-
-install-hooks:  # Install pre-commit hooks to automate code checks
-	@echo "Installing hooks..."
-	$(UV) pre-commit uninstall
-	$(UV) pre-commit install
-
-update-db:  # Create and apply migrations, then install hooks
-	@echo "Updating database..."
-	alembic -c alembic/alembic.ini revision --autogenerate -m "Create a baseline migrations"
-	alembic -c alembic/alembic.ini upgrade head
-
-shell:  # Open a Django shell for interactive management
-	@echo "Opening shell..."
-	$(UV) python src/scripts/shell.py
-
-flush-tokens:  # Remove expired tokens from the database
-	@echo "Flushing expired tokens..."
-	$(UV) python src/scripts/flush_expired_tokens.py
-
-check:  # Verify the readiness of the deployment environment
-	@echo "Checking deployment..."
-	$(UV) python src/scripts/check_deploy.py
-
-test:  # Run all tests to ensure application functionality
-	@echo "Running tests..."
-	$(UV) pytest -v -rs -s -n auto --show-capture=no
-
-test-coverage:  # Run tests with coverage reporting to track code coverage
-	@echo "Running tests with coverage..."
-	$(UV) pytest --cov
-	$(UV) coverage html
-
-dev-docker:  # Start Docker containers for development
-	@echo "Starting dev containers..."
-	docker-compose $(DOCKER_COMPOSE_DEV_FLAGS) up $(DOCKER_BUILD_FLAGS)
-
-stop-dev:  # Stop and remove development Docker containers
-	@echo "Stopping dev containers..."
-	docker-compose $(DOCKER_COMPOSE_DEV_FLAGS) down
-
-prod-docker:  # Start Docker containers for production
-	@echo "Starting prod containers..."
-	docker-compose $(DOCKER_COMPOSE_FLAGS) up $(DOCKER_BUILD_FLAGS)
-
-stop-prod:  # Stop and remove production Docker containers
-	@echo "Stopping prod containers..."
-	docker-compose $(DOCKER_COMPOSE_FLAGS) down
-
-clean-docker:  # Clean up unused Docker images and volumes to free space
-	@echo "Cleaning unused images..."
+# ==================================
+# Docker Compose (development stack)
+# ==================================
+.PHONY: dc-up dc-down dc-logs dc-clean
+dc-up: ## Start full dev stack (build + detach)
+	$(COMPOSE) $(DEV_COMPOSE) up --build -d
+dc-down: ## Stop dev stack
+	$(COMPOSE) $(DEV_COMPOSE) down
+dc-logs: ## Tail dev logs (all services)
+	$(COMPOSE) $(DEV_COMPOSE) logs -f
+dc-clean: ## Prune dangling images & volumes (careful!)
 	docker system prune -f --volumes
 
-dev-logs:  # View real-time logs from development Docker containers
-	@echo "Viewing dev logs..."
-	docker-compose $(DOCKER_COMPOSE_DEV_FLAGS) logs -f
+# Service-scoped (dev)
+.PHONY: dc-be-up dc-be-rebuild dc-be-stop dc-be-logs
+dc-be-up: ## Start Backend only (dev)
+	$(COMPOSE) $(DEV_COMPOSE) up -d $(API_SERVICE)
+dc-be-rebuild: ## Rebuild & restart Backend (dev)
+	$(COMPOSE) $(DEV_COMPOSE) up -d --build $(API_SERVICE)
+dc-be-stop: ## Stop Backend (dev)
+	$(COMPOSE) $(DEV_COMPOSE) stop $(API_SERVICE)
+dc-be-logs: ## Tail Backend logs (dev)
+	$(COMPOSE) $(DEV_COMPOSE) logs -f $(API_SERVICE)
 
-prod-logs:  # View real-time logs from production Docker containers
-	@echo "Viewing prod logs..."
-	docker-compose $(DOCKER_COMPOSE_FLAGS) logs -f
+.PHONY: dc-fe-up dc-fe-rebuild dc-fe-stop dc-fe-logs
+dc-fe-up: ## Start Frontend only (dev)
+	$(COMPOSE) $(DEV_COMPOSE) up -d $(FE_SERVICE)
+dc-fe-rebuild: ## Rebuild & restart Frontend (dev)
+	$(COMPOSE) $(DEV_COMPOSE) up -d --build $(FE_SERVICE)
+dc-fe-stop: ## Stop Frontend (dev)
+	$(COMPOSE) $(DEV_COMPOSE) stop $(FE_SERVICE)
+dc-fe-logs: ## Tail Frontend logs (dev)
+	$(COMPOSE) $(DEV_COMPOSE) logs -f $(FE_SERVICE)
 
-gen-jwt:  # Generate a new JWT key for authentication
-	@echo "Generating JWT key..."
-	openssl rand -base64 32 > src/config/.keys/jwtHS256.key
+# ==================================
+# Docker Compose (production stack)
+# ==================================
+.PHONY: dcp-up dcp-down dcp-logs dcp-be-up dcp-be-rebuild dcp-be-stop dcp-be-logs dcp-fe-up dcp-fe-rebuild dcp-fe-stop dcp-fe-logs
+dcp-up: ## Start full prod stack (build + detach)
+	$(COMPOSE) $(PROD_COMPOSE) up --build -d
+dcp-down: ## Stop prod stack
+	$(COMPOSE) $(PROD_COMPOSE) down
+dcp-logs: ## Tail prod logs (all services)
+	$(COMPOSE) $(PROD_COMPOSE) logs -f
 
-translate:  # Create translation messages for localization
-	@echo "Creating translation messages..."
-	django-admin makemessages -l ${lang} --ignore .venv
+# Service-scoped (prod)
+dcp-be-up: ## Start Backend only (prod)
+	$(COMPOSE) $(PROD_COMPOSE) up -d $(API_SERVICE)
+dcp-be-rebuild: ## Rebuild & restart Backend (prod)
+	$(COMPOSE) $(PROD_COMPOSE) up -d --build $(API_SERVICE)
+dcp-be-stop: ## Stop Backend (prod)
+	$(COMPOSE) $(PROD_COMPOSE) stop $(API_SERVICE)
+dcp-be-logs: ## Tail Backend logs (prod)
+	$(COMPOSE) $(PROD_COMPOSE) logs -f $(API_SERVICE)
 
-compile-translate:  # Compile translation messages into bytecode
-	@echo "Compiling messages..."
-	django-admin compilemessages --ignore=.venv
-
-celery:  # Start a Celery worker for background tasks
-	@echo "Starting Celery worker..."
-	celery -A src.celery_app worker --loglevel=info --pool=solo
-
-build-docker:  # Build the Docker image for the application
-	@echo "Building Docker image..."
-	docker build -t $(IMAGE_NAME) .
-
-run-docker: build-docker  # Run the Docker container based on the built image
-	@echo "Running Docker container..."
-	docker run $(DOCKER_RUN_FLAGS) $(IMAGE_NAME)
-
-up-docker: build-docker run-docker  # Build and run the Docker container
-	@echo "Docker is running."
-
-clean-image:  # Remove the Docker image to reclaim space
-	@echo "Cleaning Docker image..."
-	docker rmi $(IMAGE_NAME) || true
+dcp-fe-up: ## Start Frontend only (prod)
+	$(COMPOSE) $(PROD_COMPOSE) up -d $(FE_SERVICE)
+dcp-fe-rebuild: ## Rebuild & restart Frontend (prod)
+	$(COMPOSE) $(PROD_COMPOSE) up -d --build $(FE_SERVICE)
+dcp-fe-stop: ## Stop Frontend (prod)
+	$(COMPOSE) $(PROD_COMPOSE) stop $(FE_SERVICE)
+dcp-fe-logs: ## Tail Frontend logs (prod)
+	$(COMPOSE) $(PROD_COMPOSE) logs -f $(FE_SERVICE)

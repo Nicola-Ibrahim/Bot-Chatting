@@ -9,6 +9,12 @@ services:
       - internal_network # Use a single internal network for all services
     restart: always # Ensure the service restarts on failure for reliability
 
+  # Frontend service for production.  The Next.js UI is built from
+  # the `frontend` directory and served on port 3000.  It points to
+  # the backend on the same Docker network.  This service can be
+  # fronted by an external load balancer or reverse proxy if
+  # required.
+
   nginx:
     image: nginx:latest # Production NGINX image for reverse proxy
     volumes:
@@ -20,6 +26,29 @@ services:
     networks:
       - internal_network # Use the same internal network for communication
     restart: always # Automatically restart NGINX in case of failure
+
+  # -----------------------------------------------------------------------------
+  # Frontend service
+  #
+  # The production frontend is a Next.js application that consumes the API
+  # exposed by the FastAPI backend.  It runs using the default `npm start`
+  # command defined in the Dockerfile, which serves the compiled static
+  # application on port 3000.  The `BACKEND_URL` environment variable
+  # points to the backend service on the internal Docker network.
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      - BACKEND_URL=http://app:8000
+      - NODE_ENV=production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - app
+    networks:
+      - internal_network
+    restart: always
 
 networks:
   internal_network: # Single internal network for all services

@@ -13,14 +13,16 @@ services:
       - "8000" # Exposes port 8000 internally for communication within the Docker network (not publicly exposed)
     networks:
       - internal_network # Connects the app service to the internal network for secure communication with other services
+
     depends_on:
       - postgres_db # Ensures that the PostgreSQL database starts before the app service
+
     restart: on-failure
 
+    command: >
+      sh -c "alembic upgrade head && uvicorn src.api.main:app --host 0.0.0.0 --port 8000"
+
   postgres_db:
-    build:
-      context: ./src/database # Path to the Dockerfile for PostgreSQL
-      dockerfile: Dockerfile # PostgreSQL Dockerfile
     volumes:
       - db_data:/var/lib/postgresql/data # Mounts a persistent volume to store PostgreSQL data, ensuring data is not lost on container restart
     env_file:
@@ -58,6 +60,31 @@ services:
       - app # Ensures the app service starts before NGINX begins
     networks:
       - internal_network # Connects NGINX to the internal network to communicate with the app service
+
+  # -----------------------------------------------------------------------------
+  # Frontend service
+  #
+  # This service runs the Next.js based UI that demonstrates how to consume the
+  # API exposed by the FastAPI backend.  During development the container
+  # runs `npm run dev` to enable hot‑reloading.  The `BACKEND_URL`
+  # environment variable tells the frontend where to find the API on the docker
+  # network.  The port 3000 on the host exposes the development server.
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app
+    environment:
+      - BACKEND_URL=http://app:8000
+      - NODE_ENV=development
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    depends_on:
+      - app
+    networks:
+      - internal_network
 
 volumes:
   db_data:
