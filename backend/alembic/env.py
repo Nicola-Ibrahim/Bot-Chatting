@@ -17,7 +17,11 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from src.database.model import Base
+# Import the SQLAlchemy metadata for autogeneration.  The Base class
+# lives in ``src.database.models.model`` and includes the declarative
+# base along with our custom ``User`` model.  Alembic will inspect
+# ``Base.metadata`` to generate migration scripts.
+from src.database.models.base import Base
 
 target_metadata = Base.metadata
 

@@ -54,8 +54,44 @@ The **Core Layer** is the heart of the system, responsible for the main business
 This layered architecture ensures clear boundaries between business logic, infrastructure concerns, and application-specific code.
 
 ## 📄 **Running the Application**
+For more details on setting up and running the application, please refer to the [Setup and Run guide](docs/processes/BUILDING.md).
 
-For more details on setting up and running the application, please refer to the [Running the Application guide](./BUILDING.md).
+### 🚀 Development with Docker Compose
+
+This repository includes a `docker-compose.dev.yml` file that runs the FastAPI backend, a PostgreSQL database, pgAdmin, an NGINX reverse proxy, **and an example Next.js frontend** on a shared network.  Running the services is as simple as:
+
+```bash
+docker compose -f docker-compose.dev.yml up --build
+```
+
+After the images build and the containers start, you can access:
+
+- 🧠 **Backend API** via NGINX at `http://localhost` (port 80).  The API documentation is available at `/docs`.
+- 🎨 **Example Frontend** at `http://localhost:3000`.  This Next.js app demonstrates how to call the backend APIs, stream chat responses via Server‑Sent Events (SSE), and display conversation history.
+
+The frontend container is configured with a `BACKEND_URL` environment variable pointing at the backend service on the Docker network, so no CORS or proxy issues occur.
+
+### 🏗️ Production with Docker Compose
+
+For a production‑like deployment (no hot reload), use:
+
+```bash
+docker compose -f docker-compose.prod.yml up --build
+```
+
+In this setup the backend, NGINX and the compiled frontend run in their own containers.  NGINX proxies API requests to the backend and you can access the frontend directly on port `3000` (or configure NGINX to proxy to it).  Make sure to set environment variables in your `.env` files appropriately (e.g., `DATABASE_URL`, `JWT_SECRET_KEY`).
+
+### 👩‍💻 Manual Frontend Usage
+
+If you prefer to run the example UI outside of Docker (for instance, during development), navigate into the `frontend` directory and start the development server:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Copy `.env.local.example` to `.env.local` and update `BACKEND_URL` to point at your running FastAPI backend (e.g., `http://127.0.0.1:8000`).  Then open `http://localhost:3000` in your browser to interact with the API through the UI.
 
 ### 🧑‍💻 **Authentication & Authorization**
 
