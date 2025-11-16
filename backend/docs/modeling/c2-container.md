@@ -4,7 +4,7 @@ C4Container
     title ChatBot Container Diagram
 
     Person(user, "User", "A client uses chatbot")
-    
+
     System_Boundary(chat_system, "Chat System") {
         Container(web_app, "Web/Mobile App", "React/Angular/Flutter", "Provides chat interface")
         Container(api_gateway, "API Gateway", "Spring Cloud Gateway", "Routes requests")

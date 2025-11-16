@@ -1,13 +1,9 @@
-"""Repository interface for roles."""
-
-from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import Iterable, Optional
 
-from ..aggregates.role.role import Role
-from ..aggregates.role.value_objects.role_id import RoleId
-
+from ..role.role import Role
+from ..role.value_objects.role_id import RoleId
 
 class RoleRepository(ABC):
     @abstractmethod

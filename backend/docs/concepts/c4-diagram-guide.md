@@ -1,6 +1,6 @@
 # C4 Model Diagram Guide
 
-The **C4 Model** is a simple way to visualize software architecture at **different levels of detail**.  
+The **C4 Model** is a simple way to visualize software architecture at **different levels of detail**.
 It has **four main diagram types**, each serving a different purpose depending on **who you’re talking to** and **what you want to explain**.
 
 Think of it like zooming in with Google Maps:
@@ -14,7 +14,7 @@ Think of it like zooming in with Google Maps:
 
 ## 1. **Context Diagram**
 
-**Goal:** Show how your system fits into the **big picture**.  
+**Goal:** Show how your system fits into the **big picture**.
 **Audience:** Non-technical stakeholders, managers, new team members.
 
 **When to use:**
@@ -29,7 +29,7 @@ Think of it like zooming in with Google Maps:
 - **Users** (roles, actors)
 - **Relationships** (data flow, interactions)
 
-**Example:**  
+**Example:**
 If you’re building an **Online Bookstore**, the context diagram might show:
 
 - The Online Bookstore system
@@ -41,7 +41,7 @@ If you’re building an **Online Bookstore**, the context diagram might show:
 
 ## 2. **Container Diagram**
 
-**Goal:** Show the **major technology building blocks** inside your system.  
+**Goal:** Show the **major technology building blocks** inside your system.
 **Audience:** Developers, tech leads, architects.
 
 **When to use:**
@@ -55,7 +55,7 @@ If you’re building an **Online Bookstore**, the context diagram might show:
 - **Technologies** (Node.js, PostgreSQL, Redis, etc.)
 - **Communication paths** (REST, gRPC, messaging)
 
-**Example:**  
+**Example:**
 The Online Bookstore container diagram might show:
 
 - **Web App** (React + Node.js)
@@ -69,7 +69,7 @@ The Online Bookstore container diagram might show:
 
 ## 3. **Component Diagram**
 
-**Goal:** Show the **internal structure** of one container.  
+**Goal:** Show the **internal structure** of one container.
 **Audience:** Developers working on that specific container.
 
 **When to use:**
@@ -83,7 +83,7 @@ The Online Bookstore container diagram might show:
 - **Responsibilities** of each
 - **Interfaces / dependencies**
 
-**Example:**  
+**Example:**
 Inside the **Order Service**, you might have:
 
 - **OrderController** (handles HTTP requests)
@@ -95,7 +95,7 @@ Inside the **Order Service**, you might have:
 
 ## 4. **Code Diagram**
 
-**Goal:** Show **detailed code-level structure**.  
+**Goal:** Show **detailed code-level structure**.
 **Audience:** Developers reading or writing the code.
 
 **When to use:**
@@ -109,7 +109,7 @@ Inside the **Order Service**, you might have:
 - **Relationships** (inheritance, composition, calls)
 - **Algorithms** or sequence flows
 
-**Example:**  
+**Example:**
 You could show how the `OrderService` class calls `PaymentClient`, which then calls Stripe API, and how exceptions are handled.
 
 ---

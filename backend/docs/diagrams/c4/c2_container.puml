@@ -1,7 +1,7 @@
 @startuml ChatBot_Container_View
 !include <C4/C4_Container>
 
-LAYOUT_TOP_DOWN() 
+LAYOUT_TOP_DOWN()
 LAYOUT_WITH_LEGEND()
 
 

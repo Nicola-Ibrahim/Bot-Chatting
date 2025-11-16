@@ -15,7 +15,7 @@ This guide outlines the branching strategy for our project to ensure consistent 
 ### Short-Term Branches
 
 - **Feature Branches**: Used to develop new features, fixes, or experiments. Feature branches should always be created from `dev` and merged back into `dev` when ready.
-  
+
 ---
 
 ## 🔄 Branching Workflow
@@ -98,7 +98,7 @@ In this workflow, the following guidelines should be followed:
 - **✅ `main` and `dev` are long-term branches.**
   - The `main` branch represents the production-ready state.
   - The `dev` branch is the integration branch for all features.
-  
+
 - **✅ Feature branches** (e.g., `feature/your-feature-name`) are created off the `dev` branch and merged back into `dev` after completion.
   - Feature branches should always be based on the latest `dev` to ensure consistency.
 
@@ -109,14 +109,14 @@ In this workflow, the following guidelines should be followed:
 
 To maintain a clean and consistent branch structure, follow these naming conventions:
 
-- **Features**:  
-  Use the format: `feature/your-feature-name`  
+- **Features**:
+  Use the format: `feature/your-feature-name`
   Example: `feature/login-page`
 
-- **Bug Fixes**:  
-  Use the format: `bugfix/short-description`  
+- **Bug Fixes**:
+  Use the format: `bugfix/short-description`
   Example: `bugfix/fix-header-alignment`
 
-- **Hotfixes** (Urgent fixes for `main`):  
-  Use the format: `hotfix/short-description`  
+- **Hotfixes** (Urgent fixes for `main`):
+  Use the format: `hotfix/short-description`
   Example: `hotfix/critical-db-issue`

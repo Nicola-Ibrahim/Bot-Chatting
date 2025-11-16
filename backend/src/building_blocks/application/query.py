@@ -21,5 +21,4 @@ TQuery = TypeVar("TQuery", bound=Query)
 class QueryHandler(Protocol, Generic[TQuery, TQueryResult]):
     """Protocol for query handlers."""
 
-    def handle(self, query: TQuery) -> TQueryResult:
-        ...
+    def handle(self, query: TQuery) -> TQueryResult: ...

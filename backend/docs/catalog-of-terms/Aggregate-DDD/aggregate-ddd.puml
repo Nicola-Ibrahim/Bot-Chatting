@@ -2,10 +2,10 @@
 
 package "Meeting Groups Aggregate" <<Rectangle>> {
 
-    class "MeetingGroupId" << VO >> {   
+    class "MeetingGroupId" << VO >> {
 
     }
-    
+
     class "MeetingGroup" << Entity, AR >> {
         -string: _description
         -DateTime: _createDate

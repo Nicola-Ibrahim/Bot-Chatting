@@ -21,5 +21,4 @@ TCommand = TypeVar("TCommand", bound=Command)
 class CommandHandler(Protocol, Generic[TCommand, TCommandResult]):
     """Protocol for synchronous command handlers."""
 
-    def handle(self, command: TCommand) -> TCommandResult:
-        ...
+    def handle(self, command: TCommand) -> TCommandResult: ...

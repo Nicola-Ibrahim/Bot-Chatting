@@ -59,10 +59,7 @@ class Entity(Generic[TEntityId]):
         """Serialize the entity (recursively) into a dict."""
         raw = asdict(self)
         raw.pop("_events", None)
-        return {
-            key: value.to_dict() if isinstance(value, Entity) else value
-            for key, value in raw.items()
-        }
+        return {key: value.to_dict() if isinstance(value, Entity) else value for key, value in raw.items()}
 
     # ------------------------------------------------------------------ #
     # Domain events

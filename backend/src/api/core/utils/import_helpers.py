@@ -103,7 +103,7 @@ def get_settings() -> BaseSettings:
 
     except ImportError as e:
         raise ImportError(
-            f"Could not import settings for environment '{env}'. " f"Ensure app/core/config/{env}_settings.py exists."
+            f"Could not import settings for environment '{env}'. Ensure app/core/config/{env}_settings.py exists."
         ) from e
     except Exception as e:
         raise RuntimeError(f"Failed to load settings for environment '{env}': {str(e)}") from e

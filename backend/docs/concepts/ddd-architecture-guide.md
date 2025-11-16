@@ -22,15 +22,15 @@ A well-structured system separates responsibilities across **three main layers**
 
 ### ✅ What belongs here
 
-- **Entities**: Domain objects with identity and lifecycle  
+- **Entities**: Domain objects with identity and lifecycle
   _e.g., `User`, `OptimizationRun`, `Experiment`_
-- **Value Objects**: Immutable, equality-based types  
+- **Value Objects**: Immutable, equality-based types
   _e.g., `Coordinate`, `Range`, `Bounds`_
-- **Domain Services**: Stateless logic that doesn’t belong to an entity  
+- **Domain Services**: Stateless logic that doesn’t belong to an entity
   _e.g., `DistanceCalculator`, `Normalizer`, `Evaluator`_
-- **Business Rules**: Core constraints, rules, and strategies  
+- **Business Rules**: Core constraints, rules, and strategies
   _e.g., how solutions are validated, or dominance is defined_
-- **Base Classes & Interfaces for Domain Strategies**  
+- **Base Classes & Interfaces for Domain Strategies**
   _e.g., `BaseAlgorithm`, `BaseOptimizer`, `BaseProblem` — when these define domain **behaviors**, not I/O_
 
 ### ✅ Allowed Dependencies
@@ -53,13 +53,13 @@ A well-structured system separates responsibilities across **three main layers**
 
 ### ✅ What belongs here
 
-- **Use Case Classes**  
+- **Use Case Classes**
   _e.g., `RunOptimization`, `EvaluateSolution`, `TrainModel`_
-- **Orchestrators / Coordinators**  
+- **Orchestrators / Coordinators**
   _e.g., pulling an algorithm, fitting it, evaluating results, logging them_
-- **Port Interfaces** (for external dependencies)  
+- **Port Interfaces** (for external dependencies)
   _e.g., `PlottingInterface`, `RepositoryInterface`, `LoggerInterface`_
-- **Pipelines / Batch Jobs / CLI Commands**  
+- **Pipelines / Batch Jobs / CLI Commands**
   _Tasks that call domain logic to do something real for the user_
 
 ### ❓ Ask Yourself
@@ -76,15 +76,15 @@ A well-structured system separates responsibilities across **three main layers**
 
 ### ✅ What belongs here
 
-- **Framework Adapters**  
+- **Framework Adapters**
   _e.g., FastAPI endpoints, Typer CLI commands_
-- **Repositories / File Systems**  
+- **Repositories / File Systems**
   _e.g., JSONLoader, CSVWriter, SQLAlchemy models_
-- **Plotters / Visualizations**  
+- **Plotters / Visualizations**
   _e.g., Plotly, Matplotlib, Seaborn tools_
-- **ML Framework Adapters**  
+- **ML Framework Adapters**
   _e.g., `SklearnModelAdapter`, `PytorchTrainer`_
-- **Logging / Monitoring / Metrics**  
+- **Logging / Monitoring / Metrics**
   _e.g., `WandbLogger`, `TensorBoardLogger`_
 
 ### ❓ Ask Yourself
@@ -114,8 +114,8 @@ A well-structured system separates responsibilities across **three main layers**
 
 ## ✅ Rule of Thumb
 
-> 🟢 **If it expresses business logic or rules, it's Domain**  
-> 🟡 **If it coordinates components and actions, it's Application**  
+> 🟢 **If it expresses business logic or rules, it's Domain**
+> 🟡 **If it coordinates components and actions, it's Application**
 > 🔴 **If it touches frameworks or the outside world, it's Infrastructure**
 
 ---
@@ -182,7 +182,7 @@ flowchart TD
         D2["Domain Services<br>(Business Logic)"]
         D3["Domain Interfaces<br>(Strategies, Policies)"]
     end
-    
+
     subgraph I["🌐 Infrastructure Layer"]
         I1["Framework Adapters<br>(FastAPI, CLI)"]
         I2["Repositories<br>(DB, CSV, JSON)"]
@@ -206,5 +206,5 @@ flowchart TD
 
 ## 💡 Final Thought
 
-> **"Code should scream the domain." — Eric Evans**  
+> **"Code should scream the domain." — Eric Evans**
 Structure your code so its intent and logic are obvious. Don’t let technology dictate design — let the problem domain lead.

@@ -50,17 +50,19 @@ class Session(AggregateRoot[SessionId]):
             _refresh_token=refresh_token,
             _expires_at=expires_at,
         )
-        session.record_event(
-            SessionIssuedEvent(session_id=str(session.id.value), account_id=str(account_id.value))
-        )
+        session.record_event(SessionIssuedEvent(session_id=str(session.id.value), account_id=str(account_id.value)))
         return session
 
     def revoke(self) -> None:
         if self._status.is_active:
             self._status = self._status.revoke()
-            self.record_event(SessionRevokedEvent(session_id=str(self.id.value), account_id=str(self.account_id.value)))
+            self.record_event(
+                SessionRevokedEvent(session_id=str(self.id.value), account_id=str(self.account_id.value))
+            )
 
     def expire(self) -> None:
         if self._status.is_active:
             self._status = self._status.revoke()
-            self.record_event(SessionExpiredEvent(session_id=str(self.id.value), account_id=str(self.account_id.value)))
+            self.record_event(
+                SessionExpiredEvent(session_id=str(self.id.value), account_id=str(self.account_id.value))
+            )

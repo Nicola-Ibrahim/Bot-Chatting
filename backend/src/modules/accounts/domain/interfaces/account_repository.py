@@ -1,13 +1,12 @@
-"""Repository interface for persisting :class:`Account` aggregates."""
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import Iterable, Optional
 
-from ..aggregates.account.account import Account
-from ..aggregates.account.value_objects.account_id import AccountId
-from ..aggregates.role.value_objects.role_id import RoleId
+from ..account.account import Account
+from ..account.value_objects.account_id import AccountId
+from ..role.value_objects.role_id import RoleId
 
 
 class AccountRepository(ABC):

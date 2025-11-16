@@ -21,5 +21,5 @@ C4Component
     Rel(chat_manager, data_store, "Reads from and Writes to", "JDBC/ORM")
     Rel(chat_manager, notification_system, "Triggers", "Asynchronous Message Queue")
     Rel(notification_system, user, "Sends notifications", "Email/SMS")
-    
+
 ```

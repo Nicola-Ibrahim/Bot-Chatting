@@ -56,7 +56,9 @@ class SQLSessionRepository(SessionRepository):
     def update(self, session_domain: DomainSession) -> None:
         with self._session_factory() as session:  # type: Session
             record = (
-                session.query(SessionModel).filter(SessionModel.session_uuid == str(session_domain.id.value)).one_or_none()
+                session.query(SessionModel)
+                .filter(SessionModel.session_uuid == str(session_domain.id.value))
+                .one_or_none()
             )
             if not record:
                 raise ValueError("Session not found")

@@ -74,9 +74,7 @@ def login(payload: LoginRequest) -> LoginResponse:
     try:
         service = _service()
         account, dto = service.authenticate(email=payload.email, password=payload.password)
-        access_token = jwt.create_access_token(
-            {"sub": str(account.id.value)}, expires_delta=timedelta(minutes=30)
-        )
+        access_token = jwt.create_access_token({"sub": str(account.id.value)}, expires_delta=timedelta(minutes=30))
         return LoginResponse(
             user=AccountResponse.from_domain(account),
             access_token=access_token,

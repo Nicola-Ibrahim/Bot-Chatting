@@ -147,7 +147,7 @@ async def download_conversation_content(
 
     accept_header = request.headers.get("Accept")
     query = GetConversationContentQuery(conversation_id=conversation_id)
-    result = await chats_mediator.execute_query(query) 
+    result = await chats_mediator.execute_query(query)
 
     if result.is_failure:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(result.error))
