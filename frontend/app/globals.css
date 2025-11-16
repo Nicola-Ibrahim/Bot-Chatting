@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Global styles for the chat application.  We set a dark background
+ * colour and a light text colour on the html/body elements.  These
+ * styles are applied by Tailwind's utility classes via the
+ * `@apply` directive.  Additional global resets (e.g. box-sizing)
+ * could be added here if needed.
+ */
+html,
+body {
+  /* Use the panel colour as the base background for the application
+     and the panelLight colour for subtle contrast. */
+  @apply bg-panel text-gray-100 min-h-screen;
+}
