@@ -65,11 +65,9 @@ export default function ChatPage() {
   const handleSend = async (content: string) => {
     if (loading) return;
     setLoading(true);
+    const userMessage: ChatMessage = { role: 'user', content };
     // Append user message locally
-    setMessages((prev) => {
-      const updated = [...prev, { role: 'user', content }];
-      return updated;
-    });
+    setMessages((prev) => [...prev, userMessage]);
     // Call backend send endpoint
     try {
       const res = await fetch('/api/send', {
@@ -77,7 +75,7 @@ export default function ChatPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           conversation_id: currentId,
-          messages: [{ role: 'user', content }],
+          messages: [userMessage],
         }),
       });
       if (!res.ok) {
@@ -92,7 +90,8 @@ export default function ChatPage() {
       }
       setCurrentId(convId);
       // Add assistant placeholder message
-      setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
+      const assistantPlaceholder: ChatMessage = { role: 'assistant', content: '' };
+      setMessages((prev) => [...prev, assistantPlaceholder]);
       // Start streaming tokens via SSE
       streamTokens(
         `/api/stream?conversation_id=${encodeURIComponent(convId)}`,
