@@ -1,8 +1,8 @@
-# 🤖 **Bot Chat System**
+# 🤖 **Horizon Chat System**
 
 ## 🚀 **Overview**
 
-This repository contains a **Bot Chat System** built with **FastAPI** and adhering to **Domain-Driven Design (DDD)** principles. The system is modular, scalable, and maintainable, integrating essential features such as **authentication**, **user management**, and **bot conversations**.
+This repository contains a **Horizon Chat System** built with **FastAPI** and adhering to **Domain-Driven Design (DDD)** principles. The system is modular, scalable, and maintainable, integrating essential features such as **authentication**, **user management**, and **bot conversations**.
 
 The architecture is designed using **Clean Architecture** and **Modularization of a Monolithic Application**, ensuring that each feature operates within its own **bounded context**. This separation of concerns helps in managing complexity and promoting long-term maintainability.
 
@@ -30,7 +30,7 @@ Each feature (e.g., **auth**, **chat**, **notifications**) is encapsulated withi
 ### 1. System Context
 
 ![System Context](docs/diagrams/images/c1_system_context.png)
-*The bot chat system interacts with users through web/mobile clients and integrates with external AI services and notification providers.*
+*The Horizon Chat system interacts with users through web/mobile clients and integrates with external AI services and notification providers.*
 
 ### 2. Container Architecture
 
