@@ -5,7 +5,7 @@ from typing import Self
 from src.building_blocks.domain.value_object import ValueObject
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class MemberId(ValueObject):
     """Represents the ID of a member."""
 

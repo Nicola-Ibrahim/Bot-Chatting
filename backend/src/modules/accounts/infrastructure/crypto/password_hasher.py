@@ -1,7 +1,3 @@
-"""Infrastructure password hasher using PBKDF2."""
-
-from __future__ import annotations
-
 import base64
 import hashlib
 import hmac

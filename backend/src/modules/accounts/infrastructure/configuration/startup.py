@@ -1,4 +1,4 @@
-from .di.containers import AccountsDIContainer
+from .containers import AccountsDIContainer
 
 
 class AccountsStartUp:

@@ -9,7 +9,6 @@ from src.building_blocks.domain.exceptions import BusinessRuleValidationExceptio
 from ..conversations.value_objects.conversation_id import ConversationId
 from ..members.value_objects.member_id import MemberId
 from .events import (
-    MessageContentUpdatedEvent,
     MessageCreatedEvent,
     MessageEditedEvent,
     MessagePinnedEvent,

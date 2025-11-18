@@ -10,7 +10,7 @@ from src.building_blocks.domain.value_object import ValueObject
 from ..rules.hashed_password_must_be_set_rule import HashedPasswordMustBeSetRule
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class HashedPassword(ValueObject):
     value: str
 

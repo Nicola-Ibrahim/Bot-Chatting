@@ -1,16 +1,12 @@
-"""Handler coordinating authentication flow."""
-
-from __future__ import annotations
-
-from datetime import datetime, timedelta, timezone
 import secrets
+from datetime import datetime, timedelta, timezone
 
-from src.modules.accounts.domain.aggregates.account.account import Account
-from src.modules.accounts.domain.aggregates.account.value_objects.email import Email
-from src.modules.accounts.domain.aggregates.session.session import Session
-from src.modules.accounts.domain.aggregates.session.value_objects.refresh_token import RefreshToken
+from src.modules.accounts.domain.account.account import Account
+from src.modules.accounts.domain.account.value_objects.email import Email
 from src.modules.accounts.domain.interfaces.account_repository import AccountRepository
 from src.modules.accounts.domain.interfaces.session_repository import SessionRepository
+from src.modules.accounts.domain.session.session import Session
+from src.modules.accounts.domain.session.value_objects.refresh_token import RefreshToken
 
 from ...interfaces.password_hasher import IPasswordHasher
 from .command import LoginCommand

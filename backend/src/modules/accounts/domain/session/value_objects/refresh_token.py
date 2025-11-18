@@ -8,7 +8,7 @@ from src.building_blocks.domain.value_object import ValueObject
 from ..rules.refresh_token_must_be_secure_rule import RefreshTokenMustBeSecureRule
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class RefreshToken(ValueObject):
     value: str
 

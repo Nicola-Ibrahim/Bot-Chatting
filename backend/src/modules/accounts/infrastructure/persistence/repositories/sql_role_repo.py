@@ -1,21 +1,16 @@
-"""SQLAlchemy repository for role aggregates."""
-
-from __future__ import annotations
-
 import uuid
 from typing import Iterable, Optional
 
-from sqlalchemy.orm import Session
-
-from src.modules.accounts.domain.aggregates.role.role import Role
-from src.modules.accounts.domain.aggregates.role.value_objects.role_id import RoleId
-from src.modules.accounts.domain.aggregates.role.value_objects.role_name import RoleName
-from src.modules.accounts.domain.interfaces.role_repository import RoleRepository
-
+from .....accounts.domain.interfaces.role_repository import RoleRepository
+from .....accounts.domain.role.role import Role
+from .....accounts.domain.role.value_objects.role_id import RoleId
+from .....accounts.domain.role.value_objects.role_name import RoleName
 from ..orm.models import RoleModel
 
 
 class SQLRoleRepository(RoleRepository):
+    """SQLAlchemy repository for role aggregates."""
+
     def __init__(self, session_factory) -> None:
         self._session_factory = session_factory
 

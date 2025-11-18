@@ -4,10 +4,10 @@ from typing import Optional, Self
 from src.building_blocks.domain.value_object import ValueObject
 
 from ..enum.rating import RatingType
-from ..rules import FeedbackMustBeValidRule
+from ..rules.feedback_must_be_valid_rule import FeedbackMustBeValidRule
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class Feedback(ValueObject):
     """Represents feedback provided on a message."""
 
@@ -34,5 +34,5 @@ class Feedback(ValueObject):
         Returns:
             Feedback: A new instance of the Feedback class.
         """
-        cls.check_rules(FeedbackMustBeValidRule(rating=rating))
+        cls.check_rules(FeedbackMustBeValidRule(rating=rating, comment=comment))
         return cls(_rating=rating, _comment=comment)

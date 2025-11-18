@@ -6,7 +6,7 @@ from ..application.contracts.chat_module import IChatsModule
 from ..application.contracts.command import BaseCommand
 from ..application.contracts.mediator import IMediator
 from ..application.contracts.query import BaseQuery
-from .configuration.di.containers import ChatDIContainer
+from .configuration.containers import ChatDIContainer
 
 
 class ChatsModule(IChatsModule):

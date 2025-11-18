@@ -1,8 +1,6 @@
-"""Response schema representing an account."""
-
 from pydantic import BaseModel, EmailStr
 
-from src.modules.accounts.domain.aggregates.account.account import Account
+from ......modules.accounts.domain.account import Account
 
 
 class AccountResponse(BaseModel):

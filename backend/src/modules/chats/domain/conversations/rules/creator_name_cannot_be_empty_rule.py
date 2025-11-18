@@ -8,7 +8,7 @@ along with a validation error type. When the rule is broken, a
 ``BusinessRuleValidationException`` should be raised by the caller.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from src.building_blocks.domain.enums import ErrorCode, ErrorType
 from src.building_blocks.domain.rule import BaseBusinessRule
@@ -20,9 +20,12 @@ class CreatorNameCannotBeEmptyRule(BaseBusinessRule):
 
     # Use a generic invalid input code since no specific code exists for
     # creator name validation
-    code: ErrorCode = ErrorCode.INVALID_INPUT
-    message: str = "The name of the creator cannot be empty."
-    error_type: ErrorType = ErrorType.VALIDATION_ERROR
+    code: ErrorCode = field(default=ErrorCode.INVALID_INPUT, init=False)
+    message: str = field(
+        default="Conversation creator name cannot be empty or whitespace.",
+        init=False,
+    )
+    error_type: ErrorType = field(default=ErrorType.VALIDATION_ERROR, init=False)
 
     def is_broken(self) -> bool:
         """

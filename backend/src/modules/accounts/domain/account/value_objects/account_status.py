@@ -8,7 +8,7 @@ from typing import Self
 from src.building_blocks.domain.value_object import ValueObject
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class AccountStatus(ValueObject):
     is_verified: bool = False
     is_active: bool = True

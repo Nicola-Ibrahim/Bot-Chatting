@@ -22,8 +22,8 @@ from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel
 
 from src.api.routers.accounts.v1.security.jwt import get_current_user_optional
-from src.modules.accounts.domain.aggregates.account.account import Account as DomainUser
 
+from ......modules.accounts.domain.account import Account
 
 router = APIRouter(prefix="/accounts", tags=["accounts"])
 
@@ -48,7 +48,7 @@ class ChatResponse(BaseModel):
 )
 def chat(
     req: ChatRequest,
-    current_user: Optional[DomainUser] = Depends(get_current_user_optional),
+    current_user: Optional[Account] = Depends(get_current_user_optional),
 ) -> ChatResponse:
     """Echo the incoming message back to the client.
 

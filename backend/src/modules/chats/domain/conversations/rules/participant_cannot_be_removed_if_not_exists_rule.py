@@ -9,12 +9,9 @@ is broken. Imports corrected to reference ``src``.
 from src.building_blocks.domain.enums import ErrorCode, ErrorType
 from src.building_blocks.domain.rule import BaseBusinessRule
 
-from ..value_objects.participant import Participant
-
 
 @dataclass
 class ParticipantCannotBeRemovedIfNotExistsRule(BaseBusinessRule):
-    participants: list[Participant]
     participant_id: str
 
     code = ErrorCode.CONFLICT_ERROR

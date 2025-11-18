@@ -16,9 +16,10 @@ class Entity(Generic[TEntityId]):
     """Base class for all domain entities."""
 
     _id: TEntityId
-    _created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    _updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    _version: int = 0
+    # Managed internally; exclude from generated __init__ so subclasses can add required fields.
+    _created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc), init=False)
+    _updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc), init=False)
+    _version: int = field(default=0, init=False)
     _events: list[DomainEvent] = field(default_factory=list, init=False, repr=False)
 
     @property

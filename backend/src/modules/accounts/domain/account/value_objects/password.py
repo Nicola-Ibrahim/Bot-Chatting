@@ -10,7 +10,7 @@ from src.building_blocks.domain.value_object import ValueObject
 from ..rules.password_must_meet_policy_rule import PasswordMustMeetPolicyRule
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class Password(ValueObject):
     value: str
 

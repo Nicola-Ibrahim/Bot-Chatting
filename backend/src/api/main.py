@@ -7,19 +7,21 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from ..modules.initializer import ModuleInitializer
+from ..initializer import BackendInitializer
 from .core import middleware
+from .core.config import get_settings
+from .core.config.dev import Settings as DevSettings
 from .core.exceptions.errors import APIError
 from .core.exceptions.handlers import global_exception_handler
-from .core.utils.import_helpers import get_settings
-from .core.utils.routing import collect_routers
+from .routing import collect_routers
 
 
+# TODO: Split the settings of api settings the modules settings, for cleaner initialization
 class APIFactory:
     def __init__(self):
         self.app: Optional[FastAPI] = None
 
-        raw_settings = get_settings()
+        raw_settings = DevSettings()
         settings_dict = (
             raw_settings
             if isinstance(raw_settings, dict)
@@ -28,13 +30,12 @@ class APIFactory:
 
         # 🔹 Split once, keep dict-only
         self.api_cfg = settings_dict.get("api", {})
-        self.platform_cfg = settings_dict.get("platform", {})
         self.modules_cfg = settings_dict.get("modules", settings_dict)  # fallback to legacy flat shape
 
     @asynccontextmanager
     async def _lifespan(self, app: FastAPI):
         # 🔹 Initialize modules with separated configs
-        handles = ModuleInitializer.initialize(self.modules_cfg, self.platform_cfg)
+        handles = BackendInitializer.initialize(self.modules_cfg)
 
         # Optional: expose handles for routers/tests
         app.state.modules = handles
@@ -114,3 +115,7 @@ class APIFactory:
             import logging as _logging
 
             _logging.getLogger(__name__).exception("An error occurred while mounting the frontend directory")
+
+
+# Module-level app for ASGI servers (e.g., uvicorn expects `app`)
+app = APIFactory().create_app()

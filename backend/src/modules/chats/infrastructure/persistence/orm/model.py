@@ -1,6 +1,8 @@
 import uuid
+from datetime import datetime, timezone
 
-from sqlmodel import Field, Relationship
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
+from sqlalchemy.orm import relationship
 
 from ......database.models import BaseSQLModel
 
@@ -8,39 +10,41 @@ from ......database.models import BaseSQLModel
 class ConversationDBModel(BaseSQLModel):
     __tablename__ = "conversations"
 
-    id: int = Field(primary_key=True)
-    title: str = Field(default="")
-    creator_id: uuid.UUID = Field(foreign_key="members.id", nullable=False)
-    chat_id: uuid.UUID = Field(foreign_key="chats.id", nullable=False)
-    is_archived: bool = Field(default=False)
-    members: list["Member"] = Relationship(back_populates="conversations")
-    messages: list["MessageDBModel"] = Relationship(back_populates="conversation")
-    participants: list["ParticipantDBModel"] = Relationship(back_populates="conversation")
+    # Override default integer PK with UUID string PK
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    title = Column(String, default="")
+    creator_id = Column(String, ForeignKey("members.id"), nullable=False)
+    chat_id = Column(String, nullable=False)
+    is_archived = Column(Boolean, default=False)
 
-    # If you need a direct mapping between message ids and participants
-    # you could use a normalized table for participants and messages
+    members = relationship("MemberDBModel", back_populates="conversations")
+    messages = relationship("MessageDBModel", back_populates="conversation")
 
 
-class Message(Model):
+class MessageDBModel(BaseSQLModel):
     __tablename__ = "messages"
 
-    content: str
-    timestamp: datetime = Field(default_factory=datetime.now(timezone.utc))
-    sender_id: uuid.UUID = Field(foreign_key="member.id")
-    sender: "Member" = Relationship(back_populates="messages")
-    conversation_id: uuid.UUID = Field(foreign_key="conversation.id")
-    conversation: "Conversation" = Relationship(back_populates="messages")
-    feedback: str = Field(default=None)
-    feedback_timestamp: datetime = Field(default=None)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    content = Column(String, nullable=False)
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    sender_id = Column(String, ForeignKey("members.id"))
+    conversation_id = Column(String, ForeignKey("conversations.id"))
+    feedback = Column(String, nullable=True)
+    feedback_timestamp = Column(DateTime, nullable=True)
+
+    sender = relationship("MemberDBModel", back_populates="messages")
+    conversation = relationship("ConversationDBModel", back_populates="messages")
 
 
-class Member(Model):
+class MemberDBModel(BaseSQLModel):
     __tablename__ = "members"
 
-    login: str
-    first_name: str
-    last_name: str
-    is_admin: bool = False
-    is_creator: bool = False
-    conversations: list["Conversation"] = Relationship(back_populates="members")
-    messages: list["Message"] = Relationship(back_populates="sender")
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    login = Column(String, nullable=False)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+    is_admin = Column(Boolean, default=False)
+    is_creator = Column(Boolean, default=False)
+
+    conversations = relationship("ConversationDBModel", back_populates="members")
+    messages = relationship("MessageDBModel", back_populates="sender")

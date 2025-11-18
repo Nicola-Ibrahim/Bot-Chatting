@@ -1,18 +1,17 @@
-"""In-memory repository implementations for development and testing."""
-
-from __future__ import annotations
-
 from typing import Dict, Iterable, Optional
 
-from src.modules.accounts.domain.aggregates.account.account import Account
-from src.modules.accounts.domain.aggregates.account.value_objects.account_id import AccountId
-from src.modules.accounts.domain.aggregates.role.value_objects.role_id import RoleId
-from src.modules.accounts.domain.aggregates.session.session import Session
-from src.modules.accounts.domain.aggregates.session.value_objects.session_id import SessionId
 from src.modules.accounts.domain.interfaces import AccountRepository, SessionRepository
+
+from ....accounts.domain.account.account import Account
+from ....accounts.domain.account.value_objects.account_id import AccountId
+from ....accounts.domain.role.value_objects.role_id import RoleId
+from ....accounts.domain.session.session import Session
+from ....accounts.domain.session.value_objects.session_id import SessionId
 
 
 class InMemoryAccountRepository(AccountRepository):
+    """In-memory repository implementations for development and testing."""
+
     def __init__(self) -> None:
         self._by_id: Dict[str, Account] = {}
         self._by_email: Dict[str, str] = {}

@@ -20,7 +20,7 @@ class RoleNameCannotBeEmptyRule(BaseBusinessRule):
         return not self.value or not self.value.strip()
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class RoleName(ValueObject):
     value: str
 

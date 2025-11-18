@@ -1,23 +1,18 @@
-"""SQLAlchemy repository for session aggregates."""
-
-from __future__ import annotations
-
 import uuid
 from typing import Iterable, Optional
 
-from sqlalchemy.orm import Session
-
-from src.modules.accounts.domain.aggregates.account.value_objects.account_id import AccountId
-from src.modules.accounts.domain.aggregates.session.session import Session as DomainSession
-from src.modules.accounts.domain.aggregates.session.value_objects.refresh_token import RefreshToken
-from src.modules.accounts.domain.aggregates.session.value_objects.session_id import SessionId
-from src.modules.accounts.domain.aggregates.session.value_objects.session_status import SessionStatus
-from src.modules.accounts.domain.interfaces.session_repository import SessionRepository
-
+from .....accounts.domain.account.value_objects.account_id import AccountId
+from .....accounts.domain.interfaces.session_repository import SessionRepository
+from .....accounts.domain.session.session import Session as DomainSession
+from .....accounts.domain.session.value_objects.refresh_token import RefreshToken
+from .....accounts.domain.session.value_objects.session_id import SessionId
+from .....accounts.domain.session.value_objects.session_status import SessionStatus
 from ..orm.models import AccountModel, SessionModel
 
 
 class SQLSessionRepository(SessionRepository):
+    """SQLAlchemy repository for session aggregates."""
+
     def __init__(self, session_factory) -> None:
         self._session_factory = session_factory
 

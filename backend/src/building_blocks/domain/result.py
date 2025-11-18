@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Callable, Generic, TypeVar
 
-from .exception import BusinessRuleValidationException
+from .exceptions import BusinessRuleValidationException
 
 TResult = TypeVar("TResult")  # Type of the success value
 TError = TypeVar("TError", bound=BusinessRuleValidationException)  # Type of the error (must be an exception)

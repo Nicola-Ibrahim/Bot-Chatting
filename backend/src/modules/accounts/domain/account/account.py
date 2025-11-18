@@ -1,7 +1,3 @@
-"""Aggregate root representing an account within the system."""
-
-from __future__ import annotations
-
 from dataclasses import dataclass, field
 from typing import Iterable
 
@@ -20,6 +16,8 @@ from .value_objects.hashed_password import HashedPassword
 
 @dataclass(eq=False)
 class Account(AggregateRoot[AccountId]):
+    """Aggregate root representing an account within the system."""
+
     _id: AccountId
     _email: Email
     _password: HashedPassword

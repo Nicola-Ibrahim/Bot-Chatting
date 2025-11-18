@@ -6,7 +6,7 @@ from ......database.models import BaseSQLModel
 # Association table linking accounts and roles.
 account_roles = Table(
     "account_roles",
-    Base.metadata,
+    BaseSQLModel.metadata,
     Column("account_id", ForeignKey("accounts.id", ondelete="CASCADE"), primary_key=True),
     Column("role_id", ForeignKey("roles.id", ondelete="CASCADE"), primary_key=True),
 )

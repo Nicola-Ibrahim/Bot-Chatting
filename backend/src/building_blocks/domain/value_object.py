@@ -6,7 +6,7 @@ from .exceptions import BusinessRuleValidationException
 from .rule import BaseBusinessRule
 
 
-@dataclass(frozen=True)
+@dataclass
 class ValueObject(ABC):
     """Abstract base class for value objects."""
 

@@ -1,14 +1,16 @@
-from typing import Any, ClassVar
+# src/api/core/config/base.py
+from typing import Any, ClassVar, List
 
-from pydantic import AnyHttpUrl, PostgresDsn, field_validator
+from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from .logging import LoggingConfig
 
 
-class AppSettings(BaseSettings):
+class ApiSettings(BaseSettings):
     """Main application settings with environment-aware configuration"""
 
+    # Pydantic v2-style config
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -25,44 +27,13 @@ class AppSettings(BaseSettings):
 
     # Security
     SECRET_KEY: str = "change-me-in-production"
-    BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
+    BACKEND_CORS_ORIGINS: list[AnyHttpUrl] | list[str] = []
 
-    # Database
-    POSTGRES_HOST: str = "localhost"
-    POSTGRES_PORT: int = 5432
-    POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = "postgres"
-    POSTGRES_DB: str = "chatbot"
-    DATABASE_URI: PostgresDsn | None = None
+    # Simple database URL string (instead of PostgresDsn + validator)
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/chatbot"
 
     # Logging
     LOGGING: ClassVar[LoggingConfig] = LoggingConfig()
-
-    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
-    def assemble_cors_origins(cls, v: str | list[str]) -> list[str]:
-        """Parse CORS origins from string or list"""
-        if isinstance(v, str):
-            if v.startswith("["):
-                import json
-
-                return json.loads(v)
-            return [origin.strip() for origin in v.split(",")]
-        return v
-
-    @field_validator("DATABASE_URI", mode="before")
-    def assemble_db_uri(cls, v: str | None, values: dict[str, Any]) -> PostgresDsn:
-        """Construct DB URI if not explicitly provided"""
-        if v:
-            return v
-
-        return PostgresDsn.build(
-            scheme="postgresql+asyncpg",
-            username=values["POSTGRES_USER"],
-            password=values["POSTGRES_PASSWORD"],
-            host=values["POSTGRES_HOST"],
-            port=str(values["POSTGRES_PORT"]),
-            path=values["POSTGRES_DB"],
-        )
 
     def configure(self) -> None:
         """Apply all configurations"""

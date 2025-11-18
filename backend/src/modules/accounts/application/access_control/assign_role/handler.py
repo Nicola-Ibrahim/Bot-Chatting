@@ -1,12 +1,8 @@
-"""Handler assigning roles to accounts."""
-
-from __future__ import annotations
-
 import uuid
 
-from src.modules.accounts.domain.aggregates.account.value_objects.account_id import AccountId
-from src.modules.accounts.domain.aggregates.role.value_objects.role_id import RoleId
+from src.modules.accounts.domain.account.value_objects.account_id import AccountId
 from src.modules.accounts.domain.interfaces import AccountRepository, RoleRepository
+from src.modules.accounts.domain.role.value_objects.role_id import RoleId
 
 from .command import AssignRoleCommand
 from .dto import AssignedRoleDTO

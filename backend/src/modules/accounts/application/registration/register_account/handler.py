@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from src.modules.accounts.domain.aggregates.account.account import Account
-from src.modules.accounts.domain.aggregates.account.value_objects.email import Email
-from src.modules.accounts.domain.aggregates.account.value_objects.hashed_password import HashedPassword
-from src.modules.accounts.domain.aggregates.account.value_objects.password import Password
+from src.modules.accounts.domain.account.account import Account
+from src.modules.accounts.domain.account.value_objects.email import Email
+from src.modules.accounts.domain.account.value_objects.hashed_password import HashedPassword
+from src.modules.accounts.domain.account.value_objects.password import Password
 from src.modules.accounts.domain.interfaces.account_repository import AccountRepository
 
 from ...interfaces.notification_service import INotificationService

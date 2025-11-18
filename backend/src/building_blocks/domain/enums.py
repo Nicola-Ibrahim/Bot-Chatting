@@ -25,3 +25,7 @@ class ErrorCode(Enum):
     CONFLICT_ERROR = "ConflictError"
     INFRASTRUCTURE_FAILURE = "InfrastructureFailure"
     INTERNAL_ERROR = "InternalError"
+    INVALID_EMAIL_ADDRESS = "InvalidEmailAddress"
+    INVALID_PASSWORD = "InvalidPassword"
+    VALIDATION_ERROR = "ValidationError"
+    SESSION_EXPIRATION_INVALID = "SessionExpirationInvalid"

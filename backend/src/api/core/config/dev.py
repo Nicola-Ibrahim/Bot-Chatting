@@ -1,26 +1,34 @@
+# src/api/core/config/dev.py
 from typing import List
 
 from pydantic import Field
+from pydantic_settings import SettingsConfigDict
 
-from .base import AppSettings
+from .base import ApiSettings
 
 
-class Settings(AppSettings):
+class Settings(ApiSettings):
     """Development-specific settings that override base configuration"""
 
-    # Override base defaults for development
     DEBUG: bool = True
     LOG_LEVEL: str = "DEBUG"
+
     BACKEND_CORS_ORIGINS: List[str] = Field(
-        default=["http://localhost:3000", "http://127.0.0.1:3000"], description="Allowed CORS origins for development"
+        default=[
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+        ],
+        description="Allowed CORS origins for development",
     )
 
-    # Development-specific database configuration
-    POSTGRES_HOST: str = "localhost"
-    POSTGRES_USER: str = "dev_user"
-    POSTGRES_PASSWORD: str = "dev_password"
-    POSTGRES_DB: str = "chatbot_dev"
+    # Dev database URL as a plain string
+    DATABASE_URL: str = "postgresql+asyncpg://dev_user:dev_password@localhost:5432/chatbot_dev"
 
-    class Config(AppSettings.Config):
-        env_file = ".env.dev"
-        extra = "allow"  # More forgiving during development
+    # Dev-specific config (e.g. different env file)
+    model_config = SettingsConfigDict(
+        env_file=".env.dev",
+        env_file_encoding="utf-8",
+        env_prefix="APP_",
+        case_sensitive=True,
+        extra="ignore",
+    )

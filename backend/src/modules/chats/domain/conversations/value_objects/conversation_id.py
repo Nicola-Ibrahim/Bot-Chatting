@@ -4,7 +4,7 @@ from uuid import UUID
 from src.building_blocks.domain.value_object import ValueObject
 
 
-@dataclass(frozen=True)
+@dataclass
 class ConversationId(ValueObject):
     value: UUID
 

@@ -1,16 +1,13 @@
-"""HTTP endpoints for accounts management."""
-
-from __future__ import annotations
-
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from src.modules.accounts.domain.aggregates.account.account import Account as DomainAccount
-from src.modules.accounts.infrastructure.configuration.startup import AccountsStartUp
-
+from ......modules.accounts.domain.account import Account
+from ......modules.accounts.infrastructure.accounts_module import AccountsModule
 from ..security import jwt
 from .account_response import AccountResponse
+from .get_account import GetAccountRequest
+from .list_accounts import ListAccountsRequest
 from .login_request import LoginRequest
 from .login_response import LoginResponse
 from .register_account_request import RegisterAccountRequest
@@ -18,22 +15,6 @@ from .update_account_request import UpdateAccountRequest
 from .verify_account_request import VerifyAccountRequest
 
 router = APIRouter(prefix="/accounts", tags=["accounts"])
-
-
-def _service():
-    AccountsStartUp.initialize()
-    service = AccountsStartUp.service
-    if not service:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Accounts service unavailable")
-    return service
-
-
-def _get_account_or_404(account_id: str) -> DomainAccount:
-    service = _service()
-    account = service.get_user(account_id)
-    if not account:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found")
-    return account
 
 
 @router.post(
@@ -44,8 +25,9 @@ def _get_account_or_404(account_id: str) -> DomainAccount:
 )
 def register_account(payload: RegisterAccountRequest) -> AccountResponse:
     try:
-        service = _service()
-        account = service.register_user(email=payload.email, password=payload.password)
+        account = AccountsModule.execute_command_async(
+            command=RegisterAccountRequest(email=payload.email, password=payload.password)
+        )
         return AccountResponse.from_domain(account)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
@@ -58,8 +40,7 @@ def register_account(payload: RegisterAccountRequest) -> AccountResponse:
 )
 def verify_account(payload: VerifyAccountRequest) -> AccountResponse:
     try:
-        service = _service()
-        account = service.verify_user(payload.account_id)
+        account = AccountsModule.execute_command_async(command=VerifyAccountRequest(account_id=payload.account_id))
         return AccountResponse.from_domain(account)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
@@ -72,8 +53,9 @@ def verify_account(payload: VerifyAccountRequest) -> AccountResponse:
 )
 def login(payload: LoginRequest) -> LoginResponse:
     try:
-        service = _service()
-        account, dto = service.authenticate(email=payload.email, password=payload.password)
+        account, dto = AccountsModule.execute_command_async(
+            command=LoginRequest(email=payload.email, password=payload.password)
+        )
         access_token = jwt.create_access_token({"sub": str(account.id.value)}, expires_delta=timedelta(minutes=30))
         return LoginResponse(
             user=AccountResponse.from_domain(account),
@@ -92,9 +74,9 @@ def login(payload: LoginRequest) -> LoginResponse:
 )
 def get_account(
     account_id: str,
-    current_user: DomainAccount = Depends(jwt.get_current_user),
+    current_user: Account = Depends(jwt.get_current_user),
 ) -> AccountResponse:
-    account = _get_account_or_404(account_id)
+    account = AccountsModule.execute_query_async(command=GetAccountRequest(account_id=account_id))
     return AccountResponse.from_domain(account)
 
 
@@ -103,9 +85,8 @@ def get_account(
     response_model=list[AccountResponse],
     summary="List all accounts",
 )
-def list_accounts(current_user: DomainAccount = Depends(jwt.get_current_user)) -> list[AccountResponse]:
-    service = _service()
-    accounts = service.list_users()
+def list_accounts(current_user: Account = Depends(jwt.get_current_user)) -> list[AccountResponse]:
+    accounts = AccountsModule.execute_query_async(command=ListAccountsRequest())
     return [AccountResponse.from_domain(account) for account in accounts]
 
 
@@ -114,7 +95,7 @@ def list_accounts(current_user: DomainAccount = Depends(jwt.get_current_user)) -
     response_model=AccountResponse,
     summary="Retrieve the authenticated account",
 )
-def get_current_account(current_user: DomainAccount = Depends(jwt.get_current_user)) -> AccountResponse:
+def get_current_account(current_user: Account = Depends(jwt.get_current_user)) -> AccountResponse:
     return AccountResponse.from_domain(current_user)
 
 
@@ -126,15 +107,16 @@ def get_current_account(current_user: DomainAccount = Depends(jwt.get_current_us
 def update_account(
     account_id: str,
     payload: UpdateAccountRequest,
-    current_user: DomainAccount = Depends(jwt.get_current_user),
+    current_user: Account = Depends(jwt.get_current_user),
 ) -> AccountResponse:
     try:
-        service = _service()
-        account = service.update_user(
-            account_id,
-            email=payload.email,
-            password=payload.password,
-            is_active=payload.is_active,
+        account = AccountsModule.execute_command_async(
+            command=UpdateAccountRequest(
+                account_id=account_id,
+                email=payload.email,
+                password=payload.password,
+                is_active=payload.is_active,
+            )
         )
         return AccountResponse.from_domain(account)
     except ValueError as exc:
@@ -150,13 +132,9 @@ def update_account(
 )
 def delete_account(
     account_id: str,
-    current_user: DomainAccount = Depends(jwt.get_current_user),
+    current_user: Account = Depends(jwt.get_current_user),
 ) -> None:
     try:
-        service = _service()
-        service.remove_user(account_id)
+        AccountsModule.execute_command_async(command=DeleteAccountRequest(account_id=account_id))
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
-
-
-__all__ = ["router"]

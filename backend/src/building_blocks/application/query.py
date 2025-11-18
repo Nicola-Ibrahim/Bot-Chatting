@@ -7,7 +7,7 @@ from typing import Generic, Protocol, TypeVar, runtime_checkable
 TQueryResult = TypeVar("TQueryResult")
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class Query:
     """Base type for queries dispatched through the application layer."""
 

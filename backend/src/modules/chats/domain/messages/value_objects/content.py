@@ -7,7 +7,7 @@ from ..rules import ContentResponseMustBeValidRule, ContentTextMustBeValidRule, 
 from .feedback import Feedback
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class Content(ValueObject):
     """Represents a user's question and the corresponding generated response."""
 

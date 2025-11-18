@@ -7,7 +7,7 @@ from typing import Generic, Protocol, TypeVar, runtime_checkable
 TCommandResult = TypeVar("TCommandResult")
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class Command:
     """Base type for application commands."""
 

@@ -1,24 +1,19 @@
-"""SQLAlchemy implementation of :class:`AccountRepository`."""
-
-from __future__ import annotations
-
 import uuid
 from typing import Iterable, Optional
 
-from sqlalchemy.orm import Session
-
-from src.modules.accounts.domain.aggregates.account.account import Account
-from src.modules.accounts.domain.aggregates.account.value_objects.account_id import AccountId
-from src.modules.accounts.domain.aggregates.account.value_objects.account_status import AccountStatus
-from src.modules.accounts.domain.aggregates.account.value_objects.email import Email
-from src.modules.accounts.domain.aggregates.account.value_objects.hashed_password import HashedPassword
-from src.modules.accounts.domain.aggregates.role.value_objects.role_id import RoleId
-from src.modules.accounts.domain.interfaces.account_repository import AccountRepository
-
+from .....accounts.domain.account.account import Account
+from .....accounts.domain.account.value_objects.account_id import AccountId
+from .....accounts.domain.account.value_objects.account_status import AccountStatus
+from .....accounts.domain.account.value_objects.email import Email
+from .....accounts.domain.account.value_objects.hashed_password import HashedPassword
+from .....accounts.domain.interfaces.account_repository import AccountRepository
+from .....accounts.domain.role.value_objects.role_id import RoleId
 from ..orm.models import AccountModel, CredentialModel, RoleModel
 
 
 class SQLAccountRepository(AccountRepository):
+    """SQLAlchemy implementation of :class:`AccountRepository`."""
+
     def __init__(self, session_factory) -> None:
         self._session_factory = session_factory
 

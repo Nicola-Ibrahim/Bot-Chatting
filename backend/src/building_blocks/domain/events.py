@@ -7,8 +7,11 @@ from dataclasses import asdict, dataclass, field
 class DomainEvent:
     """Base class for the domain event"""
 
-    _event_id: uuid.UUID = field(default_factory=uuid.uuid4)
-    _occurred_on: datetime.datetime = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
+    # Auto-populate identifiers; keep them out of __init__ so subclasses can add required fields.
+    _event_id: uuid.UUID = field(default_factory=uuid.uuid4, init=False)
+    _occurred_on: datetime.datetime = field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc), init=False
+    )
 
     @property
     def id(self) -> uuid.UUID:

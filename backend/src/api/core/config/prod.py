@@ -3,10 +3,10 @@ from typing import List, Optional
 
 from pydantic import Field, PostgresDsn, RedisDsn
 
-from .base import AppSettings
+from .base import ApiSettings
 
 
-class ProdSettings(AppSettings):
+class ProdSettings(ApiSettings):
     """Production environment settings with security-hardened defaults"""
 
     # Environment identification
@@ -39,7 +39,7 @@ class ProdSettings(AppSettings):
     # Rate limiting
     RATE_LIMIT_PER_MINUTE: int = 100
 
-    class Config(AppSettings.Config):
+    class Config(ApiSettings.Config):
         env_file = ".env.prod"
         env_file_encoding = "utf-8"
         extra = "forbid"  # Strict validation in production

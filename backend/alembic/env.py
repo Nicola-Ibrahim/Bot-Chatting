@@ -21,7 +21,7 @@ if config.config_file_name is not None:
 # lives in ``src.database.models.model`` and includes the declarative
 # base along with our custom ``User`` model.  Alembic will inspect
 # ``Base.metadata`` to generate migration scripts.
-from src.database.models.base import Base
+from backend.src.database.models.models import Base
 
 target_metadata = Base.metadata
 

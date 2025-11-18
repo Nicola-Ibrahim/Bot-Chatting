@@ -1,9 +1,9 @@
-
 from abc import ABC, abstractmethod
 from typing import Iterable, Optional
 
 from ..role.role import Role
 from ..role.value_objects.role_id import RoleId
+
 
 class RoleRepository(ABC):
     @abstractmethod

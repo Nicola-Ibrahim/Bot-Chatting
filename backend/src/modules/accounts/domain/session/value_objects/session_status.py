@@ -1,13 +1,13 @@
-"""Value object describing the lifecycle of a session."""
-
 from dataclasses import dataclass
 from typing import Self
 
 from src.building_blocks.domain.value_object import ValueObject
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class SessionStatus(ValueObject):
+    """Value object describing the lifecycle of a session."""
+
     is_active: bool = True
 
     @classmethod

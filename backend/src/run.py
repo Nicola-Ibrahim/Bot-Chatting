@@ -1,18 +1,18 @@
-from src.api.main import APIFactory
+from src.api.main import app as FastAPIApp
 
-from .modules.initializer import initialize_modules
-
-
-def create_and_run_api():
-    """Creates and runs the Flask application."""
-    app = APIFactory().create_app()
-    return app.run()
+from .initializer import BackendInitializer
 
 
 def main():
     """Main entry point: Initializes DI and runs the app."""
-    initialize_modules()
-    create_and_run_api()
+    BackendInitializer.initialize(
+        config={
+            "database": {"url": "postgresql+asyncpg://dev_user:dev_password@localhost:5432/chatbot_dev"},
+            "accounts": {"enable_registration": True, "default_role": "user"},
+            "chats": {"max_active_chats_per_user": 5},
+        }
+    )
+    FastAPIApp.run()
 
 
 if __name__ == "__main__":

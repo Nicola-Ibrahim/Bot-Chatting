@@ -9,7 +9,7 @@ from typing import Self
 from src.building_blocks.domain.value_object import ValueObject
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class AccountId(ValueObject):
     value: uuid.UUID
 

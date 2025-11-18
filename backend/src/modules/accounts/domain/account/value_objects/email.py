@@ -1,5 +1,3 @@
-"""Email value object used by the account aggregate."""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -10,8 +8,10 @@ from src.building_blocks.domain.value_object import ValueObject
 from ..rules.email_must_be_valid_rule import EmailMustBeValidRule
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(slots=True)
 class Email(ValueObject):
+    """Email value object used by the account aggregate."""
+
     value: str
 
     @classmethod

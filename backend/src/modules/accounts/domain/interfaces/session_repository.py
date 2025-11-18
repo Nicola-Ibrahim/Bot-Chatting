@@ -5,9 +5,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Iterable, Optional
 
-from ..aggregates.account.value_objects.account_id import AccountId
-from ..aggregates.session.session import Session
-from ..aggregates.session.value_objects.session_id import SessionId
+from ..account.value_objects.account_id import AccountId
+from ..session.session import Session
+from ..session.value_objects.session_id import SessionId
 
 
 class SessionRepository(ABC):

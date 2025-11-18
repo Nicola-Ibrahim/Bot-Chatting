@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 
-from src.modules.accounts.domain.aggregates.session.value_objects.session_id import SessionId
+from src.modules.accounts.domain.session.value_objects.session_id import SessionId
 from src.modules.accounts.domain.interfaces.session_repository import SessionRepository
 
 from .command import LogoutCommand

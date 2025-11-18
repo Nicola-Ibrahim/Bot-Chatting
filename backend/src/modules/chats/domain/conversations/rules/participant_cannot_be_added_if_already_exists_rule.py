@@ -9,12 +9,9 @@ rule is considered broken. Imports corrected to reference the ``src`` prefix.
 from src.building_blocks.domain.enums import ErrorCode, ErrorType
 from src.building_blocks.domain.rule import BaseBusinessRule
 
-from ..value_objects.participant import Participant
-
 
 @dataclass
 class ParticipantCannotBeAddedIfAlreadyExistsRule(BaseBusinessRule):
-    participants: list[Participant]
     participant_id: str
 
     code = ErrorCode.CONFLICT_ERROR

@@ -1,7 +1,3 @@
-"""Session aggregate representing an authenticated session for an account."""
-
-from __future__ import annotations
-
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -19,6 +15,8 @@ from .value_objects.session_status import SessionStatus
 
 @dataclass(eq=False)
 class Session(AggregateRoot[SessionId]):
+    """Session aggregate representing an authenticated session for an account."""
+
     _id: SessionId
     _account_id: AccountId
     _refresh_token: RefreshToken
