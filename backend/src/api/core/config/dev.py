@@ -21,8 +21,11 @@ class Settings(ApiSettings):
         description="Allowed CORS origins for development",
     )
 
-    # Dev database URL as a plain string
-    DATABASE_URL: str = "postgresql+asyncpg://dev_user:dev_password@localhost:5432/chatbot_dev"
+    CORS_ENABLED: bool = True
+    CORS_ALLOW_CREDENTIALS: bool = True
+    CORS_ORIGINS: List[str] = ["*"]
+    CORS_ALLOW_METHODS: List[str] = ["*"]
+    CORS_ALLOW_HEADERS: List[str] = ["*"]
 
     # Dev-specific config (e.g. different env file)
     model_config = SettingsConfigDict(

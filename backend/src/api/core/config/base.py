@@ -24,6 +24,7 @@ class ApiSettings(BaseSettings):
     VERSION: str = "1.0.0"
     DEBUG: bool = False
     ENVIRONMENT: str = "development"
+    DESCRIPTION: str = "API service for chatbot application."
 
     # Security
     SECRET_KEY: str = "change-me-in-production"

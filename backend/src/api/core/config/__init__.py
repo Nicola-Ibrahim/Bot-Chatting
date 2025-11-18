@@ -2,11 +2,11 @@ import os
 from functools import lru_cache
 from importlib import import_module
 
-from pydantic_settings import BaseSettings
+from .base import ApiSettings
 
 
 @lru_cache
-def get_settings() -> BaseSettings:
+def get_settings() -> ApiSettings:
     """
     Dynamically loads the appropriate settings module based on environment.
     Caches the result for performance.

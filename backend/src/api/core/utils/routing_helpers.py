@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from .core.utils.import_helpers import extract_members_from_package
+from .import_helpers import extract_members_from_package
 
 # Packages containing FastAPI routers.  ``collect_routers`` will scan
 # these packages and import any members that are instances of

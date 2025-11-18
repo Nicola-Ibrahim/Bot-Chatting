@@ -1,4 +1,4 @@
-from .di.containers import DatabaseDIContainer
+from .containers import DatabaseDIContainer
 
 
 class DatabaseStartUp:
