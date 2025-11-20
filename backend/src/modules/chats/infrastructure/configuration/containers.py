@@ -15,7 +15,6 @@ class ChatDIContainer(containers.DeclarativeContainer):
     """Top-level Chats BC container."""
 
     config = providers.Configuration()
-    # 👇 this will be wired to DatabaseDIContainer.session_factory
     session_factory = providers.Dependency(instance_of=sessionmaker)
 
     logger = providers.Singleton(logging.getLogger, name="chat")

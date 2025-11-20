@@ -15,7 +15,7 @@ class AccountsDIContainer(containers.DeclarativeContainer):
 
     config = providers.Configuration()
 
-    session_factory = providers.Dependency()  # this will be wired to DatabaseDIContainer.session_factory
+    session_factory = providers.Dependency()  # wired in via AccountsStartUp
 
     account_repository = providers.Singleton(
         SQLAccountRepository,

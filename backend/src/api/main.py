@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,6 +10,8 @@ from .core.config.base import ApiSettings
 from .core.exceptions.errors import APIError
 from .core.exceptions.handlers import global_exception_handler
 from .core.utils.routing_helpers import collect_routers
+from src.modules.accounts.infrastructure.configuration.startup import AccountsStartUp
+from src.modules.chats.infrastructure.configuration.startup import ChatsStartUp
 
 
 class APIFactory:
@@ -16,25 +20,43 @@ class APIFactory:
 
         self.settings: ApiSettings = get_settings()
 
-    # @asynccontextmanager
-    # async def _lifespan(self, app: FastAPI):
-    #     # 🔹 Initialize modules with separated configs
-    #     handles = BackendInitializer.initialize(self.modules_cfg)
-
-    #     # Optional: expose handles for routers/tests
-    #     app.state.modules = handles
-
-    #     try:
-    #         yield
-    #     finally:
-    #         if handles:
-    #             handles.shutdown()
-
     def create_app(self) -> FastAPI:
+        settings = self.settings
+
+        @asynccontextmanager
+        async def lifespan(app: FastAPI):
+            startups: list[object] = []
+            modules: dict[str, object] = {}
+            try:
+                accounts = AccountsStartUp().initialize(
+                    database_url=settings.DATABASE_URL,
+                    enable_registration=settings.ACCOUNTS_ENABLE_REGISTRATION,
+                    default_role=settings.ACCOUNTS_DEFAULT_ROLE,
+                )
+                startups.append(accounts)
+                modules["accounts"] = accounts
+
+                chats = ChatsStartUp().initialize(
+                    database_url=settings.DATABASE_URL,
+                    max_active_chats_per_user=settings.CHATS_MAX_ACTIVE_CHATS_PER_USER,
+                )
+                startups.append(chats)
+                modules["chats"] = chats
+
+                app.state.backend_modules = modules
+                yield
+            finally:
+                for startup in reversed(startups):
+                    try:
+                        startup.stop()
+                    except Exception:
+                        pass
+
         self.app = FastAPI(
-            title=self.settings.PROJECT_NAME,
-            version=self.settings.VERSION,
-            description=self.settings.DESCRIPTION,
+            title=settings.PROJECT_NAME,
+            version=settings.VERSION,
+            description=settings.DESCRIPTION,
+            lifespan=lifespan,
             # docs_url=self.settings.DOCS_URL,
             # redoc_url=self.settings.REDOC_URL,
             # contact=self.settings.CONTACT_INFO,
@@ -84,7 +106,6 @@ class APIFactory:
         for error in APIError.__subclasses__():
             self.app.add_exception_handler(error, global_exception_handler)
         self.app.add_exception_handler(Exception, global_exception_handler)
-
 
 # ASGI app for uvicorn src.api.main:app
 app = APIFactory().create_app()

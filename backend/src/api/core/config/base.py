@@ -25,6 +25,9 @@ class ApiSettings(BaseSettings):
     DEBUG: bool = False
     ENVIRONMENT: str = "development"
     DESCRIPTION: str = "API service for chatbot application."
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
+    WORKERS: int = 1
 
     # Security
     SECRET_KEY: str = "change-me-in-production"
@@ -32,6 +35,9 @@ class ApiSettings(BaseSettings):
 
     # Simple database URL string (instead of PostgresDsn + validator)
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/chatbot"
+    ACCOUNTS_ENABLE_REGISTRATION: bool = True
+    ACCOUNTS_DEFAULT_ROLE: str = "user"
+    CHATS_MAX_ACTIVE_CHATS_PER_USER: int = 5
 
     # Logging
     LOGGING: ClassVar[LoggingConfig] = LoggingConfig()
