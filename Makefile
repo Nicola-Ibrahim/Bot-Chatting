@@ -43,7 +43,7 @@ backend-test-coverage: ## Run backend tests with coverage report
 	cd $(BACKEND_DIR) && $(UV) pytest --cov && $(UV) coverage html
 
 backend-run-dev: ## Run backend API locally with Uvicorn (auto-reload)
-	cd $(BACKEND_DIR) && $(UV) python -m src.server
+	cd $(BACKEND_DIR) && $(UV) uvicorn src.api.main:app --reload --host 0.0.0.0 --port 8000
 
 # Backend scripts (optional)
 .PHONY: backend-create-superuser backend-generate-sample-users backend-flush-expired-tokens backend-shell
