@@ -1,34 +1,33 @@
-version: '3.8'
-
 services:
   app:
     build:
-      context: ./src # Points to the current directory where the Dockerfile is located
+      context: ./backend # Points to the backend directory where the Dockerfile is located
       dockerfile: Dockerfile # The Dockerfile used to build the application image
     volumes:
-      - .:/bot # Mounts the current directory (source code) into the container for development
+      - ./backend:/bot # Mounts the backend directory (source code) into the container for development
     env_file:
-      - .env
+      - .env.dev
     expose:
       - "8000" # Exposes port 8000 internally for communication within the Docker network (not publicly exposed)
     networks:
       - internal_network # Connects the app service to the internal network for secure communication with other services
 
     depends_on:
-      - postgres_db # Ensures that the PostgreSQL database starts before the app service
+      - DB # Ensures that the PostgreSQL database starts before the app service
 
     restart: on-failure
 
-    command: >
-      sh -c "alembic upgrade head && uvicorn src.api.main:app --host 0.0.0.0 --port 8000"
+  DB:
+    # Explicit Postgres image to satisfy compose requirements
+    image: postgres:16-alpine
 
-  postgres_db:
     volumes:
       - db_data:/var/lib/postgresql/data # Mounts a persistent volume to store PostgreSQL data, ensuring data is not lost on container restart
     env_file:
       - .env.dev # Loads environment variables from a .env file for development
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ] # Health check command to ensure PostgreSQL is ready
+      # Use container env vars (from env_file) rather than compose-time substitution
+      test: [ "CMD-SHELL", "pg_isready -U $$DB_USER -d $$DB" ] # Health check command to ensure PostgreSQL is ready
       interval: 5s # Checks the database every 5 seconds
       timeout: 5s # Timeout for the health check
       retries: 5 # Number of retries before considering the service unhealthy
@@ -45,8 +44,22 @@ services:
     ports:
       - "5050:80" # Expose pgAdmin on port 5050 of the host
     depends_on:
-      postgres_db:
+      DB:
         condition: service_healthy
+    networks:
+      - internal_network
+
+  migrate:
+    build:
+      context: ./backend # same image/tooling as app (now using backend directory)
+      dockerfile: Dockerfile
+    env_file:
+      - .env.dev
+    depends_on:
+      DB:
+        condition: service_healthy
+    command: alembic upgrade head # apply latest migrations and exit
+    restart: "no" # never restart; fail deploy if this fails
     networks:
       - internal_network
 
@@ -66,7 +79,7 @@ services:
   #
   # This service runs the Next.js based UI that demonstrates how to consume the
   # API exposed by the FastAPI backend.  During development the container
-  # runs `npm run dev` to enable hot‑reloading.  The `BACKEND_URL`
+  # runs `npm run dev` to enable hot-reloading.  The `BACKEND_URL`
   # environment variable tells the frontend where to find the API on the docker
   # network.  The port 3000 on the host exposes the development server.
   frontend:

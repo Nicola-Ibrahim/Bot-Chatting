@@ -1,12 +1,13 @@
+import uuid
+from typing import Callable, Iterable, Optional
+
 from sqlalchemy import delete as sqla_delete
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-import uuid
-
 from ....domain.conversations.conversation import Conversation
-from ....domain.interfaces.conversation_repository import BaseConversationRepository
 from ....domain.conversations.value_objects.conversation_id import ConversationId
+from ....domain.interfaces.conversation_repository import BaseConversationRepository
 from ....domain.members.value_objects.member_id import MemberId
 from ..orm.model import ConversationDBModel
 
@@ -37,43 +38,57 @@ def map_to_db(entity: Conversation) -> ConversationDBModel:
 class SQLConversationRepository(BaseConversationRepository):
     """SQL-based repository using an injected SQLAlchemy Session."""
 
-    def __init__(self, session: Session) -> None:
-        self._session = session
+    def __init__(self, session_factory: Callable[[], Session]) -> None:
+        self._session_factory = session_factory
 
     # ---------- Queries ----------
 
     def find(self, conversation_id: str) -> Conversation:
-        row = self._session.get(ConversationDBModel, str(conversation_id))
-        return map_to_entity(row)
+        with self._session_factory() as session:
+            row = session.get(ConversationDBModel, str(conversation_id))
+            return map_to_entity(row)
 
     def find_all(self, user_id: str) -> list[Conversation]:
         # If your column is named creator_id in the DB model, filter by that.
         stmt = select(ConversationDBModel).where(ConversationDBModel.creator_id == str(user_id))
-        rows = self._session.execute(stmt).scalars().all()
-        return [c for c in (map_to_entity(r) for r in rows) if c is not None]
+        with self._session_factory() as session:
+            rows = session.execute(stmt).scalars().all()
+            return [c for c in (map_to_entity(r) for r in rows) if c is not None]
 
     def exists(self, conversation_id: str) -> bool:
-        return self._session.get(ConversationDBModel, str(conversation_id)) is not None
+        with self._session_factory() as session:
+            return session.get(ConversationDBModel, str(conversation_id)) is not None
 
     def count(self, user_id: str) -> int:
-        stmt = select(func.count()).select_from(ConversationDBModel).where(ConversationDBModel.creator_id == str(user_id))
-        return int(self._session.execute(stmt).scalar_one())
+        stmt = (
+            select(func.count()).select_from(ConversationDBModel).where(ConversationDBModel.creator_id == str(user_id))
+        )
+        with self._session_factory() as session:
+            return int(session.execute(stmt).scalar_one())
 
     # ---------- Commands ----------
 
     def save(self, conversation: Conversation) -> None:
-        self._session.add(map_to_db(conversation))
+        with self._session_factory() as session:
+            session.add(map_to_db(conversation))
+            session.commit()
 
     def update(self, conversation: Conversation) -> None:
-        self._session.merge(map_to_db(conversation))
+        with self._session_factory() as session:
+            session.merge(map_to_db(conversation))
+            session.commit()
 
     def delete(self, conversation_id: str) -> None:
-        row = self._session.get(ConversationDBModel, str(conversation_id))
-        if not row:
-            raise ValueError(f"Conversation with ID {conversation_id} does not exist.")
-        self._session.delete(row)
+        with self._session_factory() as session:
+            row = session.get(ConversationDBModel, str(conversation_id))
+            if not row:
+                raise ValueError(f"Conversation with ID {conversation_id} does not exist.")
+            session.delete(row)
+            session.commit()
 
     def delete_all(self, user_id: str) -> None:
         # Bulk delete; if you need per-row hooks, load then delete.
         stmt = sqla_delete(ConversationDBModel).where(ConversationDBModel.creator_id == str(user_id))
-        self._session.execute(stmt)
+        with self._session_factory() as session:
+            session.execute(stmt)
+            session.commit()

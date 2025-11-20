@@ -90,8 +90,9 @@ HANDLER_REGISTRY: dict[Type[Any], Callable[[ChatDIContainer], object]] = {
 class ChatsStartUp:
     """Composition root for Chats bounded context (self-owned DI container)."""
 
-    def __init__(self) -> None:
-        self._container: ChatDIContainer | None = None
+    def __init__(self, session_factory) -> None:
+        self._session_factory = session_factory
+        self._container: ChatDIContainer
 
     @property
     def container(self) -> ChatDIContainer:
@@ -102,18 +103,12 @@ class ChatsStartUp:
     def initialize(self, config: dict) -> None:
         """Create container, load config dict, init resources, wire."""
         try:
-            self._container = ChatDIContainer()
+            self._container = ChatDIContainer(config=config, session_factory=self._session_factory)
             # expected: {"database": {"url": "..."}}
-            self._container.config.from_dict(config)
+
 
             # Order: init resources, then wire packages using Provide[...] markers
             self._container.init_resources()
-            self._container.wire(
-                packages=[
-                    "src.contexts.chats.application",  # handlers, services using @inject/Provide
-                    "src.contexts.chats.module",  # if you expose a ChatsModule facade
-                ]
-            )
 
             # Build mediator and register all command/query handlers
             mediator = self._container.mediator()

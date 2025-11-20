@@ -83,7 +83,7 @@ docker compose -f docker-compose.dev.yml up --build
 This command will:
 
 - Build and start the FastAPI backend on the internal Docker network (`app`).
-- Create a PostgreSQL database (`postgres_db`) and pgAdmin instance (`pgadmin`).
+- Create a PostgreSQL database (`DB`) and pgAdmin instance (`pgadmin`).
 - Start an NGINX container that proxies API requests to the backend on port 80.
 - Launch the example Next.js frontend (`frontend`) on port 3000 with hot reloading.  The UI communicates with the backend via the `BACKEND_URL` environment variable set in the compose file.
 

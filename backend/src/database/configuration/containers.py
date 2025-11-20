@@ -3,24 +3,23 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
-# If you already have a DatabaseConnectionManager, you can keep using it.
-# Here's a direct SQLAlchemy version for clarity.
 class DatabaseDIContainer(containers.DeclarativeContainer):
-    config = providers.Configuration()  # expects: {"url": "postgresql+psycopg://..."}
+    """Infrastructure-level DB container: one engine, one session_factory."""
 
+    config = providers.Configuration()  # expects: {"url": "postgresql+asyncpg://..."}
+
+    # One Engine (connection pool) for the whole process
     engine = providers.Singleton(
         create_engine,
-        config.url,
+        url=config.url,
         pool_pre_ping=True,
         future=True,
     )
 
+    # Singleton session factory bound to the engine
     session_factory = providers.Singleton(
         sessionmaker,
         bind=engine,
         autoflush=False,
         expire_on_commit=False,
     )
-
-    # Per-use / per-request session factory -> returns a new Session each call
-    session = providers.Factory(lambda sf: sf(), sf=session_factory)

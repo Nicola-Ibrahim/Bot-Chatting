@@ -25,10 +25,10 @@ class ProdSettings(ApiSettings):
     )
 
     # Database configuration
-    POSTGRES_HOST: str = "production-db-host"
-    POSTGRES_PORT: int = 5432
-    POSTGRES_USER: str = "prod_db_user"
-    POSTGRES_PASSWORD: str = Field(..., description="Database password (must be set via env var)", min_length=16)
+    DB_DBHOST: str = "production-db-host"
+    DB_DBPORT: int = 5432
+    DB_USER: str = "prod_db_user"
+    DB_PASSWORD: str = Field(..., description="Database password (must be set via env var)", min_length=16)
     DATABASE_URI: Optional[PostgresDsn] = None
 
     # Redis/cache configuration
@@ -50,6 +50,6 @@ class ProdSettings(ApiSettings):
         return (
             str(self.DATABASE_URI)
             if self.DATABASE_URI
-            else f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@"
-            f"{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+            else f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@"
+            f"{self.DB_DBHOST}:{self.DB_DBPORT}/{self.DB}"
         )

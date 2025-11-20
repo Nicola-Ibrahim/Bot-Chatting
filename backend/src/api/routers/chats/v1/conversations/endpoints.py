@@ -1,10 +1,13 @@
-from dependency_injector.wiring import Provide
-from fastapi import APIRouter, Depends, HTTPException, status
+from uuid import UUID
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
+
+from src.modules.chats.application.conversation_lifecycle.start_conversation.command import StartConversationCommand
+from src.building_blocks.domain.result import Result
 from src.modules.chats.infrastructure.chat_module import ChatsModule
 
 from .....core.exceptions.errors import APIError
-from fastapi.responses import StreamingResponse
 
 # from src.building_blocks.domain.result import Result
 # from src.modules.chats.application.contracts.mediator import IMediator
@@ -28,9 +31,27 @@ router = APIRouter(
 )
 
 
+class ConversationResponseSchema(BaseModel):
+    conversation_id: str
+
+
+def _conversation_response(dto) -> "ConversationResponseSchema":
+    conversation_id = getattr(dto, "conversation_id", getattr(dto, "id", None))
+    if not conversation_id:
+        raise APIError(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Conversation id not returned")
+    return ConversationResponseSchema(conversation_id=str(conversation_id))
+
+
+def _raise_api(status_code: int):
+    def _inner(error: Exception):
+        raise APIError(status_code=status_code, detail=str(error))
+
+    return _inner
+
+
 @router.post(
     "/",
-    response_model=ConversationResponseSchem,
+    response_model=ConversationResponseSchema,
     status_code=status.HTTP_201_CREATED,
     summary="Create new conversation",
     responses={
@@ -46,18 +67,16 @@ router = APIRouter(
 )
 async def create_conversation(
     request: CreateConversationRequest,
-    chats_module=Depends(Provide[ChatsModule]),
+    chats_module: ChatsModule = Depends(ChatsModule),
 ) -> ConversationResponseSchema:
     """
     Create a new conversation.
     """
-    # Execute command
-    command = CreateConversationCommand(user_id=request.user_id)
-    result = await chats_module.execute_command_async(command)
-
+    command = StartConversationCommand(user_id=UUID(str(request.user_id)), user_name=request.user_name, title=request.title)
+    result: Result = await chats_module.execute_command_async(command)
     return result.match(
-        on_success=lambda conversation: ConversationResponseSchema(id=str(conversation.id)),
-        on_failure=lambda error: raise APIError(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error)),
+        on_success=_conversation_response,
+        on_failure=_raise_api(status.HTTP_400_BAD_REQUEST),
     )
 
 
@@ -112,68 +131,7 @@ async def create_conversation(
 #     )
 
 
-@router.get(
-    "/conversations/{conversation_id}/download",  # Changed endpoint name to /download
-    summary="Download conversation content in a specific format",
-    responses={
-        status.HTTP_200_OK: {
-            "description": "Conversation content successfully retrieved in the requested format",
-            "content": {
-                "application/pdf": {"example": "PDF content..."},
-                "text/plain": {"example": "Plain text content..."},
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
-                    "example": "Word content..."
-                },
-            },
-        },
-        status.HTTP_406_NOT_ACCEPTABLE: {"description": "Requested format not supported"},
-        status.HTTP_404_NOT_FOUND: {"description": "Conversation not found"},
-    },
-)
-async def download_conversation_content(
-    request: GetConversationContentQuery,
-    chats_mediator: IMediator = Depends(Provide[ChatAppDIContainer.chats_mediator]),
-):
-    """
-    Download the content of a conversation.
-    """
-    # Define the available download formats and their MIME types
-    AVAILABLE_FORMATS = {
-        "application/pdf": "pdf",
-        "text/plain": "txt",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx", # Example for Word
-    }
-
-
-    accept_header = request.headers.get("Accept")
-    query = GetConversationContentQuery(conversation_id=conversation_id)
-    result = await chats_mediator.execute_query(query)
-
-    if result.is_failure:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(result.error))
-
-    conversation_content = result.unwrap()
-
-    if not accept_header:
-        # Default to JSON if no Accept header is provided (or handle as you see fit)
-        return conversation_content
-
-    for mime_type, format_name in AVAILABLE_FORMATS.items():
-        if mime_type in accept_header:
-            if format_name == "pdf":
-                pdf_content = generate_pdf(conversation_content) # Implement this function
-                headers = {"Content-Disposition": f"attachment; filename=\"conversation_{conversation_id}.pdf\""}
-                return StreamingResponse(pdf_content, media_type="application/pdf", headers=headers)
-            elif format_name == "txt":
-                text_content = generate_text(conversation_content) # Implement this function
-                headers = {"Content-Disposition": f"attachment; filename=\"conversation_{conversation_id}.txt\""}
-                return StreamingResponse(iter([text_content.encode("utf-8")]), media_type="text/plain", headers=headers)
-            elif format_name == "docx":
-                docx_content = generate_docx(conversation_content) # Implement this function
-                headers = {"Content-Disposition": f"attachment; filename=\"conversation_{conversation_id}.docx\""}
-                return StreamingResponse(docx_content, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document", headers=headers)
-
-    raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="Requested format not supported")
+# TODO: Conversation download endpoint can be reintroduced once supporting query/handlers are implemented.
 
 
 

@@ -1,7 +1,11 @@
+import asyncio
 from contextlib import asynccontextmanager
+
+import uvicorn
 
 from src.api.main import app as FastAPIApp
 
+from .api.core.config import get_settings
 from .initializer import BackendInitializer
 
 
@@ -25,9 +29,19 @@ async def backend_runtime():
 async def server():
     """Main entry point: Initializes DI and runs the app."""
 
-    async with backend_runtime() as handles:
-        FastAPIApp.run()
+    settings = get_settings()
+
+    async with backend_runtime():
+        config = uvicorn.Config(
+            app=FastAPIApp,
+            host=getattr(settings, "HOST", "0.0.0.0"),
+            port=getattr(settings, "PORT", 8000),
+            reload=bool(getattr(settings, "DEBUG", False)),
+            log_level="debug" if getattr(settings, "DEBUG", False) else "info",
+        )
+        server = uvicorn.Server(config)
+        await server.serve()
 
 
 if __name__ == "__main__":
-    server()
+    asyncio.run(server())

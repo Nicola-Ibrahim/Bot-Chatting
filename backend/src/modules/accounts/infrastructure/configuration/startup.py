@@ -2,8 +2,9 @@ from .containers import AccountsDIContainer
 
 
 class AccountsStartUp:
-    def __init__(self) -> None:
-        self._container: AccountsDIContainer | None = None
+    def __init__(self, session_factory) -> None:
+        self._session_factory = session_factory
+        self.container: AccountsDIContainer
 
     @property
     def container(self) -> AccountsDIContainer:
@@ -13,9 +14,8 @@ class AccountsStartUp:
 
     def initialize(self, config: dict) -> None:
         try:
-            self._container = AccountsDIContainer()
+            self._container = AccountsDIContainer(config=config, session_factory=self._session_factory)
             # expected: {"database": {"url": "..."}}
-            self._container.config.from_dict(config)
             self._container.init_resources()
             self._container.wire(
                 packages=[

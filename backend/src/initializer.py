@@ -24,9 +24,9 @@ class BackendInitializer:
     """Initializes all modules based on provided settings."""
 
     _modules = {
-        "database": DatabaseStartUp,
-        "chats": ChatsStartUp,
-        "accounts": AccountsStartUp,
+        "database": DatabaseStartUp(),
+        "chats": ChatsStartUp(),
+        "accounts": AccountsStartUp(),
     }
 
     @classmethod
@@ -39,8 +39,8 @@ class BackendInitializer:
 
             # Initialize module startup with its settings
             module_settings = config.get(module_name, {})
-            startup_instance = startup_cls.initialize(module_settings)
-            startup_instance.start()
+            print(f"Initializing module '{module_name}' with settings: {module_settings}")
+            startup_instance = startup_cls.initialize(config=module_settings)
             startups[module_name] = startup_instance
 
         return _BackendHandles(startups)

@@ -10,15 +10,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl build-esse
     && curl -LsSf https://astral.sh/uv/install.sh | sh \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+# Ensure uv is on PATH (installed to /root/.local/bin by default)
+ENV PATH="/root/.local/bin:${PATH}"
 
 # Set or change to the working directory for the application
 WORKDIR /bot
 
 # Copy only the uv file to leverage Docker layer caching for dependencies
 COPY uv.lock pyproject.toml /bot/
-
-# Install project dependencies using uv
-RUN uv install
 
 # Copy the entire application code to the container
 COPY . /bot

@@ -24,18 +24,6 @@ APP_MODULE="${APP_MODULE:-src.api.main:app}"
 # Reload settings (dev)
 RELOAD_DIR="${RELOAD_DIR:-src}"
 
-# Database hints (optional)
-DB_HOST="${DB_HOST:-}"
-DB_PORT="${DB_PORT:-}"
-DB_USER="${DB_USER:-}"
-DB_NAME="${DB_NAME:-}"
-
-# Alembic toggle
-RUN_MIGRATIONS="${RUN_MIGRATIONS:-true}"
-
-# DB readiness wait config
-DB_MAX_RETRIES="${DB_MAX_RETRIES:-30}"
-DB_RETRY_DELAY="${DB_RETRY_DELAY:-2}"
 
 # -----------------------------
 # Helpers

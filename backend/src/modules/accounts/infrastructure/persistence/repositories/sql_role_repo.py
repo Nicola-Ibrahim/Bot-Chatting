@@ -1,5 +1,7 @@
 import uuid
-from typing import Iterable, Optional
+from typing import Callable, Iterable, Optional
+
+from sqlalchemy.orm import Session
 
 from .....accounts.domain.interfaces.role_repository import RoleRepository
 from .....accounts.domain.role.role import Role
@@ -11,7 +13,7 @@ from ..orm.models import RoleModel
 class SQLRoleRepository(RoleRepository):
     """SQLAlchemy repository for role aggregates."""
 
-    def __init__(self, session_factory) -> None:
+    def __init__(self, session_factory: Callable[[], Session]) -> None:
         self._session_factory = session_factory
 
     def _to_domain(self, record: RoleModel) -> Role:

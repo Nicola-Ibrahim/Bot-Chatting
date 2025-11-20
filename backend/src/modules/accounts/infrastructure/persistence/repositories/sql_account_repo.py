@@ -1,5 +1,7 @@
 import uuid
-from typing import Iterable, Optional
+from typing import Callable, Iterable, Optional
+
+from sqlalchemy.orm import Session
 
 from .....accounts.domain.account.account import Account
 from .....accounts.domain.account.value_objects.account_id import AccountId
@@ -14,7 +16,7 @@ from ..orm.models import AccountModel, CredentialModel, RoleModel
 class SQLAccountRepository(AccountRepository):
     """SQLAlchemy implementation of :class:`AccountRepository`."""
 
-    def __init__(self, session_factory) -> None:
+    def __init__(self, session_factory: Callable[[], Session]) -> None:
         self._session_factory = session_factory
 
     def _to_domain(self, record: AccountModel) -> Account:
