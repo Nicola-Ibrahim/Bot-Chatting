@@ -1,6 +1,6 @@
 'use client';
 
-import { Layout } from '@/components/Layout';
+import { DashboardShell } from '@/components/DashboardShell';
 import { useAppContext } from '@/context/AppContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -21,5 +21,5 @@ export default function DashboardLayout({
 
   if (!user) return null;
 
-  return <Layout>{children}</Layout>;
+  return <DashboardShell>{children}</DashboardShell>;
 }

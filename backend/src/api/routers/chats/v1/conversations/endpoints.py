@@ -72,7 +72,9 @@ async def create_conversation(
     """
     Create a new conversation.
     """
-    command = StartConversationCommand(user_id=UUID(str(request.user_id)), user_name=request.user_name, title=request.title)
+    command = StartConversationCommand(
+        user_id=UUID(str(request.user_id)), user_name=request.user_name, title=request.title
+    )
     result: Result = await chats_module.execute_command_async(command)
     return result.match(
         on_success=_conversation_response,
@@ -132,8 +134,6 @@ async def create_conversation(
 
 
 # TODO: Conversation download endpoint can be reintroduced once supporting query/handlers are implemented.
-
-
 
 
 # @chat_page.route("/")

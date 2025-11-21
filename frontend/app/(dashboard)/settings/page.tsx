@@ -1,9 +1,9 @@
 'use client';
 
-import { SettingsPage } from '@/components/SettingsPage';
+import { SettingsForm } from '@/components/SettingsForm';
 import { useAppContext } from '@/context/AppContext';
 
 export default function Page() {
   const { user } = useAppContext();
-  return <SettingsPage user={user} />;
+  return <SettingsForm user={user} />;
 }

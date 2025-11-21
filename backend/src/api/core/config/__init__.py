@@ -26,5 +26,5 @@ def get_settings() -> ApiSettings:
         return settings_module.Settings()
     except Exception as exc:
         raise ImportError(
-            f"Could not import settings for environment '{env}'. " f"Expected module '{module_path}'"
+            f"Could not import settings for environment '{env}'. Expected module '{module_path}'"
         ) from exc

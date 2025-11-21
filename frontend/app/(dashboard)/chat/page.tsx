@@ -1,14 +1,14 @@
 'use client';
 
-import { ChatPage } from '@/components/ChatPage';
+import { ChatInterface } from '@/components/ChatInterface';
 import { useAppContext } from '@/context/AppContext';
 import { useEffect } from 'react';
 
 export default function Page() {
-  const { 
-    conversations, 
-    currentConversationId, 
-    sendMessage, 
+  const {
+    conversations,
+    currentConversationId,
+    sendMessage,
     updateTitle,
     user,
     createNewConversation
@@ -16,7 +16,7 @@ export default function Page() {
 
   useEffect(() => {
     if (user && !currentConversationId && conversations.length === 0) {
-        createNewConversation();
+      createNewConversation();
     }
   }, [user, currentConversationId, conversations, createNewConversation]);
 
@@ -24,7 +24,7 @@ export default function Page() {
   const isNew = currentMessages.length === 0;
 
   return (
-    <ChatPage
+    <ChatInterface
       messages={currentMessages}
       onSendMessage={sendMessage}
       onUpdateTitle={updateTitle}

@@ -15,6 +15,8 @@ class ProdSettings(ApiSettings):
     # Security-critical overrides
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
+    LOG_USE_JSON: bool = True
+    LOG_USE_COLORS: bool = False
     SECRET_KEY: str = Field(
         default_factory=lambda: secrets.token_urlsafe(64), description="Cryptographic secret for session security"
     )
@@ -50,6 +52,5 @@ class ProdSettings(ApiSettings):
         return (
             str(self.DATABASE_URI)
             if self.DATABASE_URI
-            else f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@"
-            f"{self.DB_DBHOST}:{self.DB_DBPORT}/{self.DB}"
+            else f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_DBHOST}:{self.DB_DBPORT}/{self.DB}"
         )

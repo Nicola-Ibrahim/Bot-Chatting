@@ -1,6 +1,6 @@
 'use client';
 
-import { AuthPage } from '@/components/AuthPage';
+import { AuthForm } from '@/components/AuthForm';
 import { useAppContext } from '@/context/AppContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -15,5 +15,5 @@ export default function Page() {
     }
   }, [user, router]);
 
-  return <AuthPage />;
+  return <AuthForm />;
 }

@@ -10,17 +10,17 @@ interface SidebarProps {
   children: React.ReactNode;
 }
 
-export const Layout: React.FC<SidebarProps> = ({ children }) => {
-  const { 
-    user, 
-    logout, 
-    conversations, 
-    currentConversationId, 
-    setCurrentConversationId, 
-    createNewConversation, 
-    deleteConversation 
+export const DashboardShell: React.FC<SidebarProps> = ({ children }) => {
+  const {
+    user,
+    logout,
+    conversations,
+    currentConversationId,
+    setCurrentConversationId,
+    createNewConversation,
+    deleteConversation
   } = useAppContext();
-  
+
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
@@ -31,11 +31,10 @@ export const Layout: React.FC<SidebarProps> = ({ children }) => {
       <Link
         href={href}
         onClick={() => setIsMobileMenuOpen(false)}
-        className={`flex items-center w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-          isActive
+        className={`flex items-center w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive
             ? 'bg-indigo-600/10 text-indigo-400'
             : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
-        }`}
+          }`}
       >
         <Icon className="w-5 h-5 mr-3" />
         {label}
@@ -60,9 +59,8 @@ export const Layout: React.FC<SidebarProps> = ({ children }) => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 w-72 bg-gray-900 border-r border-gray-800 transform transition-transform duration-300 ease-in-out z-40 lg:transform-none flex flex-col ${
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:flex`}
+        className={`fixed lg:static inset-y-0 left-0 w-72 bg-gray-900 border-r border-gray-800 transform transition-transform duration-300 ease-in-out z-40 lg:transform-none flex flex-col ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:flex`}
       >
         <div className="h-16 flex items-center px-6 border-b border-gray-800/50 hidden lg:flex">
           <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-white">
@@ -98,27 +96,26 @@ export const Layout: React.FC<SidebarProps> = ({ children }) => {
             conversations.map((conv) => (
               <div
                 key={conv.id}
-                className={`group flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors cursor-pointer ${
-                  currentConversationId === conv.id && pathname === '/chat'
+                className={`group flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors cursor-pointer ${currentConversationId === conv.id && pathname === '/chat'
                     ? 'bg-gray-800 text-white'
                     : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200'
-                }`}
+                  }`}
                 onClick={() => {
-                   router.push('/chat');
-                   setCurrentConversationId(conv.id);
-                   setIsMobileMenuOpen(false);
+                  router.push('/chat');
+                  setCurrentConversationId(conv.id);
+                  setIsMobileMenuOpen(false);
                 }}
               >
                 <span className="truncate max-w-[180px]">{conv.title}</span>
                 <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        deleteConversation(conv.id);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-400 transition-opacity"
-                    title="Delete conversation"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteConversation(conv.id);
+                  }}
+                  className="opacity-0 group-hover:opacity-100 p-1 hover:text-red-400 transition-opacity"
+                  title="Delete conversation"
                 >
-                    <X className="w-3 h-3" />
+                  <X className="w-3 h-3" />
                 </button>
               </div>
             ))
@@ -136,7 +133,7 @@ export const Layout: React.FC<SidebarProps> = ({ children }) => {
               Log Out
             </button>
           </div>
-          
+
           {user && (
             <div className="mt-4 flex items-center px-3 pb-2">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
@@ -158,7 +155,7 @@ export const Layout: React.FC<SidebarProps> = ({ children }) => {
 
       {/* Overlay for mobile */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />

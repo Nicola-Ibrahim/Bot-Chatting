@@ -12,6 +12,8 @@ class Settings(ApiSettings):
 
     DEBUG: bool = True
     LOG_LEVEL: str = "DEBUG"
+    LOG_USE_JSON: bool = False
+    LOG_USE_COLORS: bool = True
 
     BACKEND_CORS_ORIGINS: List[str] = Field(
         default=[

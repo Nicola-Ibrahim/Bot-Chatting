@@ -4,24 +4,26 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.modules.accounts.infrastructure.configuration.startup import AccountsStartUp
+from src.modules.chats.infrastructure.configuration.startup import ChatsStartUp
+
 from .core import middleware
 from .core.config import get_settings
 from .core.config.base import ApiSettings
 from .core.exceptions.errors import APIError
 from .core.exceptions.handlers import global_exception_handler
 from .core.utils.routing_helpers import collect_routers
-from src.modules.accounts.infrastructure.configuration.startup import AccountsStartUp
-from src.modules.chats.infrastructure.configuration.startup import ChatsStartUp
 
 
 class APIFactory:
     def __init__(self):
-        self.app: FastAPI
+        self.app: FastAPI | None = None
 
         self.settings: ApiSettings = get_settings()
 
     def create_app(self) -> FastAPI:
         settings = self.settings
+        settings.configure()
 
         @asynccontextmanager
         async def lifespan(app: FastAPI):
@@ -74,10 +76,10 @@ class APIFactory:
             self.create_app()
         uvicorn.run(
             app=self.app,
-            host=self.settings.HOST or "0.0.0.0",
-            port=self.settings.PORT or 8000,
-            reload=self.settings.DEBUG or False,
-            workers=self.settings.WORKERS if not self.settings.DEBUG else 1,
+            host=self.settings.HOST,
+            port=self.settings.PORT,
+            reload=self.settings.DEBUG,
+            workers=self.settings.WORKERS,
             log_level="debug" if self.settings.DEBUG else "info",
             **uvicorn_kwargs,
         )
@@ -107,5 +109,7 @@ class APIFactory:
             self.app.add_exception_handler(error, global_exception_handler)
         self.app.add_exception_handler(Exception, global_exception_handler)
 
-# ASGI app for uvicorn src.api.main:app
-app = APIFactory().create_app()
+
+if __name__ == "__main__":
+    """Convenience entrypoint to start the API via APIFactory.run"""
+    APIFactory().run()

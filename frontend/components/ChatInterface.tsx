@@ -11,11 +11,11 @@ interface ChatPageProps {
   isNewConversation: boolean;
 }
 
-export const ChatPage: React.FC<ChatPageProps> = ({ 
-  messages, 
-  onSendMessage, 
-  onUpdateTitle, 
-  isNewConversation 
+export const ChatInterface: React.FC<ChatPageProps> = ({
+  messages,
+  onSendMessage,
+  onUpdateTitle,
+  isNewConversation
 }) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +45,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     const userMessageText = input.trim();
     setInput('');
     setError(null);
-    
+
     // Reset textarea height
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
 
@@ -54,35 +54,35 @@ export const ChatPage: React.FC<ChatPageProps> = ({
     setIsLoading(true);
 
     try {
-        // Format history for AI
-        // Exclude the very last message which we just added (as we need to pass it as 'newMessage')
-        // However, state updates are async, so relying on 'messages' prop here might be stale or racey.
-        // Better to use the prop messages + the current new message logic.
-        
-        const history = messages.map(m => ({
-            role: m.role === Role.USER ? 'user' : 'model',
-            parts: [{ text: m.content }]
-        }));
+      // Format history for AI
+      // Exclude the very last message which we just added (as we need to pass it as 'newMessage')
+      // However, state updates are async, so relying on 'messages' prop here might be stale or racey.
+      // Better to use the prop messages + the current new message logic.
 
-        // 2. Call API
-        const responseText = await generateChatResponse(history, userMessageText);
+      const history = messages.map(m => ({
+        role: m.role === Role.USER ? 'user' : 'model',
+        parts: [{ text: m.content }]
+      }));
 
-        // 3. Add AI Message
-        onSendMessage(responseText, Role.MODEL);
+      // 2. Call API
+      const responseText = await generateChatResponse(history, userMessageText);
 
-        // 4. Generate Title if it's the first exchange
-        if (isNewConversation && messages.length === 0) {
-            const title = await generateConversationTitle(userMessageText);
-            onUpdateTitle(title);
-        }
+      // 3. Add AI Message
+      onSendMessage(responseText, Role.MODEL);
+
+      // 4. Generate Title if it's the first exchange
+      if (isNewConversation && messages.length === 0) {
+        const title = await generateConversationTitle(userMessageText);
+        onUpdateTitle(title);
+      }
 
     } catch (err: any) {
-        console.error(err);
-        setError(err.message || "Failed to get response from server.");
-        // Optionally add an error message to the chat
-        onSendMessage("Sorry, I encountered an error processing your request.", Role.MODEL);
+      console.error(err);
+      setError(err.message || "Failed to get response from server.");
+      // Optionally add an error message to the chat
+      onSendMessage("Sorry, I encountered an error processing your request.", Role.MODEL);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -114,8 +114,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                   <button
                     key={suggestion}
                     onClick={() => {
-                        setInput(suggestion);
-                        if(textareaRef.current) textareaRef.current.focus();
+                      setInput(suggestion);
+                      if (textareaRef.current) textareaRef.current.focus();
                     }}
                     className="p-3 bg-gray-900/50 border border-gray-800 rounded-xl hover:bg-gray-800 hover:border-gray-700 transition-all text-sm text-gray-300 text-left"
                   >
@@ -130,50 +130,48 @@ export const ChatPage: React.FC<ChatPageProps> = ({
                 key={msg.id}
                 className={`flex gap-4 ${msg.role === Role.USER ? 'flex-row-reverse' : 'flex-row'} animate-slide-up`}
               >
-                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                  msg.role === Role.USER 
-                    ? 'bg-indigo-600 text-white' 
+                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${msg.role === Role.USER
+                    ? 'bg-indigo-600 text-white'
                     : 'bg-emerald-600 text-white'
-                }`}>
+                  }`}>
                   {msg.role === Role.USER ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
                 </div>
-                
+
                 <div className={`flex flex-col max-w-[85%] lg:max-w-[75%] ${msg.role === Role.USER ? 'items-end' : 'items-start'}`}>
-                  <div className={`px-5 py-3.5 rounded-2xl text-sm leading-relaxed shadow-sm ${
-                    msg.role === Role.USER
+                  <div className={`px-5 py-3.5 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.role === Role.USER
                       ? 'bg-gray-800 text-gray-100 rounded-tr-sm'
                       : 'bg-gray-900/50 border border-gray-800 text-gray-200 rounded-tl-sm'
-                  }`}>
+                    }`}>
                     {/* Simple text rendering - In a real app, use ReactMarkdown here */}
                     <div className="whitespace-pre-wrap font-sans">
-                        {msg.content}
+                      {msg.content}
                     </div>
                   </div>
                   <span className="text-xs text-gray-600 mt-1 px-1">
-                    {msg.role === Role.USER ? 'You' : 'Horizon'} • {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    {msg.role === Role.USER ? 'You' : 'Horizon'} • {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               </div>
             ))
           )}
           {isLoading && (
-             <div className="flex gap-4 animate-pulse">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white">
-                   <Bot className="w-5 h-5" />
-                </div>
-                <div className="bg-gray-900/50 border border-gray-800 px-5 py-4 rounded-2xl rounded-tl-sm flex items-center gap-2">
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                </div>
-             </div>
+            <div className="flex gap-4 animate-pulse">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white">
+                <Bot className="w-5 h-5" />
+              </div>
+              <div className="bg-gray-900/50 border border-gray-800 px-5 py-4 rounded-2xl rounded-tl-sm flex items-center gap-2">
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+            </div>
           )}
           {error && (
             <div className="flex items-center justify-center p-4">
-                <div className="bg-red-900/20 border border-red-800 text-red-300 px-4 py-3 rounded-lg flex items-center gap-2 text-sm">
-                    <AlertCircle className="w-4 h-4" />
-                    {error}
-                </div>
+              <div className="bg-red-900/20 border border-red-800 text-red-300 px-4 py-3 rounded-lg flex items-center gap-2 text-sm">
+                <AlertCircle className="w-4 h-4" />
+                {error}
+              </div>
             </div>
           )}
           <div ref={messagesEndRef} />
@@ -203,9 +201,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({
           </button>
         </div>
         <div className="text-center mt-2">
-            <p className="text-[10px] text-gray-600">
-                AI can make mistakes. Check important info.
-            </p>
+          <p className="text-[10px] text-gray-600">
+            AI can make mistakes. Check important info.
+          </p>
         </div>
       </div>
     </div>
