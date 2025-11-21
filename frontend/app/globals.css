@@ -2,16 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-/*
- * Global styles for the chat application.  We set a dark background
- * colour and a light text colour on the html/body elements.  These
- * styles are applied by Tailwind's utility classes via the
- * `@apply` directive.  Additional global resets (e.g. box-sizing)
- * could be added here if needed.
- */
-html,
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #09090b;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
 body {
-  /* Use the panel colour as the base background for the application
-     and the panelLight colour for subtle contrast. */
-  @apply bg-panel text-gray-100 min-h-screen;
+  @apply bg-gray-950 text-gray-50;
 }
