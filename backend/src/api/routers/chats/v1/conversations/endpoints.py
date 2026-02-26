@@ -1,11 +1,12 @@
 from uuid import UUID
 
+from dependency_injector.wiring import Provide
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
-from src.modules.chats.application.conversation_lifecycle.start_conversation.command import StartConversationCommand
-from src.building_blocks.domain.result import Result
-from src.modules.chats.infrastructure.chat_module import ChatsModule
+from src.modules.chats.application.conversation_lifecycle.service import ConversationLifecycleService
+from src.modules.chats.application.conversation_lifecycle.start_conversation_command import StartConversationCommand
+from src.modules.chats.infrastructure.configuration.containers import ChatDIContainer
 
 from .....core.exceptions.errors import APIError
 
@@ -67,19 +68,21 @@ def _raise_api(status_code: int):
 )
 async def create_conversation(
     request: CreateConversationRequest,
-    chats_module: ChatsModule = Depends(ChatsModule),
+    conversation_lifecycle_service: ConversationLifecycleService = Depends(
+        Provide[ChatDIContainer.conversation_lifecycle_service]
+    ),
 ) -> ConversationResponseSchema:
     """
     Create a new conversation.
     """
-    command = StartConversationCommand(
-        user_id=UUID(str(request.user_id)), user_name=request.user_name, title=request.title
-    )
-    result: Result = await chats_module.execute_command_async(command)
-    return result.match(
-        on_success=_conversation_response,
-        on_failure=_raise_api(status.HTTP_400_BAD_REQUEST),
-    )
+    try:
+        command = StartConversationCommand(
+            user_id=UUID(str(request.user_id)), user_name=request.user_name, title=request.title
+        )
+        dto = conversation_lifecycle_service.start(command)
+        return _conversation_response(dto)
+    except Exception as exc:
+        raise APIError(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
 
 # @router.get("/conversations/{conversation_id}")

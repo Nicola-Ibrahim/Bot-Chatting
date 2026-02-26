@@ -35,8 +35,8 @@ class AccountsStartUp:
             self._container.init_resources()
             self._container.wire(
                 packages=[
-                    "src.contexts.accounts.application",
-                    "src.contexts.accounts.module",
+                    "src.modules.accounts.application",
+                    "src.modules.accounts.infrastructure",
                 ]
             )
             return self

@@ -11,16 +11,14 @@ def get_settings() -> ApiSettings:
     Dynamically loads the appropriate settings module based on environment.
     Caches the result for performance.
     """
-    env = (os.getenv("ENV") or os.getenv("APP_ENV", "dev")).lower()
+    env = os.getenv("BACKEND_ENVIRONMENT", "dev").lower()
 
     # __name__ is 'src.api.core.config' when this function is in config/__init__.py
     base_package = __name__  # e.g. "src.api.core.config"
     module_path = f"{base_package}.{env}"  # e.g. "src.api.core.config.dev"
 
     try:
-        print(f"Attempting to load settings module: {module_path}")
         settings_module = import_module(module_path)
-        print(f"Loaded settings module: {module_path}")
         if not hasattr(settings_module, "Settings"):
             raise AttributeError(f"Module '{module_path}' does not define a 'Settings' class")
         return settings_module.Settings()

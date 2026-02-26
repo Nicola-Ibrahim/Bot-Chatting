@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config, pool
@@ -8,22 +9,28 @@ from alembic import context
 # access to the values within the .ini file in use.
 config = context.config
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+# Overwrite sqlalchemy.url with environment variable if present
+# Handle async driver if present by switching to psycopg2 for migrations
+db_url = os.getenv("DATABASE_URL")
+if db_url:
+    if "+asyncpg" in db_url:
+        db_url = db_url.replace("+asyncpg", "+psycopg2")
+    config.set_main_option("sqlalchemy.url", db_url)
+
+# Only interpret the config file for logging if it's actually an .ini file.
+# If using pyproject.toml, config_file_name will be "pyproject.toml",
+# which fileConfig cannot parse.
+if config.config_file_name and config.config_file_name.endswith(".ini"):
+    try:
+        fileConfig(config.config_file_name)
+    except Exception:
+        pass
 
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-# Import the SQLAlchemy metadata for autogeneration.  The Base class
-# lives in ``src.database.models.model`` and includes the declarative
-# base along with our custom ``User`` model.  Alembic will inspect
-# ``Base.metadata`` to generate migration scripts.
-from backend.src.database.models.models import Base
-
-target_metadata = Base.metadata
+target_metadata = None
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

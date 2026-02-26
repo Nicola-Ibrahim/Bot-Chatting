@@ -5,6 +5,7 @@ from typing import Any
 from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class ApiSettings(BaseSettings):
     """Main application settings with environment-aware configuration"""
 
@@ -12,9 +13,11 @@ class ApiSettings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        env_prefix="APP_",
+        env_prefix="BACKEND_",
         case_sensitive=True,
         extra="ignore",
+        env_ignore_empty=True,
+        env_file_optional=True,
     )
 
     # Application Metadata
@@ -52,7 +55,6 @@ class ApiSettings(BaseSettings):
 
     def logging_dict_config(self, log_level: str) -> dict[str, Any]:
         """Return dictConfig ready logging configuration for the environment."""
-        formatter_name = "json" if self.LOG_USE_JSON else "default"
         handler_name = "json_console" if self.LOG_USE_JSON else "console"
 
         return {

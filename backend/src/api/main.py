@@ -110,6 +110,9 @@ class APIFactory:
         self.app.add_exception_handler(Exception, global_exception_handler)
 
 
+app = APIFactory().create_app()
+
+
 if __name__ == "__main__":
     """Convenience entrypoint to start the API via APIFactory.run"""
     APIFactory().run()

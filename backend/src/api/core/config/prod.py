@@ -2,6 +2,7 @@ import secrets
 from typing import List, Optional
 
 from pydantic import Field, PostgresDsn, RedisDsn
+from pydantic_settings import SettingsConfigDict
 
 from .base import ApiSettings
 
@@ -41,10 +42,12 @@ class ProdSettings(ApiSettings):
     # Rate limiting
     RATE_LIMIT_PER_MINUTE: int = 100
 
-    class Config(ApiSettings.Config):
-        env_file = ".env.prod"
-        env_file_encoding = "utf-8"
-        extra = "forbid"  # Strict validation in production
+    model_config = SettingsConfigDict(
+        env_file_encoding="utf-8",
+        env_prefix="BACKEND_",
+        case_sensitive=True,
+        extra="forbid",  # Strict validation in production
+    )
 
     @property
     def sqlalchemy_database_uri(self) -> str:

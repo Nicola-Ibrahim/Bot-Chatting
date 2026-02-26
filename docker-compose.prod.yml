@@ -1,31 +1,16 @@
 services:
   app:
-    image: myfastapi:latest # Uses a pre-built FastAPI image for production (no build required)
+    image: bot-chat-backend
+    container_name: bot-chat-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: runner # select the runner stage from the Dockerfile
     environment:
-      - DATABASE_URL=${DATABASE_URL} # Use an external database URL (ensure this is set in your environment)
-    expose:
-      - "8000"
+      - BACKEND_ENVIRONMENT=prod
     networks:
-      - internal_network # Use a single internal network for all services
-    restart: always # Ensure the service restarts on failure for reliability
-
-  # Frontend service for production.  The Next.js UI is built from
-  # the `frontend` directory and served on port 3000.  It points to
-  # the backend on the same Docker network.  This service can be
-  # fronted by an external load balancer or reverse proxy if
-  # required.
-
-  nginx:
-    image: nginx:latest # Production NGINX image for reverse proxy
-    volumes:
-      - ./nginx/default.prod.conf:/etc/nginx/conf.d/default.conf # Production NGINX configuration file
-    ports:
-      - "80:80" # Expose port 80 to the public for HTTP traffic
-    depends_on:
-      - app # Ensure FastAPI app is running before NGINX starts
-    networks:
-      - internal_network # Use the same internal network for communication
-    restart: always # Automatically restart NGINX in case of failure
+      - front_tier_network
+    restart: always
 
   # -----------------------------------------------------------------------------
   # Frontend service
@@ -36,19 +21,42 @@ services:
   # application on port 3000.  The `BACKEND_URL` environment variable
   # points to the backend service on the internal Docker network.
   frontend:
+    image: bot-chat-frontend
+    container_name: bot-chat-frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: runner # select the runner stage from the Dockerfile
     environment:
-      - BACKEND_URL=http://app:8000
       - NODE_ENV=production
-    ports:
-      - "3000:3000"
     depends_on:
       - app
     networks:
-      - internal_network
+      - front_tier_network
+    restart: always # Ensure the service restarts on failure for reliability
+
+  # Frontend service for production.  The Next.js UI is built from
+  # the `frontend` directory and served on port 3000.  It points to
+  # the backend on the same Docker network.  This service can be
+  # fronted by an external load balancer or reverse proxy if
+  # required.
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: bot-chat-nginx
+    volumes:
+      - ./infra/nginx/default.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./infra/ssl:/etc/nginx/ssl:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
+      - frontend
+    networks:
+      - front_tier_network
     restart: always
 
 networks:
-  internal_network: # Single internal network for all services
+  front_tier_network:
+    driver: bridge

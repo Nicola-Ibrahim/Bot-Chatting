@@ -1,7 +1,5 @@
 """JWT authentication utilities for the accounts module."""
 
-from __future__ import annotations
-
 import base64
 import hashlib
 import hmac
@@ -106,8 +104,8 @@ def get_current_user(
             detail="Invalid token payload",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    from src.modules.accounts.infrastructure.configuration.startup import AccountsStartUp
     from src.modules.accounts.domain.aggregates.account.account import Account as DomainUser
+    from src.modules.accounts.infrastructure.configuration.startup import AccountsStartUp
 
     AccountsStartUp.initialize()
     service = AccountsStartUp.service
@@ -140,8 +138,8 @@ def get_current_user_optional(
             detail="Invalid token payload",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    from src.modules.accounts.infrastructure.configuration.startup import AccountsStartUp
     from src.modules.accounts.domain.aggregates.account.account import Account as DomainUser
+    from src.modules.accounts.infrastructure.configuration.startup import AccountsStartUp
 
     AccountsStartUp.initialize()
     service = AccountsStartUp.service
@@ -158,14 +156,3 @@ def get_current_user_optional(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
-
-
-__all__ = [
-    "SECRET_KEY",
-    "ALGORITHM",
-    "ACCESS_TOKEN_EXPIRE_MINUTES",
-    "create_access_token",
-    "decode_access_token",
-    "get_current_user",
-    "get_current_user_optional",
-]

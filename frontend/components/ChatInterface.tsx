@@ -131,16 +131,16 @@ export const ChatInterface: React.FC<ChatPageProps> = ({
                 className={`flex gap-4 ${msg.role === Role.USER ? 'flex-row-reverse' : 'flex-row'} animate-slide-up`}
               >
                 <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${msg.role === Role.USER
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-emerald-600 text-white'
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-emerald-600 text-white'
                   }`}>
                   {msg.role === Role.USER ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
                 </div>
 
                 <div className={`flex flex-col max-w-[85%] lg:max-w-[75%] ${msg.role === Role.USER ? 'items-end' : 'items-start'}`}>
                   <div className={`px-5 py-3.5 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.role === Role.USER
-                      ? 'bg-gray-800 text-gray-100 rounded-tr-sm'
-                      : 'bg-gray-900/50 border border-gray-800 text-gray-200 rounded-tl-sm'
+                    ? 'bg-gray-800 text-gray-100 rounded-tr-sm'
+                    : 'bg-gray-900/50 border border-gray-800 text-gray-200 rounded-tl-sm'
                     }`}>
                     {/* Simple text rendering - In a real app, use ReactMarkdown here */}
                     <div className="whitespace-pre-wrap font-sans">

@@ -1,1 +1,0 @@
-"""Rename an existing conversation."""

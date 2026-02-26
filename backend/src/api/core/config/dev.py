@@ -31,9 +31,11 @@ class Settings(ApiSettings):
 
     # Dev-specific config (e.g. different env file)
     model_config = SettingsConfigDict(
-        env_file=".env.dev",
+        env_file=".env",
         env_file_encoding="utf-8",
-        env_prefix="APP_",
+        env_prefix="BACKEND_",
         case_sensitive=True,
         extra="ignore",
+        env_ignore_empty=True,
+        env_file_optional=True,
     )

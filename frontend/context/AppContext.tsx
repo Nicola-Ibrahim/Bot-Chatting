@@ -18,25 +18,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setUser(loggedInUser);
     // Mock initial data
     setConversations([
-        {
-            id: '1',
-            title: 'Introduction to Horizon',
-            messages: [
-                { id: 'm1', role: Role.USER, content: 'Hello!', timestamp: new Date(Date.now() - 100000) },
-                { id: 'm2', role: Role.MODEL, content: 'Welcome to Horizon Chat! How can I assist you today?', timestamp: new Date(Date.now() - 90000) }
-            ],
-            updatedAt: new Date()
-        }
+      {
+        id: '1',
+        title: 'Introduction to Horizon',
+        messages: [
+          { id: 'm1', role: Role.USER, content: 'Hello!', timestamp: new Date(Date.now() - 100000) },
+          { id: 'm2', role: Role.MODEL, content: 'Welcome to Horizon Chat! How can I assist you today?', timestamp: new Date(Date.now() - 90000) }
+        ],
+        updatedAt: new Date()
+      }
     ]);
     router.push('/chat');
   };
 
   const guestLogin = () => {
     const guestUser: UserProfile = {
-        id: 'guest-' + generateId(),
-        name: 'Guest User',
-        email: 'guest@horizon.ai',
-        isGuest: true
+      id: 'guest-' + generateId(),
+      name: 'Guest User',
+      email: 'guest@horizon.ai',
+      isGuest: true
     };
     setUser(guestUser);
     setConversations([]);
@@ -64,42 +64,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const sendMessage = (text: string, role: Role) => {
     if (!currentConversationId) {
-        createNewConversation();
-        // Note: In a strictly async real-world scenario, we'd handle the message queuing here.
-        // For this mock, if ID is null, next render will fix it, but let's not break logic.
-        return; 
+      createNewConversation();
+      // Note: In a strictly async real-world scenario, we'd handle the message queuing here.
+      // For this mock, if ID is null, next render will fix it, but let's not break logic.
+      return;
     }
 
     setConversations(prev => prev.map(conv => {
-        if (conv.id === currentConversationId) {
-            const newMessage: Message = {
-                id: generateId(),
-                role,
-                content: text,
-                timestamp: new Date()
-            };
-            return {
-                ...conv,
-                messages: [...conv.messages, newMessage],
-                updatedAt: new Date()
-            };
-        }
-        return conv;
+      if (conv.id === currentConversationId) {
+        const newMessage: Message = {
+          id: generateId(),
+          role,
+          content: text,
+          timestamp: new Date()
+        };
+        return {
+          ...conv,
+          messages: [...conv.messages, newMessage],
+          updatedAt: new Date()
+        };
+      }
+      return conv;
     }));
   };
 
   const updateTitle = (title: string) => {
-      if (!currentConversationId) return;
-      setConversations(prev => prev.map(conv => 
-        conv.id === currentConversationId ? { ...conv, title } : conv
-      ));
+    if (!currentConversationId) return;
+    setConversations(prev => prev.map(conv =>
+      conv.id === currentConversationId ? { ...conv, title } : conv
+    ));
   };
 
   const deleteConversation = (id: string) => {
-      setConversations(prev => prev.filter(c => c.id !== id));
-      if (currentConversationId === id) {
-          setCurrentConversationId(null);
-      }
+    setConversations(prev => prev.filter(c => c.id !== id));
+    if (currentConversationId === id) {
+      setCurrentConversationId(null);
+    }
   };
 
   return (

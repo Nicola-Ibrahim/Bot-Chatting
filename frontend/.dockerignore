@@ -1,61 +1,47 @@
-# Dependencies / package managers (install inside the image)
-node_modules
-npm-debug.log
+# --- Dependencies ---
+node_modules/
 npm-debug.log*
-yarn.lock
-pnpm-lock.yaml
-.pnpm-store
-
-# Build output (rebuilt in the image)
-.next
-.next/cache
-out
-dist
-
-# Logs
-logs
-*.log
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+.pnpm-store/
+.npm/
 
-# Test / coverage artifacts
-coverage
-.cypress
-cypress/screenshots
-cypress/videos
-playwright-report
-test-results
+# --- Build & Output ---
+.next/
+# Specifically exclude the cache but KEEP the build if needed elsewhere
+# However, for multi-stage, we rebuild this anyway
+out/
+dist/
+.turbo/
+.vercel/
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Editor / IDE
-.vscode
-.idea
-*.swp
-*.swo
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Git
-.git
+# --- Environmental & Secrets ---
+.env
+.env*.local
+.git/
 .gitignore
 
-# Env files (don’t bake secrets into images)
-.env
-.env.*
+# --- Testing ---
+coverage/
+test-results/
+playwright-report/
+cypress/screenshots/
+cypress/videos/
 
-# Deployment / build tooling
-.vercel
-.turbo
+# --- IDE & OS Junk ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
 
-# Docker config
+# --- Docker ---
 Dockerfile
-docker-compose.yml
-docker-compose.dev.yml
+docker-compose*.yml
+.dockerignore
+
+# --- Documentation ---
+README.md
+*.md
+LICENSE

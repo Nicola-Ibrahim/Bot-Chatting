@@ -1,8 +1,9 @@
+import logging
+
 from src.paths import EXTERNAL_DATA_DIR, PROCESSED_DATA_DIR
 
 from ..processing.document import DocumentProcessor
 from .di.containers import (
-    LLMBackendContainer,
     LLMDIContainer,  # your DI container for LLM runtime
 )
 
@@ -57,10 +58,10 @@ class LLMsStartUp:
             # expected: {"default": "...", "providers": {...}}
             self._container.config.from_dict(config)
             self._container.init_resources()
+
             self._container.wire(
                 packages=[
-                    "src.contexts.llm_backend.application",
-                    "src.contexts.llm_backend.module",
+                    "src.modules.llm_backend.application",
                 ]
             )
             self._log.info("LLM module initialized")

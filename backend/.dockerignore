@@ -1,27 +1,45 @@
+# --- Version Control & IDEs ---
+.git
+.gitignore
+.vscode
+.idea
+.vs
+*.swp
+
+# --- Python & uv Junk ---
 **/__pycache__
 **/.venv
-**/.classpath
-**/.dockerignore
-**/.env
-**/.git
-**/.gitignore
-**/.project
-**/.settings
-**/.toolstarget
-**/.vs
-**/.vscode
-**/*.*proj.user
-**/*.dbmdl
-**/*.jfm
-**/bin
-**/charts
-**/docker-compose*
-**/compose*
-**/Dockerfile*
+.venv
+.venv/
+venv/
+env/
+**/.pytest_cache
+**/.ruff_cache
+**/.uv
+uv.cache/
+*.pyc
+*.pyo
+*.egg-info/
+htmlcov/
+coverage.xml
+.coverage
+
+# --- Secrets (CRITICAL) ---
+.env*
+**/secrets.*
+**/values.*.yaml
+
+# --- Other Project Bloat ---
 **/node_modules
-**/npm-debug.log
+**/bin
 **/obj
-**/secrets.dev.yaml
-**/values.dev.yaml
+**/docker-compose*
+**/Dockerfile*
+
+# --- Documentation ---
+docs/
+
+# --- Artifacts ---
 LICENSE
 README.md
+*.md

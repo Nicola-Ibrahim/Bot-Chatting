@@ -32,8 +32,8 @@ export const DashboardShell: React.FC<SidebarProps> = ({ children }) => {
         href={href}
         onClick={() => setIsMobileMenuOpen(false)}
         className={`flex items-center w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive
-            ? 'bg-indigo-600/10 text-indigo-400'
-            : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
+          ? 'bg-indigo-600/10 text-indigo-400'
+          : 'text-gray-400 hover:text-gray-200 hover:bg-gray-800/50'
           }`}
       >
         <Icon className="w-5 h-5 mr-3" />
@@ -97,8 +97,8 @@ export const DashboardShell: React.FC<SidebarProps> = ({ children }) => {
               <div
                 key={conv.id}
                 className={`group flex items-center justify-between w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors cursor-pointer ${currentConversationId === conv.id && pathname === '/chat'
-                    ? 'bg-gray-800 text-white'
-                    : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200'
+                  ? 'bg-gray-800 text-white'
+                  : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200'
                   }`}
                 onClick={() => {
                   router.push('/chat');
